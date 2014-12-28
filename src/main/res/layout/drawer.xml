@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/drawer"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="300dp"
+    android:layout_height="match_parent"
+    android:layout_gravity="start"
+    android:background="@color/material_blue_grey_900"
+    android:clickable="true"
+    android:orientation="vertical"
+    android:padding="10dp"
+    >
+
+    <TextView
+        android:id="@+id/favoriteBoardsBtn"
+        style="@style/Widget.Chanobol.Drawer.Entry"
+        android:text="Favorite Boards"
+        />
+
+    <TextView
+        android:id="@+id/allBoards"
+        style="@style/Widget.Chanobol.Drawer.Entry"
+        android:text="All Boards"
+        />
+
+    <TextView
+        android:id="@+id/settings"
+        style="@style/Widget.Chanobol.Drawer.Entry"
+        android:text="Settings"
+        />
+
+    <TextView
+        android:id="@+id/debugSettings"
+        style="@style/Widget.Chanobol.Drawer.Entry"
+        android:text="Debug Settings"
+        android:visibility="gone"
+        />
+
+    <android.support.v7.internal.widget.CompatTextView
+        style="@style/Widget.Chanobol.Drawer.Header"
+        android:text="Favorite Boards"
+        />
+
+    <ListView
+        android:id="@+id/favoriteBoards"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:choiceMode="singleChoice"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="0dp"
+        />
+</LinearLayout>

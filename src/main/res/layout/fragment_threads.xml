@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<GridView
+    android:id="@+id/threads"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/cardview_dark_background"
+    android:clipToPadding="false"
+    android:columnWidth="120dp"
+    android:gravity="center"
+    android:horizontalSpacing="10dp"
+    android:padding="10dp"
+    android:numColumns="auto_fit"
+    android:scrollbarStyle="outsideOverlay"
+    android:stretchMode="columnWidth"
+    android:verticalSpacing="10dp"
+    />
+

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<anabolicandroids.chanobol.ui.boards.BoardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="180dp"
+    android:layout_gravity="top"
+    app:cardBackgroundColor="@color/background_floating_material_dark"
+    >
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="5dp"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            tools:text="fit"
+            />
+
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            />
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="5dp"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="13sp"
+            tools:text="Fitness"
+            />
+
+    </LinearLayout>
+
+</anabolicandroids.chanobol.ui.boards.BoardView>

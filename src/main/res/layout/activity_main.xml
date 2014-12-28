@@ -1,0 +1,55 @@
+<android.support.v4.widget.DrawerLayout
+    android:id="@+id/drawerLayout"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context=".MainActivity"
+        >
+
+        <RelativeLayout
+            android:id="@+id/container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            >
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/material_blue_grey_800"
+                android:elevation="4dp"
+                app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                />
+            <!-- Why the hell is a space here >:(!!!! -->
+            <ProgressBar
+                android:id="@+id/loadingBar"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="-7dp"
+                android:indeterminate="true"
+                android:visibility="gone"
+                />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+    <include layout="@layout/drawer"/>
+
+</android.support.v4.widget.DrawerLayout>
+

@@ -1,0 +1,82 @@
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:1.0.0'
+    }
+}
+
+def versionMajor = 1
+def versionMinor = 0
+def versionPatch = 0
+def versionBuild = 0
+
+apply plugin: 'com.android.application'
+
+repositories {
+    jcenter()
+}
+
+dependencies {
+    compile 'com.android.support:support-v4:21.0.+'
+    compile 'com.android.support:appcompat-v7:21.0.+'
+    compile 'com.android.support:cardview-v7:21.0.+'
+    compile 'com.android.support:recyclerview-v7:21.0.+'
+    compile 'com.android.support:gridlayout-v7:21.0.+'
+    compile 'com.nineoldandroids:library:2.4.0'
+
+    compile 'com.squareup.dagger:dagger:1.2.2'
+    provided 'com.squareup.dagger:dagger-compiler:1.2.2'
+
+    compile 'com.jakewharton:butterknife:6.0.0'
+    compile 'com.jakewharton.timber:timber:2.5.0'
+
+    compile 'com.squareup.okhttp:okhttp:2.1.0'
+    compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
+    compile 'com.squareup.picasso:picasso:2.4.0'
+    compile 'com.squareup.retrofit:retrofit:1.7.1'
+    debugCompile 'com.squareup.retrofit:retrofit-mock:1.8.0'
+
+    compile 'com.felipecsl:gifimageview:1.0.6'
+    compile "commons-io:commons-io:2.4"
+    compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
+}
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.2"
+
+    defaultConfig {
+        applicationId "anabolicandroids.chanobol"
+        minSdkVersion 9
+        targetSdkVersion 21
+
+        versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
+        versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+    }
+    // http://stackoverflow.com/a/21020469/283607
+    signingConfigs {
+        release {
+            storeFile file(RELEASE_STORE_FILE)
+            storePassword RELEASE_STORE_PASSWORD
+            keyAlias RELEASE_KEY_ALIAS
+            keyPassword RELEASE_KEY_PASSWORD
+        }
+    }
+    buildTypes {
+        debug {
+            applicationIdSuffix '.dev'
+            versionNameSuffix '-dev'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+    lintOptions {
+        disable 'InvalidPackage'
+    }
+}
+
