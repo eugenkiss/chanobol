@@ -10,6 +10,7 @@ import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
 import android.util.AttributeSet;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -26,8 +27,10 @@ import butterknife.InjectView;
 import timber.log.Timber;
 
 public class PostView extends CardView {
+    @InjectView(R.id.header) ViewGroup header;
     @InjectView(R.id.id) TextView id;
     @InjectView(R.id.date) TextView date;
+    @InjectView(R.id.repliesContainer) ViewGroup repliesContainer;
     @InjectView(R.id.replies) TextView replies;
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.progressbar) ProgressBar progress;
@@ -49,8 +52,8 @@ public class PostView extends CardView {
     }
 
     private void reset() {
-        replies.setVisibility(View.GONE);
-        replies.setOnClickListener(null);
+        repliesContainer.setVisibility(View.GONE);
+        header.setOnClickListener(null);
         image.setVisibility(View.GONE);
         image.setImageBitmap(null);
         image.setOnClickListener(null);
@@ -82,9 +85,9 @@ public class PostView extends CardView {
         id.setText(post.id);
         date.setText(post.date);
         if (post.postReplies != 0) {
-            replies.setVisibility(View.VISIBLE);
-            replies.setText("" + post.postReplies);
-            replies.setOnClickListener(new OnClickListener() {
+            repliesContainer.setVisibility(View.VISIBLE);
+            replies.setText(post.postReplies + "r");
+            header.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     repliesCallback.onClick(post);

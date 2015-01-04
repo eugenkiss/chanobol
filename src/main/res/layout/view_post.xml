@@ -15,6 +15,7 @@
         >
 
         <LinearLayout
+            android:id="@+id/header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:background="#393939"
@@ -49,15 +50,30 @@
                 android:layout_weight="1"
                 />
 
-            <Button
-                android:id="@+id/replies"
-                style="?android:attr/buttonStyleSmall"
+            <LinearLayout
+                android:id="@+id/repliesContainer"
                 android:layout_width="wrap_content"
-                android:layout_height="33dp"
-                android:padding="5dp"
-                android:text="3"
-                android:textSize="16sp"
-                />
+                android:layout_height="match_parent"
+                android:layout_gravity="center"
+                android:orientation="horizontal"
+                >
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="match_parent"
+                    android:paddingRight="8dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_replies"
+                    />
+
+                <TextView
+                    android:id="@+id/replies"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:text="3r"
+                    android:textSize="16sp"
+                    />
+            </LinearLayout>
         </LinearLayout>
 
         <FrameLayout
