@@ -198,7 +198,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         startFragment(dialog, PostsDialog.STACK_ID);
     }
 
-    public static Pattern postReferencePattern = Pattern.compile("#p(\\d{8})");
+    public static Pattern postReferencePattern = Pattern.compile("#p(\\d+)");
     // http://stackoverflow.com/a/6020436/283607
     private static LinkedHashSet<String> referencedPosts(Post post) {
         LinkedHashSet<String> refs = new LinkedHashSet<>();
