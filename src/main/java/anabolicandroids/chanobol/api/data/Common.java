@@ -48,7 +48,7 @@ public abstract class Common {
     public String filename;
 
     @SerializedName("fsize")
-    public int filesize;
+    public long filesize;
 
     @SerializedName("semantic_url")
     public String semanticUrl;

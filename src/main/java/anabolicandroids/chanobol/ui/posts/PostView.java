@@ -24,7 +24,6 @@ import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import timber.log.Timber;
 
 public class PostView extends CardView {
     @InjectView(R.id.header) ViewGroup header;
@@ -105,8 +104,13 @@ public class PostView extends CardView {
         String r = (s + t)
                 .replaceAll("<span class=\"quote\">", "<font color=\"#23b423\">")
                 .replaceAll("</span>", "</font>");
-        Timber.i(r);
         setTextViewHTML(post.id, text, r, referencedPostCallback);
+
+        if (post.imageId != null && !"null".equals(post.imageId)) {
+            footer.setVisibility(VISIBLE);
+            footer.setText(String.format("%dx%d ~ %s ~ %s%s", post.imageWidth, post.imageHeight,
+                    Util.readableFileSize(post.filesize), post.filename, post.imageExtension));
+        }
     }
 
     // http://stackoverflow.com/a/19989677/283607
@@ -170,7 +174,6 @@ public class PostView extends CardView {
 
             final int[] size = new int[3]; calcSize(size, post);
             progress.setVisibility(View.VISIBLE);
-            footer.setVisibility(View.VISIBLE);
             image.setVisibility(View.VISIBLE);
             image.getLayoutParams().height = size[H0];
             // TODO: Load the image and thumbnail in parallel into the imageView but cancel

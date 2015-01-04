@@ -23,6 +23,7 @@ import com.nineoldandroids.animation.ValueAnimator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,14 @@ public class Util {
         for (Object o : others) list.add(o);
         list.addAll(base);
         return list;
+    }
+
+    // http://stackoverflow.com/a/5599842
+    public static String readableFileSize(long size) {
+        if(size <= 0) return "0";
+        final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
+        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
     }
 
     public static void setAlpha(View view, float alpha) {
