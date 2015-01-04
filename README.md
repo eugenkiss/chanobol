@@ -16,6 +16,7 @@ Chanobol
 Chanobol is a 4Chan reader app on steroids\* inspired by [Chanu][].
 
 [Get the apk!](https://dl.dropboxusercontent.com/u/2862859/chanobol-release.apk).
+[Some Screenshots](http://imgur.com/a/e2dX9).
 
 <sup>\*Steroids being the employed libraries like Dagger, Retrofit and so on.</sup>
 
