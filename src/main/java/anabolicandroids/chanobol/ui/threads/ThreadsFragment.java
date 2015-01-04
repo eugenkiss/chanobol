@@ -110,6 +110,12 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     }
 
     @Override
+    public void onStop() {
+        super.onPause();
+        pauseUpdating = true;
+    }
+
+    @Override
     protected void load() {
         super.load();
         service.listThreads(name, new Callback<List<ChanService.Threads>>() {
