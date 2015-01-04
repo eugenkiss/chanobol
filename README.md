@@ -100,13 +100,12 @@ subfolder `app` because that extra indirection is not needed for Chanobol.
 The high-level code structure is very much inspired by [u2020][]. There is a
 debug and a release [build type][Build Types]. The debug build type has a mock
 mode just like [u2020][] where server requests are mocked to return data from
-the debug build type's assets folder. Instead of a debug drawer like in
-[u2020][] Chanobol employs a debug preference activity which can be openend from
-the drawer. This functionality and more is made possible by the Dependency
-Injection framework [Dagger][]. Chanobol has an `AppModule` which contains
-application-level or rather global dependenices, and `ApiModule` for server-
-related dependencies and an `UiModule` for fragment- and activity-related
-dependencies. The package structure follows the module structure. The debug
+the debug build type's assets folder. Instead of a debug drawer like in [u2020][] 
+Chanobol employs a debug preference activity which can be openend from the drawer. 
+Dependencies are injected with [Dagger][]. Chanobol has an `AppModule` which contains
+application-level or rather global dependenices, and `ApiModule` for server-related 
+dependencies and a scoped `UiModule` for fragment- and activity-related
+dependencies. The package structure roughly follows the module structure. The debug
 build type overwrites some module definitions in `DebugAppModule`. The top-level
 package contains a couple of `Base`*X* classes which mainly hide some Dagger-related
 injection boilerplate. `BindableAdapter` is inspired by [Jacke Wharton's
@@ -115,14 +114,15 @@ pattern and instead custom view classes like `PostView` are used. The classes
 `UiFragment` and `SwipeRefreshFragment` in the `ui` package contain code which
 is shared by most of the concrete fragments.
 
-Chanobol can be seen as UI for the [4Chan API][API]. To this end, [Retrofit][],
+Chanobol can be seen as a UI for the [4Chan API][API]. To this end, [Retrofit][],
 [OkHttp][] and [Picasso][] are employed. With Retrofit 4Chan's API is mapped to
 the interface `ChanService` in the `api` package. OkHttp is an HTTP client which
 takes care of e.g. response caching. Picasso takes care of loading and
 displaying images.
 
 Why fragments over activites? It's easier to communicate / pass complex data
-between fragments than between activites. There are many more arguments in favor
+between fragments than between activites. It's also more natural to use fragments
+for a navigation drawer based UI. There are many more arguments in favor
 of fragments that a Google search will reveal.
 
 Why static factory methods for fragment creation? Actually, I could have used
