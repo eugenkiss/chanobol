@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
+import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
@@ -82,7 +83,8 @@ public class PostView extends CardView {
                           final PostsFragment.RepliesCallback repliesCallback,
                           final PostsFragment.ReferencedPostCallback referencedPostCallback) {
         id.setText(post.id);
-        date.setText(post.date);
+        date.setText(DateUtils.getRelativeTimeSpanString(
+                post.time * 1000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS));
         if (post.postReplies != 0) {
             repliesContainer.setVisibility(View.VISIBLE);
             replies.setText(post.postReplies + "r");
