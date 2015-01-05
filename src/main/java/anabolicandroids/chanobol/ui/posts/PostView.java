@@ -10,6 +10,7 @@ import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.URLSpan;
 import android.util.AttributeSet;
+import android.util.Patterns;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -102,8 +103,11 @@ public class PostView extends CardView {
         String t = post.text;
         if (t == null) t = "";
 
-        // TODO: Make it all more performant and bulletproof
+        // TODO: I'd love to use a more principled approach
         String r = (s + t)
+                .replaceAll("<wbr>", "")
+                // TODO: I simply want to turn all plain text urls into links without matching urls that are assigned to a href attribute
+                .replaceAll("(?!href=\")("+Patterns.WEB_URL.pattern()+")", "<a href=\"$1\">$1</a>")
                 .replaceAll("<span class=\"quote\">", "<font color=\"#23b423\">")
                 .replaceAll("</span>", "</font>");
         setTextViewHTML(post.id, text, r, referencedPostCallback);
@@ -123,6 +127,7 @@ public class PostView extends CardView {
         SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
         URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
         for(final URLSpan span : urls) {
+            if (!span.getURL().startsWith("#p")) continue;
             int start = strBuilder.getSpanStart(span);
             int end = strBuilder.getSpanEnd(span);
             int flags = strBuilder.getSpanFlags(span);
