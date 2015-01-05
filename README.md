@@ -15,9 +15,6 @@ Chanobol
 
 Chanobol is a 4Chan reader app on steroids\* inspired by [Chanu][].
 
-[Get the apk!](https://dl.dropboxusercontent.com/u/2862859/chanobol-release.apk).
-[Some Screenshots](http://imgur.com/a/e2dX9).
-
 <sup>\*Steroids being the employed libraries like Dagger, Retrofit and so on.</sup>
 
 
@@ -101,10 +98,10 @@ subfolder `app` because that extra indirection is not needed for Chanobol.
 The high-level code structure is very much inspired by [u2020][]. There is a
 debug and a release [build type][Build Types]. The debug build type has a mock
 mode just like [u2020][] where server requests are mocked to return data from
-the debug build type's assets folder. Instead of a debug drawer like in [u2020][] 
-Chanobol employs a debug preference activity which can be openend from the drawer. 
+the debug build type's assets folder. Instead of a debug drawer like in [u2020][]
+Chanobol employs a debug preference activity which can be openend from the drawer.
 Dependencies are injected with [Dagger][]. Chanobol has an `AppModule` which contains
-application-level or rather global dependenices, and `ApiModule` for server-related 
+application-level or rather global dependenices, and `ApiModule` for server-related
 dependencies and a scoped `UiModule` for fragment- and activity-related
 dependencies. The package structure roughly follows the module structure. The debug
 build type overwrites some module definitions in `DebugAppModule`. The top-level
