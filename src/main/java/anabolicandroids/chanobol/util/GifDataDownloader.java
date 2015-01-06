@@ -18,10 +18,12 @@ import java.net.URLDecoder;
 
 // https://github.com/felipecsl/GifImageView/blob/master/app/src/main/java/com/felipecsl/gifimageview/app
 public class GifDataDownloader extends AsyncTask<String, Void, byte[]> {
+    private OkHttpClient client;
 
     private static final String TAG = "GifDataDownloader";
 
-    public GifDataDownloader() {
+    public GifDataDownloader(OkHttpClient client) {
+        this.client = client;
     }
 
     @Override
@@ -33,7 +35,7 @@ public class GifDataDownloader extends AsyncTask<String, Void, byte[]> {
 
         byte[] gif = null;
         try {
-            gif = ByteArrayHttpClient.get(gifUrl);
+            gif = ByteArrayHttpClient.get(client, gifUrl);
         } catch (OutOfMemoryError e) {
             Log.e(TAG, "GifDecode OOM: " + gifUrl, e);
         }
@@ -44,9 +46,8 @@ public class GifDataDownloader extends AsyncTask<String, Void, byte[]> {
 
 class ByteArrayHttpClient {
     private static final String TAG = "ByteArrayHttpClient";
-    private static OkHttpClient client = new OkHttpClient();
 
-    public static byte[] get(final String urlString) {
+    public static byte[] get(OkHttpClient client, final String urlString) {
         InputStream in = null;
         try {
             final String decodedUrl = URLDecoder.decode(urlString, "UTF-8");

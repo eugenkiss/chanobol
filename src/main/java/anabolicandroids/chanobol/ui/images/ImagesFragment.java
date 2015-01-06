@@ -47,12 +47,15 @@ public class ImagesFragment extends UiFragment {
         imageView.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         imageView.setImageDrawable(image);
         String[] imageIdAndExt = imageIdAndExts.get(index).split("\\.");
-        final String url = ApiModule.imgUrl(boardName, imageIdAndExt[0], imageIdAndExt[1]);
-        picasso
-                .load(url)
-                .noPlaceholder()
-                .noFade()
-                .into(imageView);
+        final String url = ApiModule.imgUrl(boardName, imageIdAndExt[0], "."+imageIdAndExt[1]);
+        if (imageIdAndExt[1].equals("gif")) {
+            // Do nothing
+        } else {
+            picasso.load(url)
+                   .noPlaceholder()
+                   .noFade()
+                   .into(imageView);
+        }
     }
 
     @Override

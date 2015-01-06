@@ -1,7 +1,9 @@
 package anabolicandroids.chanobol.ui.posts;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
@@ -17,15 +19,20 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.squareup.okhttp.OkHttpClient;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
+
+import java.io.IOException;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
+import anabolicandroids.chanobol.util.GifDataDownloader;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import pl.droidsonroids.gif.GifDrawableBuilder;
 
 public class PostView extends CardView {
     @InjectView(R.id.header) ViewGroup header;
@@ -34,12 +41,15 @@ public class PostView extends CardView {
     @InjectView(R.id.repliesContainer) ViewGroup repliesContainer;
     @InjectView(R.id.replies) TextView replies;
     @InjectView(R.id.image) ImageView image;
+    @InjectView(R.id.play) ImageView play;
     @InjectView(R.id.progressbar) ProgressBar progress;
     @InjectView(R.id.text) TextView text;
     @InjectView(R.id.footer) TextView footer;
 
     private static final int W = 0, H = 1, H0 = 2;
     private int screenWidth, screenHeight;
+
+    private OkHttpClient client;
 
     public PostView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -52,12 +62,17 @@ public class PostView extends CardView {
         screenHeight = Util.getScreenHeight(getContext());
     }
 
+    public void setClient(OkHttpClient client) {
+        this.client = client;
+    }
+
     private void reset() {
         repliesContainer.setVisibility(View.GONE);
         header.setOnClickListener(null);
         image.setVisibility(View.GONE);
         image.setImageBitmap(null);
         image.setOnClickListener(null);
+        play.setVisibility(View.GONE);
         progress.setVisibility(View.GONE);
         footer.setVisibility(View.GONE);
     }
@@ -195,22 +210,30 @@ public class PostView extends CardView {
                         final String url = ApiModule.imgUrl(boardName, post.imageId, post.imageExtension);
                         switch (ext) {
                             case ".gif":
-                                // TODO: gif
-                                // The following does not work
-                                /*
-                                new GifDataDownloader() {
+                                new GifDataDownloader(client) {
                                     @Override
                                     protected void onPostExecute(final byte[] bytes) {
-                                        v.progress.setVisibility(View.GONE);
-                                        v.image.setBytes(bytes);
-                                        v.image.startAnimation();
+                                        progress.setVisibility(View.GONE);
+                                        try {
+                                            image.setImageDrawable(new GifDrawableBuilder().from(bytes).build());
+                                        } catch (IOException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }.execute(url);
-                                */
-                                //break;
+                                break;
                             case ".webm":
-                                // TODO: Webm
-                                //break;
+                                progress.setVisibility(View.GONE);
+                                play.setVisibility(View.VISIBLE);
+                                image.setOnClickListener(new OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        Intent intent = new Intent(Intent.ACTION_VIEW)
+                                                .setDataAndType(Uri.parse(url), "video/webm");
+                                        getContext().startActivity(intent);
+                                    }
+                                });
+                                break;
                             default:
                                 picasso
                                         .load(url)

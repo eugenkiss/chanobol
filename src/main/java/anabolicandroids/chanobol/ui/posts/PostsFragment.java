@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.squareup.okhttp.OkHttpClient;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,6 +20,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.inject.Inject;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
@@ -32,6 +36,8 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class PostsFragment extends SwipeRefreshFragment {
+
+    @Inject OkHttpClient client;
 
     public static interface RepliesCallback {
         public void onClick(Post post);
@@ -224,6 +230,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         @Override
         public void bindView(final Post item, int position, View view) {
             PostView v = (PostView) view;
+            v.setClient(client);
             if (position == 0 && opImage != null) {
                 v.bindToOp(opImage, item, board, threadId, picasso,
                         repliesCallback, referencedPostCallback, imageCallback);

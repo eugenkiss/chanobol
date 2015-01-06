@@ -38,7 +38,7 @@ dependencies {
     compile 'com.squareup.retrofit:retrofit:1.7.1'
     debugCompile 'com.squareup.retrofit:retrofit-mock:1.8.0'
 
-    compile 'com.felipecsl:gifimageview:1.0.6'
+    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
     compile "commons-io:commons-io:2.4"
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
 }
