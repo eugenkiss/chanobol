@@ -101,7 +101,7 @@ mode just like [u2020][] where server requests are mocked to return data from
 the debug build type's assets folder. Instead of a debug drawer like in [u2020][]
 Chanobol employs a debug preference activity which can be openend from the drawer.
 Dependencies are injected with [Dagger][]. Chanobol has an `AppModule` which contains
-application-level or rather global dependenices, and `ApiModule` for server-related
+application-level or rather global dependenices, an `ApiModule` for server-related
 dependencies and a scoped `UiModule` for fragment- and activity-related
 dependencies. The package structure roughly follows the module structure. The debug
 build type overwrites some module definitions in `DebugAppModule`. The top-level
