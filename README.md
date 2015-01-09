@@ -47,7 +47,7 @@ about its UI:
 
 * There is no up button on the thread view in Chanu. This turned out
   to be problematic for me due to the way I was holding my Nexus 7.
-  Chanobol has an up botton on the thread view which makes it easier
+  Chanobol has an up button on the thread view which makes it easier
   for me to return to the catalog view.
 * Chanu apparently has this automatic refresh feature on the catalog
   view where it refreshes the catalog periodically which leads to
