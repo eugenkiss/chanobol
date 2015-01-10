@@ -5,9 +5,4 @@
         android:title="Mockmode"
         android:defaultValue="true" >
     </CheckBoxPreference>
-    <CheckBoxPreference
-        android:key="pref_indicators"
-        android:title="Debug Image Indicators"
-        android:defaultValue="true" >
-    </CheckBoxPreference>
 </PreferenceScreen>

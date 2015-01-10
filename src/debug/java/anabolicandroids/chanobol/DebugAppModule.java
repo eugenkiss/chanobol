@@ -2,24 +2,21 @@ package anabolicandroids.chanobol;
 
 import android.app.Application;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.picasso.OkHttpDownloader;
-import com.squareup.picasso.Picasso;
+import com.koushikdutta.ion.Ion;
 
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.MockChanService;
-import anabolicandroids.chanobol.api.MockDownloader;
+import anabolicandroids.chanobol.api.MockImageLoader;
 import dagger.Module;
 import dagger.Provides;
 import retrofit.MockRestAdapter;
 import retrofit.RestAdapter;
-import timber.log.Timber;
 
 @Module(
         injects = DebugSettings.class,
@@ -47,21 +44,13 @@ public final class DebugAppModule {
     }
 
     @Provides @Singleton
-    Picasso providePicasso(OkHttpClient client, MockRestAdapter mockRestAdapter, Application app,
-                           @MockMode boolean mockMode, @DebugIndicators boolean indicators) {
-        Picasso.Builder builder = new Picasso.Builder(app);
-        if (mockMode) {
-            builder.downloader(new MockDownloader(mockRestAdapter, app.getAssets()));
-        } else {
-            builder.downloader(new OkHttpDownloader(client));
-        }
-        builder.indicatorsEnabled(indicators)
-            .listener(new Picasso.Listener() {
-                @Override public void onImageLoadFailed(Picasso picasso, Uri uri, Exception e) {
-                    Timber.e(e, "Failed to load image: %s", uri);
-                }
-            });
-        return builder.build();
+    Ion provideIon(Application app) {
+        Ion ion = Ion.getDefault(app);
+        ion.configure()
+                .setLogging("ion", Log.VERBOSE)
+                .addLoader(0, new MockImageLoader())
+        ;
+        return ion;
     }
 
     @Provides @Singleton

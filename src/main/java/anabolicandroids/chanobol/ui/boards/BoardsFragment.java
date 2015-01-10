@@ -39,7 +39,7 @@ public class BoardsFragment extends UiFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         boards = new ArrayList<>();
-        boardsAdapter = new BoardsAdapter(context, picasso, boards);
+        boardsAdapter = new BoardsAdapter(context, ion, boards);
         boardsView.setAdapter(boardsAdapter);
 
         load();

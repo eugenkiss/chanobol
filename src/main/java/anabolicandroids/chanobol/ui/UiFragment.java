@@ -16,7 +16,7 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
+import com.koushikdutta.ion.Ion;
 
 import javax.inject.Inject;
 
@@ -28,7 +28,7 @@ import butterknife.ButterKnife;
 public abstract class UiFragment extends BaseFragment {
     @Inject public MainActivity activity;
     @Inject public ChanService service;
-    @Inject public Picasso picasso;
+    @Inject public Ion ion;
     @Inject public PersistentData persistentData;
 
     Toolbar toolbar;

@@ -2,6 +2,7 @@ package anabolicandroids.chanobol.ui.posts;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.widget.CardView;
@@ -19,20 +20,18 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.picasso.Callback;
-import com.squareup.picasso.Picasso;
-
-import java.io.IOException;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.ImageViewBitmapInfo;
+import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.builder.AnimateGifMode;
+import com.koushikdutta.ion.builder.Builders;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
-import anabolicandroids.chanobol.util.GifDataDownloader;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import pl.droidsonroids.gif.GifDrawableBuilder;
 
 public class PostView extends CardView {
     @InjectView(R.id.header) ViewGroup header;
@@ -46,10 +45,8 @@ public class PostView extends CardView {
     @InjectView(R.id.text) TextView text;
     @InjectView(R.id.footer) TextView footer;
 
-    private static final int W = 0, H = 1, H0 = 2;
+    private static final int W = 0, H = 1;
     private int screenWidth, screenHeight;
-
-    private OkHttpClient client;
 
     public PostView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -60,10 +57,6 @@ public class PostView extends CardView {
         ButterKnife.inject(this);
         screenWidth = Util.getScreenWidth(getContext());
         screenHeight = Util.getScreenHeight(getContext());
-    }
-
-    public void setClient(OkHttpClient client) {
-        this.client = client;
     }
 
     private void reset() {
@@ -79,11 +72,11 @@ public class PostView extends CardView {
 
     private void calcSize(int[] size, Post post) {
         final int width = Math.min(screenWidth, post.imageWidth);
-        final int height = Util.clamp(screenHeight * 0.25, post.imageHeight, screenHeight * 0.85);
-        final double factor = 1.0 * width / post.imageWidth;
-        size[W] = width;
+        final double widthFactor = 1.0 * width / post.imageWidth;
+        final int height = Util.clamp(screenHeight * 0.25, post.imageHeight * widthFactor, screenHeight * 0.85);
+        final double heightFactor = 1.0 * height / (post.imageHeight * widthFactor);
+        size[W] = (int)(width * heightFactor);
         size[H] = height;
-        size[H0] = (int) (height * factor);
     }
 
     private void initImageListener(final String imageIdAndExt, final PostsFragment.ImageCallback cb) {
@@ -161,7 +154,7 @@ public class PostView extends CardView {
 
     public void bindToOp(final Drawable opImage,
                          final Post post, final String boardName,
-                         final String threadId, final Picasso picasso,
+                         final String threadId, final Ion ion,
                          PostsFragment.RepliesCallback repliesCallback,
                          PostsFragment.ReferencedPostCallback referencedPostCallback,
                          PostsFragment.ImageCallback imageCallback) {
@@ -172,19 +165,18 @@ public class PostView extends CardView {
         image.setVisibility(View.VISIBLE);
         progress.setVisibility(View.VISIBLE);
 
-        final int[] size = new int[3]; calcSize(size, post);
+        final int[] size = new int[2]; calcSize(size, post);
         image.setImageDrawable(opImage);
-        image.getLayoutParams().height = size[H0];
+        image.getLayoutParams().height = size[H];
         image.requestLayout();
-        picasso.load(ApiModule.imgUrl(boardName, post.imageId, post.imageExtension))
-                .noPlaceholder()
+        ion.build(image)
+                .placeholder(opImage)
                 .resize(size[W], size[H])
-                .centerInside()
-                .into(image);
+                .load(ApiModule.imgUrl(boardName, post.imageId, post.imageExtension));
     }
 
     public void bindTo(final Post post, final String boardName,
-                       final String threadId, final Picasso picasso,
+                       final String threadId, final Ion ion,
                        PostsFragment.RepliesCallback repliesCallback,
                        PostsFragment.ReferencedPostCallback referencedPostCallback,
                        PostsFragment.ImageCallback imageCallback) {
@@ -194,40 +186,29 @@ public class PostView extends CardView {
         if (post.imageId != null && !"null".equals(post.imageId)) {
             initImageListener(post.imageId + post.imageExtension, imageCallback);
 
-            final int[] size = new int[3]; calcSize(size, post);
+            final int[] size = new int[2]; calcSize(size, post);
             progress.setVisibility(View.VISIBLE);
             image.setVisibility(View.VISIBLE);
-            image.getLayoutParams().height = size[H0];
-            // TODO: Load the image and thumbnail in parallel into the imageView but cancel
-            // thumbnail when real image was loaded earlier. Real image always wins.
-            picasso
-                .load(ApiModule.thumbUrl(boardName, post.imageId))
-                .noFade()
-                .into(image, new Callback() {
+            image.getLayoutParams().height = size[H];
+            String thumbUrl = ApiModule.thumbUrl(boardName, post.imageId);
+            ion.build(image)
+                .load(thumbUrl)
+                .withBitmapInfo()
+                .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                     @Override
-                    public void onSuccess() {
+                    public void onCompleted(Exception e, ImageViewBitmapInfo result) {
+                        if (e != null) {
+                            progress.setVisibility(View.GONE);
+                            return;
+                        }
                         final String ext = post.imageExtension;
                         final String url = ApiModule.imgUrl(boardName, post.imageId, post.imageExtension);
                         switch (ext) {
-                            case ".gif":
-                                new GifDataDownloader(client) {
-                                    @Override
-                                    protected void onPostExecute(final byte[] bytes) {
-                                        progress.setVisibility(View.GONE);
-                                        try {
-                                            image.setImageDrawable(new GifDrawableBuilder().from(bytes).build());
-                                        } catch (IOException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }.execute(url);
-                                break;
                             case ".webm":
                                 progress.setVisibility(View.GONE);
                                 play.setVisibility(View.VISIBLE);
                                 image.setOnClickListener(new OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
+                                    @Override public void onClick(View v) {
                                         Intent intent = new Intent(Intent.ACTION_VIEW)
                                                 .setDataAndType(Uri.parse(url), "video/webm");
                                         getContext().startActivity(intent);
@@ -235,30 +216,28 @@ public class PostView extends CardView {
                                 });
                                 break;
                             default:
-                                picasso
-                                        .load(url)
-                                        .noPlaceholder()
-                                        .noFade()
-                                        .resize(size[W], size[H])
-                                        .centerInside()
-                                        .into(image, new Callback() {
-                                            @Override
-                                            public void onSuccess() {
-                                                progress.setVisibility(View.GONE);
-                                            }
-
-                                            @Override
-                                            public void onError() {
-                                                progress.setVisibility(View.GONE);
-                                            }
-                                        });
+                                // Resized Gifs don't animate apparently that's the reason for the case analysis
+                                Builders.IV.F<?> placeholder = ion.build(image);
+                                if (result.getBitmapInfo() != null)
+                                    placeholder = placeholder.placeholder(
+                                            new BitmapDrawable(getResources(),
+                                                               result.getBitmapInfo().bitmap));
+                                if (".gif".equals(ext))
+                                    placeholder.animateGif(AnimateGifMode.ANIMATE).smartSize(true);
+                                else
+                                    placeholder.resize(size[W], size[H]);
+                                placeholder.load(url).setCallback(new FutureCallback<ImageView>() {
+                                    @Override
+                                    public void onCompleted(Exception e, ImageView result) {
+                                        if (e != null) {
+                                            progress.setVisibility(View.GONE);
+                                            return;
+                                        }
+                                        progress.setVisibility(View.GONE);
+                                    }
+                                });
                                 break;
                         }
-                    }
-
-                    @Override
-                    public void onError() {
-                        progress.setVisibility(View.GONE);
                     }
                 });
         }

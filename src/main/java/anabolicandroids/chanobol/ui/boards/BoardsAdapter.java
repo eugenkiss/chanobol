@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.squareup.picasso.Picasso;
+import com.koushikdutta.ion.Ion;
 
 import java.util.List;
 
@@ -14,11 +14,11 @@ import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.UiAdapter;
 
 class BoardsAdapter extends UiAdapter<Board> {
-    private Picasso picasso;
+    private Ion ion;
 
-    public BoardsAdapter(Context context, Picasso picasso, List<Board> boards) {
+    public BoardsAdapter(Context context, Ion ion, List<Board> boards) {
         super(context);
-        this.picasso = picasso;
+        this.ion = ion;
         this.items = boards;
     }
 
@@ -29,6 +29,6 @@ class BoardsAdapter extends UiAdapter<Board> {
 
     @Override
     public void bindView(Board item, int position, View view) {
-        ((BoardView) view).bindTo(item, picasso);
+        ((BoardView) view).bindTo(item, ion);
     }
 }

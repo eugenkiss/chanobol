@@ -6,7 +6,7 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.koushikdutta.ion.Ion;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
@@ -27,7 +27,7 @@ public class BoardView extends CardView {
         ButterKnife.inject(this);
     }
 
-    public void bindTo(Board board, Picasso picasso) {
+    public void bindTo(Board board, Ion ion) {
         name.setText(board.name);
         title.setText(board.title);
     }

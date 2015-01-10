@@ -1,13 +1,18 @@
 package anabolicandroids.chanobol.ui.threads;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.squareup.picasso.Picasso;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.ImageViewBitmapInfo;
+import com.koushikdutta.ion.Ion;
+
+import java.util.WeakHashMap;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
@@ -31,10 +36,15 @@ public class ThreadView extends CardView {
         ButterKnife.inject(this);
     }
 
-    public void bindTo(Thread thread, String boardName, Picasso picasso) {
+    public void bindTo(final Thread thread, String boardName, Ion ion, final WeakHashMap<String, Bitmap> bitMap) {
         numReplies.setText(thread.replies+"r");
         numImages.setText(thread.images+"i");
-        picasso.load(ApiModule.thumbUrl(boardName, thread.imageId)).into(image);
+        ion.build(image).load(ApiModule.thumbUrl(boardName, thread.imageId)).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+            @Override public void onCompleted(Exception e, ImageViewBitmapInfo result) {
+                if (e == null && result.getBitmapInfo() != null)
+                    bitMap.put(thread.id, result.getBitmapInfo().bitmap);
+            }
+        });
         String s = thread.subject;
         if (s == null) s = "";
         else s = "<b>" + s + "</b><br/>";

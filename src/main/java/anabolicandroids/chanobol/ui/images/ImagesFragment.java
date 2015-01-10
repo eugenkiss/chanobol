@@ -26,7 +26,7 @@ public class ImagesFragment extends UiFragment {
     private List<String> imageIdAndExts;
 
     public static ImagesFragment create(String boardName, String threadId,
-                                         Drawable image, int index, List<String> imageIdAndExts) {
+                                        Drawable image, int index, List<String> imageIdAndExts) {
         ImagesFragment f = new ImagesFragment();
         f.boardName = boardName;
         f.threadId = threadId;
@@ -45,17 +45,9 @@ public class ImagesFragment extends UiFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         imageView.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
-        imageView.setImageDrawable(image);
         String[] imageIdAndExt = imageIdAndExts.get(index).split("\\.");
         final String url = ApiModule.imgUrl(boardName, imageIdAndExt[0], "."+imageIdAndExt[1]);
-        if (imageIdAndExt[1].equals("gif")) {
-            // Do nothing
-        } else {
-            picasso.load(url)
-                   .noPlaceholder()
-                   .noFade()
-                   .into(imageView);
-        }
+        ion.build(imageView).placeholder(image).load(url);
     }
 
     @Override

@@ -125,6 +125,7 @@ public class PostsFragment extends SwipeRefreshFragment {
             menu.setGroupVisible(R.id.threads, false);
             menu.setGroupVisible(R.id.posts, true);
         }
+        postsAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -148,7 +149,7 @@ public class PostsFragment extends SwipeRefreshFragment {
                         }
                     }
                     // Preload thumbnails
-                    if (p.imageId != null) picasso.load(ApiModule.thumbUrl(board, p.imageId)).fetch();
+                    if (p.imageId != null) ion.build(context).load(ApiModule.thumbUrl(board, p.imageId)).asBitmap().tryGet();
                 }
                 postsAdapter.notifyDataSetChanged();
                 loaded();
@@ -230,13 +231,12 @@ public class PostsFragment extends SwipeRefreshFragment {
         @Override
         public void bindView(final Post item, int position, View view) {
             PostView v = (PostView) view;
-            v.setClient(client);
             if (position == 0 && opImage != null) {
-                v.bindToOp(opImage, item, board, threadId, picasso,
+                v.bindToOp(opImage, item, board, threadId, ion,
                         repliesCallback, referencedPostCallback, imageCallback);
                 opImage = null;
             } else {
-                v.bindTo(item, board, threadId, picasso,
+                v.bindTo(item, board, threadId, ion,
                         repliesCallback, referencedPostCallback, imageCallback);
             }
         }

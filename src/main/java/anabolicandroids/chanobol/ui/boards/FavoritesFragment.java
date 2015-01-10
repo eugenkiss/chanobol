@@ -39,7 +39,7 @@ public class FavoritesFragment extends UiFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        boardsAdapter = new BoardsAdapter(context, picasso, new ArrayList<>(persistentData.getFavorites()));
+        boardsAdapter = new BoardsAdapter(context, ion, new ArrayList<>(persistentData.getFavorites()));
         favoritesView.setAdapter(boardsAdapter);
         boardsAdapter.notifyDataSetChanged();
         persistentData.addFavoritesChangedCallback(new PersistentData.FavoritesCallback() {

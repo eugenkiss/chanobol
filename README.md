@@ -2,7 +2,7 @@ Chanobol
 ========
 
   [Chanu]: https://github.com/grzegorznittner/chanu
-  [u2020]: https://github.com/JakeWharton/u2020
+  [U+2020]: https://github.com/JakeWharton/u2020
   [API]: https://github.com/4chan/4chan-API
   [Build Types]: http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Build-Types
   [Nine Old Androids]: http://nineoldandroids.com/
@@ -72,7 +72,7 @@ Why did I open source Chanobol?
   where I am not strong like, for instance, the (graphical) design of the
   application.
 * *To share*. Maybe people will find this project useful as it
-  is, among other things, a non-demo application of concepts from [u2020][].
+  is, among other things, a non-demo application of concepts from [U+2020][].
 
 
 Code Architecture
@@ -95,10 +95,10 @@ There is only one build file `build.gradle`. The project structure is not the
 default one created by Android Studio where the real application code is in the
 subfolder `app` because that extra indirection is not needed for Chanobol.
 
-The high-level code structure is very much inspired by [u2020][]. There is a
+The high-level code structure is very much inspired by [U+2020][]. There is a
 debug and a release [build type][Build Types]. The debug build type has a mock
-mode just like [u2020][] where server requests are mocked to return data from
-the debug build type's assets folder. Instead of a debug drawer like in [u2020][]
+mode just like [U+2020][] where server requests are mocked to return data from
+the debug build type's assets folder. Instead of a debug drawer like in [U+2020][]
 Chanobol employs a debug preference activity which can be openend from the drawer.
 Dependencies are injected with [Dagger][]. Chanobol has an `AppModule` which contains
 application-level or rather global dependenices, an `ApiModule` for server-related
@@ -113,9 +113,9 @@ pattern and instead custom view classes like `PostView` are used. The classes
 is shared by most of the concrete fragments.
 
 Chanobol can be seen as a UI for the [4Chan API][API]. To this end, [Retrofit][],
-[OkHttp][] and [Picasso][] are employed. With Retrofit 4Chan's API is mapped to
+[OkHttp][] and [Ion][] are employed. With Retrofit 4Chan's API is mapped to
 the interface `ChanService` in the `api` package. OkHttp is an HTTP client which
-takes care of e.g. response caching. Picasso takes care of loading and
+takes care of e.g. response caching. Ion takes care of loading and
 displaying images.
 
 Why fragments over activites? It's easier to communicate / pass complex data

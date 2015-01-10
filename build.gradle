@@ -32,15 +32,15 @@ dependencies {
     compile 'com.jakewharton:butterknife:6.0.0'
     compile 'com.jakewharton.timber:timber:2.5.0'
 
+    compile 'com.koushikdutta.ion:ion:2.+'
+
     compile 'com.squareup.okhttp:okhttp:2.1.0'
     compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
-    compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'com.squareup.retrofit:retrofit:1.7.1'
     debugCompile 'com.squareup.retrofit:retrofit-mock:1.8.0'
 
-    compile 'pl.droidsonroids.gif:android-gif-drawable:1.1.+'
-    compile "commons-io:commons-io:2.4"
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:1.0.5'
+
 }
 
 android {

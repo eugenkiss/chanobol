@@ -1,5 +1,8 @@
 package anabolicandroids.chanobol.ui.threads;
 
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
@@ -15,6 +18,7 @@ import android.widget.ImageView;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.WeakHashMap;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -37,6 +41,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     String name;
     ArrayList<Thread> threads;
     HashMap<String, Integer> threadMap;
+    WeakHashMap<String, Bitmap> bitMap;
     ThreadsAdapter threadsAdapter;
 
     // TODO: Isn't there a more elegant solution?
@@ -62,6 +67,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
 
         threads = new ArrayList<>();
         threadMap = new HashMap<>();
+        bitMap = new WeakHashMap<>();
         threadsAdapter = new ThreadsAdapter();
         threadsView.setAdapter(threadsAdapter);
 
@@ -90,8 +96,9 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                     return;
                 }
                 pauseUpdating = true;
-                ImageView iv = (ImageView) view.findViewById(R.id.image);
-                PostsFragment f = PostsFragment.create(name, thread.toOpPost(), iv.getDrawable());
+                Bitmap b = bitMap.get(thread.id);
+                Drawable d = b == null ? null : new BitmapDrawable(getResources(), b);
+                PostsFragment f = PostsFragment.create(name, thread.toOpPost(), d);
                 // Doesn't work, see: https://code.google.com/p/android/issues/detail?id=82832&thanks=82832&ts=1418767240
                 //f.setEnterTransition(new Slide(Gravity.RIGHT));
                 //f.setExitTransition(new Slide(Gravity.RIGHT));
@@ -129,9 +136,6 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                         threads.add(thread);
                         threadMap.put(thread.id, position);
                         position++;
-                        // Preload thumbnails
-                        if (thread.imageId != null)
-                            picasso.load(ApiModule.thumbUrl(name, thread.imageId)).fetch();
                     }
                 }
                 threadsAdapter.notifyDataSetChanged();
@@ -224,7 +228,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
 
         @Override
         public void bindView(Thread item, int position, View view) {
-            ((ThreadView) view).bindTo(item, name, picasso);
+            ((ThreadView) view).bindTo(item, name, ion, bitMap);
         }
     }
 }
