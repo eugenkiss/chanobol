@@ -12,11 +12,10 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.ui.UiFragment;
 import butterknife.InjectView;
-import it.sephiroth.android.library.imagezoom.ImageViewTouch;
-import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
+import uk.co.senab.photoview.PhotoView;
 
 public class ImagesFragment extends UiFragment {
-    @InjectView(R.id.image) ImageViewTouch imageView;
+    @InjectView(R.id.image) PhotoView imageView;
 
     private Menu menu;
     private String boardName;
@@ -44,7 +43,6 @@ public class ImagesFragment extends UiFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        imageView.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         String[] imageIdAndExt = imageIdAndExts.get(index).split("\\.");
         final String url = ApiModule.imgUrl(boardName, imageIdAndExt[0], "."+imageIdAndExt[1]);
         ion.build(imageView).placeholder(image).deepZoom().load(url);

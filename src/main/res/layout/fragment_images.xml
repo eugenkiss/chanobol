@@ -7,7 +7,7 @@
     android:background="@color/cardview_dark_background"
     >
 
-    <it.sephiroth.android.library.imagezoom.ImageViewTouch
+    <uk.co.senab.photoview.PhotoView
         android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="0dp"
