@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.ui;
 
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -30,6 +31,7 @@ public abstract class UiFragment extends BaseFragment {
     @Inject public ChanService service;
     @Inject public Ion ion;
     @Inject public PersistentData persistentData;
+    @Inject public SharedPreferences prefs;
 
     Toolbar toolbar;
     DrawerLayout drawer;

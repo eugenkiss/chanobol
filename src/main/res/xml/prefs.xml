@@ -6,4 +6,10 @@
         android:title="Hidable Toolbar"
         >
     </CheckBoxPreference>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_preload_thumbnails"
+        android:title="Preload Thumbnails"
+        >
+    </CheckBoxPreference>
 </PreferenceScreen>

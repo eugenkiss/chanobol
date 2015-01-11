@@ -11,8 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import com.squareup.okhttp.OkHttpClient;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,12 +19,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.inject.Inject;
-
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Post;
+import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.images.ImagesFragment;
@@ -36,8 +33,6 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 public class PostsFragment extends SwipeRefreshFragment {
-
-    @Inject OkHttpClient client;
 
     public static interface RepliesCallback {
         public void onClick(Post post);
@@ -148,8 +143,8 @@ public class PostsFragment extends SwipeRefreshFragment {
                             referenced.postReplies++;
                         }
                     }
-                    // Preload thumbnails
-                    if (p.imageId != null) ion.build(context).load(ApiModule.thumbUrl(board, p.imageId)).asBitmap().tryGet();
+                    if (p.imageId != null && prefs.getBoolean(Settings.PRELOAD_THUMBNAILS, true))
+                        ion.build(context).load(ApiModule.thumbUrl(board, p.imageId)).asBitmap().tryGet();
                 }
                 postsAdapter.notifyDataSetChanged();
                 loaded();

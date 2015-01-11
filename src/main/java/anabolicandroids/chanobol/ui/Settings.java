@@ -11,6 +11,7 @@ import anabolicandroids.chanobol.R;
 public class Settings extends BaseSettings {
 
     public static final String HIDABLE_TOOLBAR = "pref_hidable_toolbar";
+    public static final String PRELOAD_THUMBNAILS = "pref_preload_thumbnails";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
