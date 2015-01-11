@@ -46,7 +46,8 @@ public class PostView extends CardView {
     @InjectView(R.id.footer) TextView footer;
 
     private static final int W = 0, H = 1;
-    private int screenWidth, screenHeight;
+    private int maxWidth;
+    private int maxHeight;
 
     public PostView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -55,8 +56,10 @@ public class PostView extends CardView {
     @Override protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.inject(this);
-        screenWidth = Util.getScreenWidth(getContext());
-        screenHeight = Util.getScreenHeight(getContext());
+        int screenWidth = Util.getScreenWidth(getContext());
+        int screenHeight = Util.getScreenHeight(getContext());
+        maxWidth = screenWidth;
+        maxHeight = (int) (screenHeight * 0.85);
     }
 
     private void reset() {
@@ -70,13 +73,25 @@ public class PostView extends CardView {
         footer.setVisibility(View.GONE);
     }
 
+    // If needed reduce the image size such that it is only as big as needed and is
+    // never bigger than approx. the screen size. For example, an image with a height
+    // of one billion pixels should fit on the screen. Therefore, the width and height
+    // have to be reduced proportionally such that the new height is smaller equal the
+    // screen height.
     private void calcSize(int[] size, Post post) {
-        final int width = Math.min(screenWidth, post.imageWidth);
-        final double widthFactor = 1.0 * width / post.imageWidth;
-        final int height = Util.clamp(screenHeight * 0.25, post.imageHeight * widthFactor, screenHeight * 0.85);
-        final double heightFactor = 1.0 * height / (post.imageHeight * widthFactor);
-        size[W] = (int)(width * heightFactor);
-        size[H] = height;
+        double w = post.imageWidth, h = post.imageHeight;
+        if (w >= maxWidth) {
+            double w_old = w;
+            w = maxWidth;
+            h *= w / w_old;
+        }
+        if (h >= maxHeight) {
+            double h_old = h;
+            h = maxHeight;
+            w *= h / h_old;
+        }
+        size[W] = (int) w;
+        size[H] = (int) h;
     }
 
     private void initImageListener(final String imageIdAndExt, final PostsFragment.ImageCallback cb) {
@@ -152,6 +167,10 @@ public class PostView extends CardView {
         text.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
+    // The raison d'être for this method is to immediately populate the OP post cardview
+    // when viewing a single thread without first waiting for the 4Chan API request to finish
+    // that gets all the posts in order to give the impression (illusion) of promptness
+    // (compare with the iOS splash screen concept).
     public void bindToOp(final Drawable opImage,
                          final Post post, final String boardName,
                          final String threadId, final Ion ion,
