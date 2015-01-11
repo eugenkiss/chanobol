@@ -10,12 +10,12 @@ Chanobol
   [Bindable Adapter]: https://twitter.com/jakewharton/status/325368867109076993
   [Retrofit]: http://square.github.io/retrofit/
   [OkHttp]: http://square.github.io/okhttp/
-  [Picasso]: https://github.com/square/picasso
+  [Ion]: https://github.com/koush/ion/
   [Support]: http://developer.android.com/tools/support-library/index.html
 
 Chanobol is a 4Chan reader app on steroids\* inspired by [Chanu][].
 
-<sup>\*Steroids being the employed libraries like Dagger, Retrofit and so on.</sup>
+<sup>\*Steroids being the employed libraries like Dagger and Ion.</sup>
 
 
 Status
