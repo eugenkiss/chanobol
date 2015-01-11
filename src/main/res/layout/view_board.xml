@@ -4,7 +4,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="180dp"
+    android:layout_height="wrap_content"
     android:layout_gravity="top"
     app:cardBackgroundColor="@color/background_floating_material_dark"
     >
@@ -38,6 +38,8 @@
             android:id="@+id/title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:maxLines="1"
+            android:minLines="1"
             android:padding="5dp"
             android:textColor="?android:textColorPrimary"
             android:textSize="13sp"
