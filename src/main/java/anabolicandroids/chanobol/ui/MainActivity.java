@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.ui;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -9,11 +10,13 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -35,8 +38,10 @@ import anabolicandroids.chanobol.ui.boards.BoardsFragment;
 import anabolicandroids.chanobol.ui.boards.FavoritesFragment;
 import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
 import anabolicandroids.chanobol.util.Util;
+import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.Optional;
+import timber.log.Timber;
 
 // The following resources have been helpful:
 // http://stackoverflow.com/questions/17258020/switching-between-android-navigation-drawer-image-and-up-caret-when-using-fragme?lq=1
@@ -55,7 +60,7 @@ public class MainActivity extends BaseActivity {
     @InjectView(R.id.settings) TextView settings;
     @InjectView(R.id.debugSettings) @Optional TextView debugSettings;
     @InjectView(R.id.favoriteBoards) ListView favoriteBoardsView;
-    ArrayAdapter<Board> favoriteBoardsAdapter;
+    FavoritesAdapter favoriteBoardsAdapter;
 
     FragmentManager fm;
     FragmentManager.OnBackStackChangedListener backStackChangedListener;
@@ -160,21 +165,18 @@ public class MainActivity extends BaseActivity {
             }
         });
 
-        favoriteBoardsAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,
-                new ArrayList<>(persistentData.getFavorites()));
+
+        favoriteBoardsAdapter = new FavoritesAdapter(this, new ArrayList<>(persistentData.getFavorites()));
         favoriteBoardsView.setAdapter(favoriteBoardsAdapter);
         favoriteBoardsAdapter.notifyDataSetChanged();
         persistentData.addFavoritesChangedCallback(new PersistentData.FavoritesCallback() {
-            @Override
-            public void onChanged(Set<Board> newFavorites) {
-                favoriteBoardsAdapter.clear();
-                for (Board f : newFavorites) favoriteBoardsAdapter.add(f);
-                favoriteBoardsAdapter.notifyDataSetChanged();
+            @Override public void onChanged(Set<Board> newFavorites) {
+                favoriteBoardsAdapter.updateItems(new ArrayList<>(newFavorites));
             }
         });
         favoriteBoardsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Timber.i("wololoo");
                 clearBackStackOnDrawerClick();
                 Fragment f = ThreadsFragment.create(favoriteBoardsAdapter.getItem(position).name);
                 fm.beginTransaction()
@@ -245,7 +247,6 @@ public class MainActivity extends BaseActivity {
     public void showToolbar() {
         if (toolbar.getTop() == -toolbar.getHeight()) {
             Util.animateY(toolbar, toolbar.getTop(), 0, 120);
-            //Util.animatePaddingTop(container, toolbar.getHeight(), 120);
             isToolbarShowing = true;
         }
     }
@@ -253,7 +254,6 @@ public class MainActivity extends BaseActivity {
     public void hideToolbar() {
         if (toolbar.getTop() == 0 && prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) {
             Util.animateY(toolbar, 0, -toolbar.getHeight(), 120);
-            //Util.animatePaddingTop(container, 0, 120);
             isToolbarShowing = false;
         }
     }
@@ -262,5 +262,48 @@ public class MainActivity extends BaseActivity {
     private void clearBackStackOnDrawerClick() {
         fm.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
         drawerLayout.closeDrawers();
+    }
+
+
+    private static class FavoritesAdapter extends UiAdapter<Board> {
+
+        public FavoritesAdapter(Context context, List<Board> items) {
+            super(context);
+            this.items = items;
+        }
+
+        @Override
+        public View newView(LayoutInflater inflater, int position, ViewGroup container) {
+            return inflater.inflate(R.layout.view_favorite, container, false);
+        }
+
+        @Override
+        public void bindView(Board item, int position, View view) {
+            ((FavoriteView) view).bindTo(item);
+        }
+
+        public void updateItems(List<Board> items) {
+            this.items = items;
+            notifyDataSetChanged();
+        }
+    }
+
+    public static class FavoriteView extends LinearLayout {
+        @InjectView(R.id.shortName) TextView shortName;
+        @InjectView(R.id.longName) TextView longName;
+
+        public FavoriteView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        @Override protected void onFinishInflate() {
+            super.onFinishInflate();
+            ButterKnife.inject(this);
+        }
+
+        public void bindTo(Board board) {
+            shortName.setText(board.name);
+            longName.setText(board.title);
+        }
     }
 }

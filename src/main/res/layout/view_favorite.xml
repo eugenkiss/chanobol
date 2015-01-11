@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<view class="anabolicandroids.chanobol.ui.MainActivity$FavoriteView"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:paddingTop="9dp"
+    android:paddingBottom="9dp"
+    android:paddingLeft="14dp"
+    android:paddingRight="14dp"
+    android:descendantFocusability="blocksDescendants"
+    android:background="?android:selectableItemBackground"
+    >
+
+    <TextView
+        android:id="@+id/shortName"
+        android:layout_width="35sp"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        tools:text="fit"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:text="  "
+        />
+
+    <TextView
+        android:id="@+id/longName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textStyle="italic"
+        tools:text="Fitness"
+        />
+
+</view>
