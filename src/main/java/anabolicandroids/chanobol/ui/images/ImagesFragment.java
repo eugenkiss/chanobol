@@ -47,7 +47,7 @@ public class ImagesFragment extends UiFragment {
         imageView.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         String[] imageIdAndExt = imageIdAndExts.get(index).split("\\.");
         final String url = ApiModule.imgUrl(boardName, imageIdAndExt[0], "."+imageIdAndExt[1]);
-        ion.build(imageView).placeholder(image).load(url);
+        ion.build(imageView).placeholder(image).deepZoom().load(url);
     }
 
     @Override
