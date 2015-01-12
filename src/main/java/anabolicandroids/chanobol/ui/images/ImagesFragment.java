@@ -45,6 +45,9 @@ public class ImagesFragment extends UiFragment {
         super.onActivityCreated(savedInstanceState);
         String[] imageIdAndExt = imageIdAndExts.get(index).split("\\.");
         final String url = ApiModule.imgUrl(boardName, imageIdAndExt[0], "."+imageIdAndExt[1]);
+        // TODO: Makes application break after a while of zooming in and out
+        //imageView.setMaximumScale(25); // Default value is to small for some images
+        // TODO: Would be great if deepZoom was more configurable. Too early too low resolution.
         ion.build(imageView).placeholder(image).deepZoom().load(url);
     }
 
