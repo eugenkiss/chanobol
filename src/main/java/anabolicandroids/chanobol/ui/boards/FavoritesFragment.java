@@ -13,9 +13,13 @@ import android.widget.EditText;
 import android.widget.GridView;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
+import javax.inject.Inject;
+
 import anabolicandroids.chanobol.R;
+import anabolicandroids.chanobol.annotations.Nsfw;
 import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.PersistentData;
@@ -29,6 +33,7 @@ import retrofit.client.Response;
 public class FavoritesFragment extends UiFragment {
     @InjectView(R.id.boards) GridView favoritesView;
 
+    @Inject @Nsfw List<Board> allBoards;
     BoardsAdapter boardsAdapter;
 
     @Override
@@ -99,26 +104,15 @@ public class FavoritesFragment extends UiFragment {
                     .setView(input)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            service.listBoards(new Callback<ChanService.Boards>() {
-                                String normalizedName = input.getText().toString().replace("/", "");
-
-                                @Override
-                                public void success(ChanService.Boards boards, Response response) {
-                                    for (Board board : boards.boards) {
-                                        if (board.name.equals(normalizedName)) {
-                                            persistentData.addFavorite(board);
-                                            showToast(board.name + " added as favorite");
-                                            return;
-                                        }
-                                    }
-                                    showToast("Board doesn't exist");
+                            String normalizedName = input.getText().toString().replace("/", "");
+                            for (Board board : allBoards) {
+                                if (board.name.equals(normalizedName)) {
+                                    persistentData.addFavorite(board);
+                                    showToast(board.name + " added as favorite");
+                                    return;
                                 }
-
-                                @Override
-                                public void failure(RetrofitError error) {
-                                    showToast("Network error");
-                                }
-                            });
+                            }
+                            showToast("Board doesn't exist");
                         }
                     }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int whichButton) {
@@ -128,5 +122,4 @@ public class FavoritesFragment extends UiFragment {
         }
         return super.onOptionsItemSelected(item);
     }
-
 }

@@ -74,6 +74,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
+        release_sfw.initWith(buildTypes.release)
     }
     lintOptions {
         disable 'InvalidPackage'

@@ -10,11 +10,6 @@ import retrofit.http.GET;
 import retrofit.http.Path;
 
 public interface ChanService {
-    @GET("/boards.json")
-    void listBoards(
-            Callback<Boards> cb
-    );
-
     @GET("/{board}/catalog.json")
     void listThreads(
             @Path("board") String board,

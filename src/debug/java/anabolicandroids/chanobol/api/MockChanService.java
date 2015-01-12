@@ -29,16 +29,6 @@ public class MockChanService implements ChanService {
     }
 
     @Override
-    public void listBoards(Callback<Boards> cb) {
-        String responseString = Util.loadJSONFromAsset(appContext, "boards.json");
-        Response response =  new Response("", 200, "nothing", Collections.EMPTY_LIST,
-                new TypedByteArray("application/json", responseString.getBytes()));
-        Type type = new TypeToken<Boards>() {}.getType();
-        Boards boards = new Gson().fromJson(responseString, type);
-        cb.success(boards, response);
-    }
-
-    @Override
     public void listThreads(@Path("board") String board, Callback<List<Threads>> cb) {
         String responseString = Util.loadJSONFromAsset(appContext, "catalog.json");
         Response response =  new Response("", 200, "nothing", Collections.EMPTY_LIST,
