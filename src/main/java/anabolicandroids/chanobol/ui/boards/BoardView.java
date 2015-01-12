@@ -30,5 +30,6 @@ public class BoardView extends CardView {
     public void bindTo(Board board, Ion ion) {
         name.setText(board.name);
         title.setText(board.title);
+        ion.build(image).load("file:///android_asset/boardimages/"+board.name+".jpg");
     }
 }

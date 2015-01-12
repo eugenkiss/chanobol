@@ -43,6 +43,7 @@
             android:padding="5dp"
             android:textColor="?android:textColorPrimary"
             android:textSize="13sp"
+            android:gravity="center"
             tools:text="Fitness"
             />
 
