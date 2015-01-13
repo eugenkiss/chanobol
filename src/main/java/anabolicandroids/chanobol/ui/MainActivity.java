@@ -1,6 +1,8 @@
 package anabolicandroids.chanobol.ui;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -232,10 +234,22 @@ public class MainActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        if (drawerLayout.isDrawerOpen(drawer))
+        if (drawerLayout.isDrawerOpen(drawer)) {
             drawerLayout.closeDrawers();
-        else
+        } else if (fm.getBackStackEntryCount() == 0) {
+            new AlertDialog.Builder(this)
+                    .setMessage("Are you sure you want to exit?")
+                    .setCancelable(false)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            finish();
+                        }
+                    })
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .show();
+        } else {
             super.onBackPressed();
+        }
     }
 
     @Override
