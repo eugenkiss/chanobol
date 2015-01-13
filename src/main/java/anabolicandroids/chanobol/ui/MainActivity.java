@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -176,7 +177,6 @@ public class MainActivity extends BaseActivity {
         });
         favoriteBoardsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Timber.i("wololoo");
                 clearBackStackOnDrawerClick();
                 Fragment f = ThreadsFragment.create(favoriteBoardsAdapter.getItem(position).name);
                 fm.beginTransaction()
@@ -244,17 +244,34 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
     }
 
+    private static int dur = 120;
+
     public void showToolbar() {
-        if (toolbar.getTop() == -toolbar.getHeight()) {
-            Util.animateY(toolbar, toolbar.getTop(), 0, 120);
-            isToolbarShowing = true;
+        if (Build.VERSION.SDK_INT >= 14) {
+            if (toolbar.getY() == -toolbar.getHeight()) {
+                toolbar.animate().y(0).setDuration(dur);
+                isToolbarShowing = true;
+            }
+        } else {
+            if (toolbar.getTop() == -toolbar.getHeight()) {
+                Util.animateY(toolbar, toolbar.getTop(), 0, dur);
+                isToolbarShowing = true;
+            }
         }
     }
 
     public void hideToolbar() {
-        if (toolbar.getTop() == 0 && prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) {
-            Util.animateY(toolbar, 0, -toolbar.getHeight(), 120);
-            isToolbarShowing = false;
+        if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
+        if (Build.VERSION.SDK_INT >= 14) {
+            if (toolbar.getY() == 0) {
+                toolbar.animate().y(-toolbar.getHeight()).setDuration(dur);
+                isToolbarShowing = false;
+            }
+        } else {
+            if (toolbar.getTop() == 0) {
+                Util.animateY(toolbar, 0, -toolbar.getHeight(), 120);
+                isToolbarShowing = false;
+            }
         }
     }
 
