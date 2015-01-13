@@ -3,6 +3,7 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <group android:id="@+id/postsDialog">
         <item android:id="@+id/close"
+              android:icon="@drawable/ic_close"
               android:title="Close All"
               app:showAsAction="always"
             />
