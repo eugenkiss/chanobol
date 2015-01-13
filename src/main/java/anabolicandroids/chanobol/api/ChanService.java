@@ -1,37 +1,73 @@
 package anabolicandroids.chanobol.api;
 
+import android.content.Context;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.Ion;
+
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
-import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.api.data.Thread;
-import retrofit.Callback;
-import retrofit.http.GET;
-import retrofit.http.Path;
 
-public interface ChanService {
-    @GET("/{board}/catalog.json")
-    void listThreads(
-            @Path("board") String board,
-            Callback<List<Threads>> cb
-    );
+public class ChanService {
+    Ion ion;
+    Context cxt;
+    Gson gson;
 
-    @GET("/{board}/thread/{number}.json")
-    void listPosts(
-            @Path("board") String board,
-            @Path("number") String number,
-            Callback<Posts> cb
-    );
-
-    public static class Boards {
-        public List<Board> boards;
+    public ChanService(Context context, Ion ion) {
+        this.cxt = context;
+        this.ion = ion;
+        gson = new Gson();
     }
 
-    public static class Threads {
-        public List<Thread> threads;
+    public void listThreads(Object group, String board, final FutureCallback<List<Thread>> cb) {
+        String path = String.format("/%s/catalog.json", board);
+        ion.build(cxt)
+                .load(ApiModule.endpoint + path)
+                .group(group)
+                .asJsonArray()
+                .setCallback(new FutureCallback<JsonArray>() {
+                    @Override public void onCompleted(Exception e, JsonArray result) {
+                        if (e != null) {
+                            cb.onCompleted(e, null);
+                            return;
+                        }
+                        List<Thread> threads = new ArrayList<>(50);
+                        for (JsonElement x : result) {
+                            for (JsonElement y : x.getAsJsonObject().get("threads").getAsJsonArray()) {
+                                Thread t = gson.fromJson(y, Thread.class);
+                                threads.add(t);
+                            }
+                        }
+                        cb.onCompleted(null, threads);
+                    }
+                });
     }
 
-    public static class Posts {
-        public List<Post> posts;
+    public void listPosts(Object group, String board, String number, final FutureCallback<List<Post>> cb) {
+        String path = String.format("/%s/thread/%s.json", board, number);
+        ion.build(cxt)
+                .load(ApiModule.endpoint + path)
+                .group(group)
+                .asJsonObject()
+                .setCallback(new FutureCallback<JsonObject>() {
+                    @Override public void onCompleted(Exception e, JsonObject result) {
+                        if (e != null) {
+                            cb.onCompleted(e, null);
+                            return;
+                        }
+                        Type type = new TypeToken<List<Post>>() {}.getType();
+                        List<Post> posts = gson.fromJson(result.get("posts").getAsJsonArray(), type);
+                        cb.onCompleted(null, posts);
+                    }
+                });
     }
 }

@@ -11,20 +11,15 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import anabolicandroids.chanobol.R;
-import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.UiFragment;
 import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
 import butterknife.InjectView;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class BoardsFragment extends UiFragment {
     @InjectView(R.id.boards) GridView boardsView;

@@ -8,8 +8,6 @@ Chanobol
   [Nine Old Androids]: http://nineoldandroids.com/
   [Dagger]: http://square.github.io/dagger/
   [Bindable Adapter]: https://twitter.com/jakewharton/status/325368867109076993
-  [Retrofit]: http://square.github.io/retrofit/
-  [OkHttp]: http://square.github.io/okhttp/
   [Ion]: https://github.com/koush/ion/
   [Support]: http://developer.android.com/tools/support-library/index.html
 
@@ -112,11 +110,10 @@ pattern and instead custom view classes like `PostView` are used. The classes
 `UiFragment` and `SwipeRefreshFragment` in the `ui` package contain code which
 is shared by most of the concrete fragments.
 
-Chanobol can be seen as a UI for the [4Chan API][API]. To this end, [Retrofit][],
-[OkHttp][] and [Ion][] are employed. With Retrofit 4Chan's API is mapped to
-the interface `ChanService` in the `api` package. OkHttp is an HTTP client which
-takes care of e.g. response caching. Ion takes care of loading and
-displaying images.
+Chanobol can be seen as a UI for the [4Chan API][API]. To this end, the great
+[Ion][] library is employed. With Ion 4Chan's API is mapped to the interface
+`ChanService` in the `api` package. On top of that, Ion takes care of loading
+and caching images.
 
 Why fragments over activites? It's easier to communicate / pass complex data
 between fragments than between activites. It's also more natural to use fragments

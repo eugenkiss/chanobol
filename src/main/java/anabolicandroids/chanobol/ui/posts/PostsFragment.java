@@ -11,6 +11,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
+import com.koushikdutta.async.future.FutureCallback;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -21,16 +23,12 @@ import java.util.regex.Pattern;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
-import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.images.ImagesFragment;
 import butterknife.InjectView;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class PostsFragment extends SwipeRefreshFragment {
 
@@ -126,13 +124,18 @@ public class PostsFragment extends SwipeRefreshFragment {
     @Override
     protected void load() {
         super.load();
-        service.listPosts(board, threadId, new Callback<ChanService.Posts>() {
-            @Override
-            public void success(ChanService.Posts posts0, Response response) {
+        service.listPosts(this, board, threadId, new FutureCallback<List<Post>>() {
+            @Override public void onCompleted(Exception e, List<Post> result) {
+                if (e != null) {
+                    showToast(e.getMessage());
+                    System.out.println(e.getMessage());
+                    loaded();
+                    return;
+                }
                 posts.clear();
                 postsMap.clear();
                 answers.clear();
-                for (Post p : posts0.posts) {
+                for (Post p : result) {
                     posts.add(p);
                     postsMap.put(p.id, p);
                     for (String id : referencedPosts(p)) {
@@ -149,20 +152,13 @@ public class PostsFragment extends SwipeRefreshFragment {
                 postsAdapter.notifyDataSetChanged();
                 loaded();
             }
-
-            @Override
-            public void failure(RetrofitError error) {
-                showToast(error.getMessage());
-                System.out.println(error.getMessage());
-                loaded();
-            }
         });
     }
 
     @Override
     protected void cancelPending() {
         super.cancelPending();
-        // TODO: Use Observables or Retrofit 2.0 to cancel listPosts and Picasso
+        ion.cancelAll(this);
     }
 
     @Override

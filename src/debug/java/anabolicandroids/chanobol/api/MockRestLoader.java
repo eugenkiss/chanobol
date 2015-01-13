@@ -16,24 +16,17 @@ import com.koushikdutta.ion.loader.SimpleLoader;
 
 import timber.log.Timber;
 
-/*
-TODO: This doesn't work currently.
-The code is copied from https://github.com/koush/ion/blob/master/ion/src/com/koushikdutta/ion/loader/HttpLoader.java
-MockImageLoader is used correctly for image requests in mock mode as can be seen in the logs.
-The problem is that currently MockImageLoader doesn't do anything different than the default
-HttpLoader so `catalogThumbnail.jpg` is not loaded from the assets folder. I wonder what's the best
-way to make it work like
-https://github.com/JakeWharton/u2020/blob/0f375d2fde2703b72c85cada2aca0d693a8dcb09/src/debug/java/com/jakewharton/u2020/data/MockRequestHandler.java
-*/
-public class MockImageLoader extends SimpleLoader {
+// TODO: This doesn't work currently. See MockImageLoader.
+// TODO: Make it similarly configurable as Retrofit's MockRestAdapter (setErrorPercentage...)
+public class MockRestLoader extends SimpleLoader {
 
     @SuppressWarnings("unchecked")
     @Override
     public Future<DataEmitter> load(Ion ion, AsyncHttpRequest request, final FutureCallback<LoaderEmitter> callback) {
         String uri = request.getUri().toString();
-        if (!uri.startsWith(ApiModule.imgCdn) && !uri.startsWith(ApiModule.thumbCdn))
+        if (!uri.startsWith(ApiModule.endpoint))
             return null;
-        Timber.i("Mocked Image Request!");
+        Timber.i("Mocked Rest API Request!");
         return (Future<DataEmitter>)(Future)ion.getHttpClient().execute(request, new HttpConnectCallback() {
             @Override public void onConnectCompleted(Exception ex, AsyncHttpResponse response) {
                 long length = -1;

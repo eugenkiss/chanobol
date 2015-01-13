@@ -44,7 +44,6 @@ import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.Optional;
-import timber.log.Timber;
 
 // The following resources have been helpful:
 // http://stackoverflow.com/questions/17258020/switching-between-android-navigation-drawer-image-and-up-caret-when-using-fragme?lq=1

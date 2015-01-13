@@ -13,7 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
-import android.widget.ImageView;
+
+import com.koushikdutta.async.future.FutureCallback;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,16 +24,11 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import anabolicandroids.chanobol.R;
-import anabolicandroids.chanobol.api.ApiModule;
-import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Thread;
 import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.posts.PostsFragment;
 import butterknife.InjectView;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class ThreadsFragment extends SwipeRefreshFragment {
     @InjectView(R.id.threads) GridView threadsView;
@@ -125,29 +121,24 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     @Override
     protected void load() {
         super.load();
-        service.listThreads(name, new Callback<List<ChanService.Threads>>() {
-            @Override
-            public void success(List<ChanService.Threads> pages, Response response) {
+        service.listThreads(this, name, new FutureCallback<List<Thread>>() {
+            @Override public void onCompleted(Exception e, List<Thread> result) {
+                if (e != null) {
+                    showToast(e.getMessage());
+                    System.out.println(e.getMessage());
+                    loaded();
+                    return;
+                }
                 threads.clear();
                 threadMap.clear();
-                int position = 0;
-                for (ChanService.Threads page : pages) {
-                    for (Thread thread : page.threads) {
-                        threads.add(thread);
-                        threadMap.put(thread.id, position);
-                        position++;
-                    }
+                for (int i = 0; i < result.size(); i++) {
+                    Thread thread = result.get(i);
+                    threads.add(thread);
+                    threadMap.put(thread.id, i);
                 }
                 threadsAdapter.notifyDataSetChanged();
                 loaded();
                 lastUpdate = System.currentTimeMillis();
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                showToast(error.getMessage());
-                System.out.println(error.getMessage());
-                loaded();
             }
         });
     }
@@ -155,35 +146,31 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     @Override
     protected void cancelPending() {
         super.cancelPending();
-        // TODO: Use Observables or Retrofit 2.0 to cancel listPosts and Picasso
+        ion.cancelAll(this);
     }
 
     private void update() {
         if (loading) return;
         lastUpdate = System.currentTimeMillis();
-        service.listThreads(name, new Callback<List<ChanService.Threads>>() {
-            @Override
-            public void success(List<ChanService.Threads> pages, Response response) {
+        service.listThreads(this, name, new FutureCallback<List<Thread>>() {
+            @Override public void onCompleted(Exception e, List<Thread> result) {
+                if (e != null) {
+                    System.out.println(e.getMessage());
+                    return;
+                }
                 if (loading) return; // cancel on real refresh
                 boolean[] positions = new boolean[threads.size()];
-                for (ChanService.Threads page : pages) {
-                    for (Thread thread : page.threads) {
-                        Integer position = threadMap.get(thread.id);
-                        if (position != null) {
-                            positions[position] = true;
-                            threads.set(position, thread);
-                        }
+                for (Thread thread : result) {
+                    Integer position = threadMap.get(thread.id);
+                    if (position != null) {
+                        positions[position] = true;
+                        threads.set(position, thread);
                     }
                 }
                 for (int i = 0; i < positions.length; i++)
                     if (!positions[i]) threads.get(i).dead = true;
                 threadsAdapter.notifyDataSetChanged();
                 lastUpdate = System.currentTimeMillis();
-            }
-
-            @Override
-            public void failure(RetrofitError error) {
-                System.out.println(error.getMessage());
             }
         });
     }

@@ -20,15 +20,11 @@ import javax.inject.Inject;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.annotations.Nsfw;
-import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.PersistentData;
 import anabolicandroids.chanobol.ui.UiFragment;
 import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
 import butterknife.InjectView;
-import retrofit.Callback;
-import retrofit.RetrofitError;
-import retrofit.client.Response;
 
 public class FavoritesFragment extends UiFragment {
     @InjectView(R.id.boards) GridView favoritesView;

@@ -34,11 +34,6 @@ dependencies {
 
     compile 'com.koushikdutta.ion:ion:2.+'
 
-    compile 'com.squareup.okhttp:okhttp:2.1.0'
-    compile 'com.squareup.okhttp:okhttp-urlconnection:2.1.0'
-    compile 'com.squareup.retrofit:retrofit:1.7.1'
-    debugCompile 'com.squareup.retrofit:retrofit-mock:1.8.0'
-
     // TODO: Update to 1.2.4 once it's out (https://github.com/chrisbanes/PhotoView/issues/72)
     compile 'com.github.chrisbanes.photoview:library:1.2.2'
 }

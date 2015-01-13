@@ -16,7 +16,6 @@ import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 public class DebugSettings extends BaseSettings {
 
     public static final String MOCK = "pref_mock";
-    public static final String INDICATORS = "pref_indicators";
 
     @Override
     public void onCreate(Bundle savedInstanceState) {

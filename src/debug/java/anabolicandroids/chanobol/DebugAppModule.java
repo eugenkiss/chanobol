@@ -1,7 +1,6 @@
 package anabolicandroids.chanobol;
 
 import android.app.Application;
-import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -10,13 +9,10 @@ import com.koushikdutta.ion.Ion;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import anabolicandroids.chanobol.api.ChanService;
-import anabolicandroids.chanobol.api.MockChanService;
 import anabolicandroids.chanobol.api.MockImageLoader;
+import anabolicandroids.chanobol.api.MockRestLoader;
 import dagger.Module;
 import dagger.Provides;
-import retrofit.MockRestAdapter;
-import retrofit.RestAdapter;
 
 @Module(
         injects = DebugSettings.class,
@@ -26,21 +22,9 @@ import retrofit.RestAdapter;
 )
 public final class DebugAppModule {
 
-    @Provides @Singleton @MockMode boolean provideMockMode(Application app) {
+    @Provides @Singleton @MockMode
+    boolean provideMockMode(Application app) {
         return PreferenceManager.getDefaultSharedPreferences(app).getBoolean(DebugSettings.MOCK, true);
-    }
-
-    @Provides @Singleton @DebugIndicators boolean provideDebugIndicators(Application app) {
-        return PreferenceManager.getDefaultSharedPreferences(app).getBoolean(DebugSettings.INDICATORS, true);
-    }
-
-    @Provides
-    @Singleton
-    MockRestAdapter provideMockRestAdapter(RestAdapter restAdapter, SharedPreferences preferences) {
-        MockRestAdapter mockRestAdapter = MockRestAdapter.from(restAdapter);
-        //AndroidMockValuePersistence.install(mockRestAdapter, preferences);
-        //mockRestAdapter.setErrorPercentage(100);
-        return mockRestAdapter;
     }
 
     @Provides @Singleton
@@ -48,21 +32,14 @@ public final class DebugAppModule {
         Ion ion = Ion.getDefault(app);
         ion.configure()
                 .setLogging("ion", Log.VERBOSE)
+                .addLoader(0, new MockRestLoader())
                 .addLoader(0, new MockImageLoader())
         ;
         return ion;
-    }
-
-    @Provides @Singleton
-    ChanService provideChanService(RestAdapter restAdapter, @MockMode boolean mockMode,
-                                   MockRestAdapter mockRestAdapter, MockChanService mockService) {
-        if (mockMode) return mockRestAdapter.create(ChanService.class, mockService);
-        return restAdapter.create(ChanService.class);
     }
 
     @Provides @Singleton @Named("DebugSettings")
     Class provideDebugSettingsClass() {
         return DebugSettings.class;
     }
-
 }
