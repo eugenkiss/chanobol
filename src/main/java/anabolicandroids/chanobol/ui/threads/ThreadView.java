@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,11 +18,11 @@ import java.util.WeakHashMap;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Thread;
-import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class ThreadView extends CardView {
+    @InjectView(R.id.blackness) View blackness;
     @InjectView(R.id.numReplies) TextView numReplies;
     @InjectView(R.id.numImages) TextView numImages;
     @InjectView(R.id.image) ImageView image;
@@ -52,9 +53,9 @@ public class ThreadView extends CardView {
         if (t == null) t = "";
         text.setText(Html.fromHtml(s + t));
         if (thread.dead) {
-            Util.setAlpha(this, 0.3f);
+            blackness.setVisibility(View.VISIBLE);
         } else {
-            Util.setAlpha(this, 1f);
+            blackness.setVisibility(View.GONE);
         }
     }
 }

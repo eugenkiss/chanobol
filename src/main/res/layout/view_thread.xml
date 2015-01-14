@@ -1,74 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
 <anabolicandroids.chanobol.ui.threads.ThreadView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_gravity="top"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardBackgroundColor="@color/background_floating_material_dark"
-    >
-    <LinearLayout
-        android:orientation="vertical"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        >
+    android:layout_gravity="top"
+    app:cardBackgroundColor="@color/background_floating_material_dark">
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="#333"
-            >
-            <TextView
-                tools:text="17r"
-                android:textSize="14sp"
-                android:padding="5dp"
-                android:id="@+id/numReplies"
-                android:layout_width="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                />
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                />
+                android:background="#333">
+
+                <TextView
+                    android:id="@+id/numReplies"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:textSize="14sp"
+                    tools:text="17r" />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1" />
+
+                <TextView
+                    android:id="@+id/numImages"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="5dp"
+                    android:textSize="14sp"
+                    tools:text="6i" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/image"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:scaleType="centerCrop" />
+
             <TextView
-                tools:text="6i"
-                android:textSize="14sp"
+                android:id="@+id/text"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:maxLines="5"
+                android:minLines="5"
                 android:padding="5dp"
-                android:id="@+id/numImages"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+                android:textColor="?android:textColorPrimary"
+                android:textSize="14sp"
+                tools:text="Hello Bla blsdf asdkf sfj sdif aj dfiasfj  sdfjasidfj sdif jasdf jsdfijdsf" />
         </LinearLayout>
 
-        <ImageView
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:scaleType="centerCrop"
-            android:id="@+id/image"
-            />
-
-        <!--<TextView-->
-            <!--tools:text="Hello"-->
-            <!--android:textColor="?android:textColorPrimary"-->
-            <!--android:textSize="14sp"-->
-            <!--android:padding="5dp"-->
-            <!--android:id="@+id/subject"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="wrap_content"-->
-            <!--/>-->
-
-        <TextView
-            tools:text="Hello Bla blsdf asdkf sfj sdif aj dfiasfj  sdfjasidfj sdif jasdf jsdfijdsf"
-            android:textColor="?android:textColorPrimary"
-            android:textSize="14sp"
-            android:maxLines="5"
-            android:minLines="5"
-            android:padding="5dp"
-            android:id="@+id/text"
+        <LinearLayout
+            android:id="@+id/blackness"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
-    </LinearLayout>
+            android:background="#99000000"
+            android:orientation="horizontal"
+            android:visibility="gone" />
+    </FrameLayout>
 
 </anabolicandroids.chanobol.ui.threads.ThreadView>
