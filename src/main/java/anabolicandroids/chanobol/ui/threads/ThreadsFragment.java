@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Thread;
+import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.posts.PostsFragment;
@@ -96,6 +97,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
             executor.scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
+                    if (!prefs.getBoolean(Settings.REFRESH, true)) return;
                     if (pauseUpdating) return;
                     if (System.currentTimeMillis() - lastUpdate > updateInterval) {
                         activity.runOnUiThread(new Runnable() {

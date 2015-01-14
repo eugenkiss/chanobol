@@ -12,4 +12,10 @@
         android:title="Preload Thumbnails"
         >
     </CheckBoxPreference>
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_refresh"
+        android:title="Refresh Threads/Posts in Background"
+        >
+    </CheckBoxPreference>
 </PreferenceScreen>

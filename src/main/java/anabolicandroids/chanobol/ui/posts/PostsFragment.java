@@ -124,6 +124,7 @@ public class PostsFragment extends SwipeRefreshFragment {
             executor.scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
+                    if (!prefs.getBoolean(Settings.REFRESH, true)) return;
                     if (pauseUpdating) return;
                     if (System.currentTimeMillis() - lastUpdate > updateInterval) {
                         activity.runOnUiThread(new Runnable() {
