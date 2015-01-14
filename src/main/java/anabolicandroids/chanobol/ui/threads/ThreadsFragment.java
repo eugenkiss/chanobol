@@ -134,8 +134,8 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         service.listThreads(this, name, new FutureCallback<List<Thread>>() {
             @Override public void onCompleted(Exception e, List<Thread> result) {
                 if (e != null) {
-                    showToast(e.getMessage());
-                    System.out.println(e.getMessage());
+                    if (e.getMessage() != null) showToast(e.getMessage());
+                    System.out.println("" + e.getMessage());
                     loaded();
                     return;
                 }
@@ -159,7 +159,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         service.listThreads(this, name, new FutureCallback<List<Thread>>() {
             @Override public void onCompleted(Exception e, List<Thread> result) {
                 if (e != null) {
-                    System.out.println(e.getMessage());
+                    System.out.println("" + e.getMessage());
                     return;
                 }
                 if (loading) return; // cancel on real refresh

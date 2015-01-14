@@ -165,8 +165,8 @@ public class PostsFragment extends SwipeRefreshFragment {
         service.listPosts(this, board, threadId, new FutureCallback<List<Post>>() {
             @Override public void onCompleted(Exception e, List<Post> result) {
                 if (e != null) {
-                    if (!silent) showToast(e.getMessage());
-                    System.out.println(e.getMessage());
+                    if (!silent && e.getMessage() != null) showToast(e.getMessage());
+                    System.out.println("" + e.getMessage());
                     loaded();
                     return;
                 }
