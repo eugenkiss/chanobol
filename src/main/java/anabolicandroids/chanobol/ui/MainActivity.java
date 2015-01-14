@@ -12,6 +12,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.internal.widget.CompatTextView;
 import android.support.v7.widget.Toolbar;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -61,6 +62,7 @@ public class MainActivity extends BaseActivity {
     @InjectView(R.id.allBoards) TextView allBoards;
     @InjectView(R.id.settings) TextView settings;
     @InjectView(R.id.debugSettings) @Optional TextView debugSettings;
+    @InjectView(R.id.favoriteBoardsHeader) CompatTextView favoriteBoardsHeader;
     @InjectView(R.id.favoriteBoards) ListView favoriteBoardsView;
     FavoritesAdapter favoriteBoardsAdapter;
 
@@ -174,6 +176,10 @@ public class MainActivity extends BaseActivity {
         persistentData.addFavoritesChangedCallback(new PersistentData.FavoritesCallback() {
             @Override public void onChanged(Set<Board> newFavorites) {
                 favoriteBoardsAdapter.updateItems(new ArrayList<>(newFavorites));
+                if (newFavorites.isEmpty())
+                    favoriteBoardsHeader.setVisibility(View.GONE);
+                else
+                    favoriteBoardsHeader.setVisibility(View.VISIBLE);
             }
         });
         favoriteBoardsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
