@@ -28,13 +28,14 @@ public final class DebugAppModule {
     }
 
     @Provides @Singleton
-    Ion provideIon(Application app) {
+    Ion provideIon(Application app, @MockMode boolean mockMode) {
         Ion ion = Ion.getDefault(app);
-        ion.configure()
-                .setLogging("ion", Log.VERBOSE)
-                .addLoader(0, new MockRestLoader())
-                .addLoader(0, new MockImageLoader())
-        ;
+        ion.configure().setLogging("ion", Log.VERBOSE);
+        if (mockMode) {
+            ion.configure()
+                    .addLoader(0, new MockRestLoader())
+                    .addLoader(0, new MockImageLoader());
+        }
         return ion;
     }
 
