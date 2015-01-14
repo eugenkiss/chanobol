@@ -44,7 +44,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     long lastUpdate;
     static final long updateInterval = 30_000;
     boolean pauseUpdating = false;
-    private final ScheduledThreadPoolExecutor executor = new ScheduledThreadPoolExecutor(1);
+    private ScheduledThreadPoolExecutor executor;
 
     public static ThreadsFragment create(String name) {
         ThreadsFragment f = new ThreadsFragment();
@@ -68,20 +68,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         threadsView.setAdapter(threadsAdapter);
 
         load();
-        executor.scheduleWithFixedDelay(new Runnable() {
-            @Override
-            public void run() {
-                if (pauseUpdating) return;
-                if (System.currentTimeMillis() - lastUpdate > updateInterval) {
-                    activity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            update();
-                        }
-                    });
-                }
-            }
-        }, 5000, 5000, TimeUnit.MILLISECONDS);
+        initBackgroundUpdater();
 
         threadsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -103,18 +90,39 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         });
     }
 
+    private void initBackgroundUpdater() {
+        if (executor == null) {
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    if (pauseUpdating) return;
+                    if (System.currentTimeMillis() - lastUpdate > updateInterval) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                update();
+                            }
+                        });
+                    }
+                }
+            }, 5000, 5000, TimeUnit.MILLISECONDS);
+        }
+    }
+
     @Override
     public void onResume() {
         super.onResume();
         activity.setTitle(name);
         if (menu != null) menu.setGroupVisible(R.id.threads, true);
         update();
+        initBackgroundUpdater();
         pauseUpdating = false;
     }
 
     @Override
     public void onStop() {
-        super.onPause();
+        super.onStop();
         pauseUpdating = true;
     }
 
@@ -141,12 +149,6 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 lastUpdate = System.currentTimeMillis();
             }
         });
-    }
-
-    @Override
-    protected void cancelPending() {
-        super.cancelPending();
-        ion.cancelAll(this);
     }
 
     private void update() {
@@ -176,9 +178,15 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     }
 
     @Override
+    protected void cancelPending() {
+        super.cancelPending();
+        ion.cancelAll(this);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
-        executor.shutdown();
+        if (executor != null) executor.shutdown();
     }
 
     @Override

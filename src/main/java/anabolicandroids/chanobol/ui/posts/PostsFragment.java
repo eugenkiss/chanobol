@@ -18,6 +18,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -80,6 +82,11 @@ public class PostsFragment extends SwipeRefreshFragment {
     HashMap<String, Post> postsMap;
     HashMap<String, ArrayList<String>> answers;
 
+    // TODO: Isn't there a more elegant solution?
+    long lastUpdate;
+    static final long updateInterval = 60_000;
+    boolean pauseUpdating = false;
+    private ScheduledThreadPoolExecutor executor;
 
     public static PostsFragment create(String board, Post op, Drawable opImage) {
         PostsFragment f = new PostsFragment();
@@ -108,6 +115,27 @@ public class PostsFragment extends SwipeRefreshFragment {
         answers = new HashMap<>();
 
         load();
+        initBackgroundUpdater();
+    }
+
+    private void initBackgroundUpdater() {
+        if (executor == null) {
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    if (pauseUpdating) return;
+                    if (System.currentTimeMillis() - lastUpdate > updateInterval) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                update();
+                            }
+                        });
+                    }
+                }
+            }, 5000, 5000, TimeUnit.MILLISECONDS);
+        }
     }
 
     @Override
@@ -119,15 +147,24 @@ public class PostsFragment extends SwipeRefreshFragment {
             menu.setGroupVisible(R.id.posts, true);
         }
         postsAdapter.notifyDataSetChanged();
+        initBackgroundUpdater();
+        pauseUpdating = false;
+    }
+
+    @Override public void onStop() {
+        super.onStop();
+        pauseUpdating = true;
     }
 
     @Override
-    protected void load() {
-        super.load();
+    protected void load() { load(false); }
+
+    private void load(final boolean silent) {
+        if (!silent) super.load();
         service.listPosts(this, board, threadId, new FutureCallback<List<Post>>() {
             @Override public void onCompleted(Exception e, List<Post> result) {
                 if (e != null) {
-                    showToast(e.getMessage());
+                    if (!silent) showToast(e.getMessage());
                     System.out.println(e.getMessage());
                     loaded();
                     return;
@@ -151,14 +188,26 @@ public class PostsFragment extends SwipeRefreshFragment {
                 }
                 postsAdapter.notifyDataSetChanged();
                 loaded();
+                lastUpdate = System.currentTimeMillis();
             }
         });
+    }
+
+    private void update() {
+        if (loading) return;
+        lastUpdate = System.currentTimeMillis();
+        load(true);
     }
 
     @Override
     protected void cancelPending() {
         super.cancelPending();
         ion.cancelAll(this);
+    }
+
+    @Override public void onDestroy() {
+        super.onDestroy();
+        if (executor != null) executor.shutdown();
     }
 
     @Override
