@@ -1,9 +1,11 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url 'https://maven.fabric.io/public' }
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'io.fabric.tools:gradle:1.+'
     }
 }
 
@@ -13,9 +15,11 @@ def versionPatch = 0
 def versionBuild = 0
 
 apply plugin: 'com.android.application'
+apply plugin: 'io.fabric'
 
 repositories {
     jcenter()
+    maven { url 'https://maven.fabric.io/public' }
 }
 
 dependencies {
@@ -36,6 +40,10 @@ dependencies {
 
     // TODO: Update to 1.2.4 once it's out (https://github.com/chrisbanes/PhotoView/issues/72)
     compile 'com.github.chrisbanes.photoview:library:1.2.2'
+
+    compile('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
+        transitive = true;
+    }
 }
 
 android {
