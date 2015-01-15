@@ -36,6 +36,12 @@
         android:visibility="gone"
         />
 
+    <TextView
+        android:id="@+id/about"
+        style="@style/Widget.Chanobol.Drawer.Entry"
+        android:text="About"
+        />
+
     <android.support.v7.internal.widget.CompatTextView
         android:id="@+id/favoriteBoardsHeader"
         style="@style/Widget.Chanobol.Drawer.Header"

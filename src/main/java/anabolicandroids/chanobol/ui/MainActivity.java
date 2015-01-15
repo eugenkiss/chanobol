@@ -14,6 +14,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.internal.widget.CompatTextView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -24,7 +27,6 @@ import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -44,7 +46,7 @@ import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.Optional;
+import butterknife.OnClick;
 
 // The following resources have been helpful:
 // http://stackoverflow.com/questions/17258020/switching-between-android-navigation-drawer-image-and-up-caret-when-using-fragme?lq=1
@@ -53,23 +55,19 @@ public class MainActivity extends BaseActivity {
     @Inject PersistentData persistentData;
     @Inject @Named("DebugSettings") Class debugSettingsClass;
 
-    @InjectView(R.id.container) RelativeLayout container;
     @InjectView(R.id.toolbar) Toolbar toolbar;
     @InjectView(R.id.loadingBar) ProgressBar loadingBar;
     @InjectView(R.id.drawerLayout) DrawerLayout drawerLayout;
     @InjectView(R.id.drawer) LinearLayout drawer;
-    @InjectView(R.id.favoriteBoardsBtn) TextView favoriteBoards;
-    @InjectView(R.id.allBoards) TextView allBoards;
-    @InjectView(R.id.settings) TextView settings;
-    @InjectView(R.id.debugSettings) @Optional TextView debugSettings;
+    @InjectView(R.id.debugSettings) TextView debugSettings;
     @InjectView(R.id.favoriteBoardsHeader) CompatTextView favoriteBoardsHeader;
     @InjectView(R.id.favoriteBoards) ListView favoriteBoardsView;
-    FavoritesAdapter favoriteBoardsAdapter;
 
-    FragmentManager fm;
-    FragmentManager.OnBackStackChangedListener backStackChangedListener;
     Menu menu;
     ActionBarDrawerToggle drawerToggle;
+    FavoritesAdapter favoriteBoardsAdapter;
+    FragmentManager fm;
+    FragmentManager.OnBackStackChangedListener backStackChangedListener;
 
     boolean isToolbarShowing = true;
 
@@ -90,6 +88,8 @@ public class MainActivity extends BaseActivity {
         getSupportActionBar().setHomeButtonEnabled(true);
         // TODO: Doesn't work even on Nexus 7 5.0.1
         getSupportActionBar().setElevation(100);
+
+        if (BuildConfig.DEBUG) debugSettings.setVisibility(View.VISIBLE);
 
         // Make the up button work as a back button
         // http://stackoverflow.com/a/24878407/283607
@@ -129,47 +129,6 @@ public class MainActivity extends BaseActivity {
         });
         drawerLayout.setDrawerListener(drawerToggle);
 
-        settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Settings.class);
-                startActivity(intent);
-            }
-        });
-        if (BuildConfig.DEBUG) {
-            debugSettings.setVisibility(View.VISIBLE);
-            debugSettings.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent = new Intent(MainActivity.this, debugSettingsClass);
-                    startActivity(intent);
-                }
-            });
-        }
-
-        allBoards.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearBackStackOnDrawerClick();
-                Fragment f = new BoardsFragment();
-                fm.beginTransaction()
-                        .replace(R.id.container, f, null)
-                        .commit();
-            }
-        });
-
-        favoriteBoards.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                clearBackStackOnDrawerClick();
-                Fragment f = new FavoritesFragment();
-                fm.beginTransaction()
-                        .replace(R.id.container, f, null)
-                        .commit();
-            }
-        });
-
-
         favoriteBoardsAdapter = new FavoritesAdapter(this, new ArrayList<>(persistentData.getFavorites()));
         favoriteBoardsView.setAdapter(favoriteBoardsAdapter);
         favoriteBoardsAdapter.notifyDataSetChanged();
@@ -203,6 +162,50 @@ public class MainActivity extends BaseActivity {
                     .replace(R.id.container, f, null)
                     .commit();
         }
+    }
+
+    @OnClick(R.id.allBoards) void onAllBoards() {
+        clearBackStackOnDrawerClick();
+        Fragment f = new BoardsFragment();
+        fm.beginTransaction()
+                .replace(R.id.container, f, null)
+                .commit();
+    }
+
+    @OnClick(R.id.favoriteBoardsBtn) void onFavoriteBoards() {
+        clearBackStackOnDrawerClick();
+        Fragment f = new FavoritesFragment();
+        fm.beginTransaction()
+                .replace(R.id.container, f, null)
+                .commit();
+    }
+
+    @OnClick(R.id.settings) void onSettings() {
+        Intent intent = new Intent(MainActivity.this, Settings.class);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.debugSettings) void onDebugSettings() {
+        Intent intent = new Intent(MainActivity.this, debugSettingsClass);
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.about) void onAbout() {
+        SpannableString s = new SpannableString(
+            "Chanobol is a fast and usable 4Chan reader inspired by Chanu. " +
+            "Find the source code here: " +
+            "https://github.com/eugenkiss/chanobol"
+        );
+        Linkify.addLinks(s, Linkify.ALL);
+
+        AlertDialog d = new AlertDialog.Builder(this)
+                .setTitle("About Chanobol")
+                .setMessage(s)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+
+        ((TextView)d.findViewById(android.R.id.message))
+                .setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     @Override
