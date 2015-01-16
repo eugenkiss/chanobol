@@ -192,7 +192,7 @@ public class MainActivity extends BaseActivity {
 
     @OnClick(R.id.about) void onAbout() {
         SpannableString s = new SpannableString(
-            "Chanobol is a fast and usable 4Chan reader inspired by Chanu. " +
+            "Chanobol is a fast and usable 4Chan reader inspired by Chanu.\n" +
             "Find the source code here: " +
             "https://github.com/eugenkiss/chanobol"
         );
