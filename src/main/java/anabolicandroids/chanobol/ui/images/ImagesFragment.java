@@ -1,6 +1,8 @@
 package anabolicandroids.chanobol.ui.images;
 
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -24,6 +26,8 @@ public class ImagesFragment extends UiFragment {
     private int index;
     private List<String> imageIdAndExts;
 
+    private String url;
+
     public static ImagesFragment create(String boardName, String threadId,
                                         Drawable image, int index, List<String> imageIdAndExts) {
         ImagesFragment f = new ImagesFragment();
@@ -44,7 +48,7 @@ public class ImagesFragment extends UiFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         String[] imageIdAndExt = imageIdAndExts.get(index).split("\\.");
-        final String url = ApiModule.imgUrl(boardName, imageIdAndExt[0], "."+imageIdAndExt[1]);
+        url = ApiModule.imgUrl(boardName, imageIdAndExt[0], "."+imageIdAndExt[1]);
         // TODO: Makes application break after a while of zooming in and out
         //imageView.setMaximumScale(25); // Default value is to small for some images
         // TODO: Would be great if deepZoom was more configurable. Too early too low resolution.
@@ -65,7 +69,7 @@ public class ImagesFragment extends UiFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.posts, menu);
+        inflater.inflate(R.menu.images, menu);
         menu.setGroupVisible(R.id.posts, false);
         menu.setGroupVisible(R.id.postsDialog, false);
         this.menu = menu;
@@ -74,6 +78,12 @@ public class ImagesFragment extends UiFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
+            case R.id.openExternal:
+                Intent intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.parse(url), "image/*");
+                startActivity(intent);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
