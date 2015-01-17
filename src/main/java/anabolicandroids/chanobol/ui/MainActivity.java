@@ -96,7 +96,6 @@ public class MainActivity extends BaseActivity {
         backStackChangedListener = new FragmentManager.OnBackStackChangedListener() {
             @Override
             public void onBackStackChanged() {
-                showToolbar();
                 FragmentManager fm = getSupportFragmentManager();
                 int stackHeight = fm.getBackStackEntryCount();
                 if (stackHeight > 0) {
@@ -110,6 +109,13 @@ public class MainActivity extends BaseActivity {
                 // http://stackoverflow.com/a/18752763/283607
                 Fragment fragment = fm.getFragments().get(stackHeight);
                 fragment.onResume();
+                // To remember the visibility of the toolbar
+                // and rehide it on return if necessary.
+                if (fragment instanceof UiFragment) {
+                    UiFragment f = (UiFragment) fragment;
+                    if (!f.wasToolbarShowing) hideToolbar();
+                    else showToolbar();
+                }
             }
         };
         fm.addOnBackStackChangedListener(backStackChangedListener);
@@ -208,11 +214,6 @@ public class MainActivity extends BaseActivity {
 
         ((TextView)d.findViewById(android.R.id.message))
                 .setMovementMethod(LinkMovementMethod.getInstance());
-    }
-
-    @Override protected void onStart() {
-        super.onStart();
-        showToolbar();
     }
 
     @Override

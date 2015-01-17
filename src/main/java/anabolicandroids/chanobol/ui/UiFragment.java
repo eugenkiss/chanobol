@@ -5,8 +5,6 @@ import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -15,7 +13,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
-import android.widget.Toast;
 
 import com.koushikdutta.ion.Ion;
 
@@ -41,7 +38,7 @@ public abstract class UiFragment extends BaseFragment {
     View rootView;
 
     protected boolean loading;
-    protected boolean wasToolbarShowing = true;
+    public boolean wasToolbarShowing = true;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +65,7 @@ public abstract class UiFragment extends BaseFragment {
         super.onActivityCreated(savedInstanceState);
         toolbar = activity.toolbar;
         drawer = activity.drawerLayout;
+        activity.showToolbar();
 
         // TODO: I bet there is a better way to get an auto-hiding toolbar...
         // I mean the Play Store App can do it and do it better, i.e.
@@ -102,32 +100,19 @@ public abstract class UiFragment extends BaseFragment {
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        if (wasToolbarShowing) activity.showToolbar();
-        else activity.hideToolbar();
-    }
-
-    @Override
     public void onDestroy() {
         super.onDestroy();
         cancelPending();
     }
 
-    // These should be used to remember the visibility of the toolbar
-    // and thus rehide it on return to this fragment if necessary.
-    protected void startFragment(FragmentTransaction ft) {
-        // http://stackoverflow.com/a/22881361/283607
-        FragmentManager fm = getFragmentManager();
-        Fragment top = fm.findFragmentById(R.id.container);
-        if (top == this) wasToolbarShowing = activity.isToolbarShowing;
-        ft.commit();
-    }
     protected void startFragment(Fragment f, String backStack) {
-        FragmentTransaction ft = activity.getSupportFragmentManager().beginTransaction()
+        // These should be used to remember the visibility of the toolbar
+        // and thus rehide it on return to this fragment if necessary.
+        wasToolbarShowing = activity.isToolbarShowing;
+        activity.getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, f, null)
-                .addToBackStack(backStack);
-        startFragment(ft);
+                .addToBackStack(backStack)
+                .commit();
     }
     protected void startFragment(Fragment f) {
         startFragment(f, null);
