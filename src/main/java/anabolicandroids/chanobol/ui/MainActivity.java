@@ -152,11 +152,13 @@ public class MainActivity extends BaseActivity {
         });
 
         if (persistentData.getFavorites().size() == 0) {
+            favoriteBoardsHeader.setVisibility(View.GONE);
             Fragment f = new BoardsFragment();
             fm.beginTransaction()
                     .replace(R.id.container, f, null)
                     .commit();
         } else {
+            favoriteBoardsHeader.setVisibility(View.VISIBLE);
             Fragment f = new FavoritesFragment();
             fm.beginTransaction()
                     .replace(R.id.container, f, null)
