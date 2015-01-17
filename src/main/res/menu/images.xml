@@ -7,8 +7,6 @@
               android:title="Open External"
               app:showAsAction="never"
             />
-    </group>
-    <group android:id="@+id/images">
         <item android:id="@+id/chooseExternal"
               android:title="Choose External"
               app:showAsAction="never"
