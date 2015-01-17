@@ -230,7 +230,10 @@ public class PostView extends CardView {
                                     @Override public void onClick(View v) {
                                         Intent intent = new Intent(Intent.ACTION_VIEW)
                                                 .setDataAndType(Uri.parse(url), "video/webm");
-                                        getContext().startActivity(intent);
+                                        if(intent.resolveActivity(getContext().getPackageManager()) != null)
+                                            getContext().startActivity(intent);
+                                        else
+                                            Util.showToast(getContext(), "No suitable app");
                                     }
                                 });
                                 break;

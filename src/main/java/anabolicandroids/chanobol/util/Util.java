@@ -18,6 +18,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import com.nineoldandroids.animation.ValueAnimator;
 
@@ -51,6 +52,10 @@ public class Util {
         final String[] units = new String[] { "B", "kB", "MB", "GB", "TB" };
         int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
         return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, digitGroups)) + " " + units[digitGroups];
+    }
+
+    public static void showToast(Context context, String msg) {
+        Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
     public static void setAlpha(View view, float alpha) {

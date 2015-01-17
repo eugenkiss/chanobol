@@ -24,6 +24,7 @@ import javax.inject.Inject;
 import anabolicandroids.chanobol.BaseFragment;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ChanService;
+import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 
 public abstract class UiFragment extends BaseFragment {
@@ -133,7 +134,7 @@ public abstract class UiFragment extends BaseFragment {
     }
 
     protected void showToast(String msg) {
-        Toast.makeText(appContext, msg, Toast.LENGTH_SHORT).show();
+        Util.showToast(appContext, msg);
     }
 
     protected void load() {

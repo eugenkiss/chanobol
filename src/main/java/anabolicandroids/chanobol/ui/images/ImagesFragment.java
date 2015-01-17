@@ -77,12 +77,22 @@ public class ImagesFragment extends UiFragment {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        Intent intent;
         switch(item.getItemId()) {
             case R.id.openExternal:
-                Intent intent = new Intent();
+                intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 intent.setDataAndType(Uri.parse(url), "image/*");
-                startActivity(intent);
+                if(intent.resolveActivity(activity.getPackageManager()) != null)
+                    startActivity(intent);
+                else
+                    showToast("No suitable app");
+                break;
+            case R.id.chooseExternal:
+                intent = new Intent();
+                intent.setAction(Intent.ACTION_VIEW);
+                intent.setDataAndType(Uri.parse(url), "image/*");
+                startActivity(Intent.createChooser(intent, "Open image with"));
                 break;
         }
         return super.onOptionsItemSelected(item);
