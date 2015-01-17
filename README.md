@@ -1,6 +1,7 @@
-Chanobol
-========
+![Logo][Logo] Chanobol
+======================
 
+  [Logo]: https://raw.githubusercontent.com/eugenkiss/chanobol/master/src/main/res/drawable-mdpi/ic_launcher.png
   [Chanu]: https://github.com/grzegorznittner/chanu
   [U+2020]: https://github.com/JakeWharton/u2020
   [API]: https://github.com/4chan/4chan-API
