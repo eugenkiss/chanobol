@@ -10,14 +10,8 @@
 
     <ListView
         android:id="@+id/posts"
+        style="@style/Widget.Chanobol.AdapterView.PostsDialogListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:clipToPadding="false"
-        android:divider="@null"
-        android:dividerHeight="@dimen/post_dialog_gap"
-        android:orientation="vertical"
-        android:padding="20dp"
-        android:scrollbarStyle="outsideOverlay"
         />
 </LinearLayout>
