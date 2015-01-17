@@ -38,7 +38,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:paddingBottom">2dp</item>
-        <item name="android:textColor">?android:textColorSecondary</item>
+        <item name="android:textColor">?android:textColorPrimary</item>
         <item name="android:textAllCaps">true</item>
         <item name="textAllCaps">true</item>
         <item name="android:textStyle">bold</item>
@@ -47,7 +47,6 @@
         <item name="android:layout_marginRight">14dp</item>
         <item name="android:layout_marginTop">12dp</item>
         <item name="android:layout_marginBottom">6dp</item>
-        <item name="android:background">@drawable/drawer_header_bg</item>
     </style>
 
     <style name="Widget.Chanobol.Drawer.Entry" parent="">
@@ -65,7 +64,7 @@
         <item name="android:fadingEdge">none</item>
         <item name="android:fadingEdgeLength">0dp</item>
         <item name="android:overScrollMode">never</item>
-        <item name="android:background">@color/cardview_dark_background</item>
+        <item name="android:background">@color/bg</item>
         <item name="android:clipToPadding">false</item>
     </style>
 

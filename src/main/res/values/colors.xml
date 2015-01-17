@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="toolbar" type="color">@color/material_blue_grey_900</item>
+    <item name="drawer" type="color">@color/material_blue_grey_900</item>
+    <item name="bg" type="color">#212121</item>
+    <item name="fg" type="color">@color/background_floating_material_dark</item>
+    <item name="fg2" type="color">#393939</item>
+</resources>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
-    app:cardBackgroundColor="@color/background_floating_material_dark"
+    app:cardBackgroundColor="@color/fg"
     >
 
     <LinearLayout
@@ -18,7 +18,7 @@
             android:id="@+id/header"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:background="#393939"
+            android:background="@color/fg2"
             android:paddingBottom="6dp"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
