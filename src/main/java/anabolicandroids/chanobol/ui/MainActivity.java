@@ -208,6 +208,11 @@ public class MainActivity extends BaseActivity {
                 .setMovementMethod(LinkMovementMethod.getInstance());
     }
 
+    @Override protected void onStart() {
+        super.onStart();
+        showToolbar();
+    }
+
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
