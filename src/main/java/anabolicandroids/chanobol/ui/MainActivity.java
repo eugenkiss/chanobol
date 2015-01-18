@@ -86,8 +86,6 @@ public class MainActivity extends BaseActivity {
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
-        // TODO: Doesn't work even on Nexus 7 5.0.1
-        getSupportActionBar().setElevation(100);
 
         if (BuildConfig.DEBUG) debugSettings.setVisibility(View.VISIBLE);
 
