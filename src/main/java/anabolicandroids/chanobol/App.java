@@ -10,6 +10,11 @@ import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
 
 public class App extends Application {
+    // This variable is needed to communicate between the Settings and the Main activity.
+    // Using a static variable is the easiest solution. Note that having a static variable
+    // in the Application class is safe with respect to stale references so it's all good.
+    public static boolean needToProtractToolbar = false;
+
     private ObjectGraph appGraph;
 
     @Override

@@ -1,21 +1,23 @@
 package anabolicandroids.chanobol.ui;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.DrawerLayout;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.widget.AdapterView;
 
 import com.koushikdutta.ion.Ion;
+import com.nineoldandroids.view.ViewHelper;
 
 import javax.inject.Inject;
 
@@ -70,11 +72,7 @@ public abstract class UiFragment extends BaseFragment {
         drawer = activity.drawerLayout;
         activity.showToolbar();
 
-        // TODO: I bet there is a better way to get an auto-hiding toolbar...
-        // I mean the Play Store App can do it and do it better, i.e.
-        // it hides immediately on scrolling down and does not rely on
-        // the visibility of an adapterview's items.
-        // http://www.techrepublic.com/article/pro-tip-maximize-android-screen-real-estate-by-showing-and-hiding-the-action-bar/
+        // Implementation of 'Quick Return Toolbar'
         final TypedArray styledAttributes = activity.getTheme().obtainStyledAttributes(
                 new int[]{android.support.v7.appcompat.R.attr.actionBarSize});
         final int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
@@ -84,21 +82,26 @@ public abstract class UiFragment extends BaseFragment {
                 rootView.getPaddingTop() + actionBarHeight,
                 rootView.getPaddingRight(),
                 rootView.getPaddingBottom());
-        if (rootView instanceof AdapterView<?>) {
-            rootView.getViewTreeObserver().addOnScrollChangedListener(
-                    new ViewTreeObserver.OnScrollChangedListener() {
-                        int oldPos = 0;
-                        public void onScrollChanged() {
-                            int pos = ((AdapterView) rootView).getFirstVisiblePosition();
-                            // actionBar.show()/.hide() does not animate the toolbar -> add animation manually
-                            if (pos < oldPos) {
-                                activity.showToolbar();
-                            } else if (pos > oldPos) {
-                                activity.hideToolbar();
-                            }
-                            oldPos = pos;
-                        }
-                    });
+        if (rootView instanceof RecyclerView) {
+            RecyclerView rv = (RecyclerView) rootView;
+            if (Build.VERSION.SDK_INT >= 11) {
+                rv.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @TargetApi(Build.VERSION_CODES.HONEYCOMB) @Override
+                    public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
+                        float y = Util.clamp(-toolbar.getHeight(), toolbar.getTranslationY() - dy, 0);
+                        toolbar.setTranslationY(y);
+                    }
+                });
+            } else {
+                rv.setOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                        if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
+                        float y = Util.clamp(-toolbar.getHeight(), ViewHelper.getTranslationY(toolbar) - dy, 0);
+                        ViewHelper.setTranslationY(toolbar, y);
+                    }
+                });
+            }
         }
     }
 
@@ -111,7 +114,7 @@ public abstract class UiFragment extends BaseFragment {
     protected void startFragment(Fragment f, String backStack) {
         // These should be used to remember the visibility of the toolbar
         // and thus rehide it on return to this fragment if necessary.
-        wasToolbarShowing = activity.isToolbarShowing;
+        wasToolbarShowing = activity.isToolbarFullyShowing();
         activity.getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, f, null)
                 .addToBackStack(backStack)

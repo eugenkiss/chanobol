@@ -13,7 +13,6 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.internal.widget.CompatTextView;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
@@ -30,6 +29,8 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.nineoldandroids.view.ViewHelper;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -37,6 +38,7 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.BaseActivity;
 import anabolicandroids.chanobol.BindableAdapter;
 import anabolicandroids.chanobol.BuildConfig;
@@ -71,7 +73,7 @@ public class MainActivity extends BaseActivity {
     FragmentManager fm;
     FragmentManager.OnBackStackChangedListener backStackChangedListener;
 
-    boolean isToolbarShowing = true;
+    //boolean isToolbarShowing = true;
 
     @Override
     protected List<Object> getModules() {
@@ -274,35 +276,33 @@ public class MainActivity extends BaseActivity {
         super.onDestroy();
     }
 
+    @Override protected void onResume() {
+        super.onResume();
+        if (App.needToProtractToolbar) {
+            showToolbar();
+            App.needToProtractToolbar = false;
+        }
+    }
+
     private static int dur = 120;
 
     public void showToolbar() {
-        if (Build.VERSION.SDK_INT >= 14) {
-            if (toolbar.getY() == -toolbar.getHeight()) {
-                toolbar.animate().y(0).setDuration(dur);
-                isToolbarShowing = true;
-            }
-        } else {
-            if (toolbar.getTop() == -toolbar.getHeight()) {
-                Util.animateY(toolbar, toolbar.getTop(), 0, dur);
-                isToolbarShowing = true;
-            }
-        }
+        if (Build.VERSION.SDK_INT >= 14)
+            toolbar.animate().y(0).setDuration(dur);
+        else
+            Util.animateY(toolbar, toolbar.getTop(), 0, dur);
     }
 
     public void hideToolbar() {
         if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
-        if (Build.VERSION.SDK_INT >= 14) {
-            if (toolbar.getY() == 0) {
-                toolbar.animate().y(-toolbar.getHeight()).setDuration(dur);
-                isToolbarShowing = false;
-            }
-        } else {
-            if (toolbar.getTop() == 0) {
-                Util.animateY(toolbar, 0, -toolbar.getHeight(), 120);
-                isToolbarShowing = false;
-            }
-        }
+        if (Build.VERSION.SDK_INT >= 14)
+            toolbar.animate().y(-toolbar.getHeight()).setDuration(dur);
+        else
+            Util.animateY(toolbar, 0, -toolbar.getHeight(), 120);
+    }
+
+    public boolean isToolbarFullyShowing() {
+        return ViewHelper.getTranslationY(toolbar) == 0;
     }
 
     // As per the design guidelines

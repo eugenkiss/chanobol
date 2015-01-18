@@ -3,6 +3,7 @@ package anabolicandroids.chanobol.ui;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
+import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.BaseSettings;
 import anabolicandroids.chanobol.R;
 
@@ -22,6 +23,10 @@ public class Settings extends BaseSettings {
 
     @Override
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-        // Do Nothing
+        if (key.equals(HIDABLE_TOOLBAR)) {
+            // For the case that the toolbar is not fully protracted and the user
+            // disables the auto-hiding toolbar it needs to be fully protracted afterwards.
+            App.needToProtractToolbar = true;
+        }
     }
 }
