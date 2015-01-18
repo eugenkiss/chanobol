@@ -13,6 +13,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.internal.widget.CompatTextView;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
@@ -37,6 +38,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import anabolicandroids.chanobol.BaseActivity;
+import anabolicandroids.chanobol.BindableAdapter;
 import anabolicandroids.chanobol.BuildConfig;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
@@ -310,7 +312,8 @@ public class MainActivity extends BaseActivity {
     }
 
 
-    private static class FavoritesAdapter extends UiAdapter<Board> {
+    private static class FavoritesAdapter extends BindableAdapter<Board> {
+        private List<Board> items;
 
         public FavoritesAdapter(Context context, List<Board> items) {
             super(context);
@@ -325,6 +328,21 @@ public class MainActivity extends BaseActivity {
         @Override
         public void bindView(Board item, int position, View view) {
             ((FavoriteView) view).bindTo(item);
+        }
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+
+        @Override
+        public Board getItem(int position) {
+            return items.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
         }
 
         public void updateItems(List<Board> items) {

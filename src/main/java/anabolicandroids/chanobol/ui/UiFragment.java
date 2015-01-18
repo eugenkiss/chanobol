@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.ui;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -20,11 +21,13 @@ import javax.inject.Inject;
 
 import anabolicandroids.chanobol.BaseFragment;
 import anabolicandroids.chanobol.R;
+import anabolicandroids.chanobol.annotations.ForActivity;
 import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 
 public abstract class UiFragment extends BaseFragment {
+    @Inject @ForActivity public Context context;
     @Inject public MainActivity activity;
     @Inject public ChanService service;
     @Inject public Ion ion;

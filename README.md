@@ -11,6 +11,7 @@
   [Bindable Adapter]: https://twitter.com/jakewharton/status/325368867109076993
   [Ion]: https://github.com/koush/ion/
   [Support]: http://developer.android.com/tools/support-library/index.html
+  [RecyclerView]: https://developer.android.com/reference/android/support/v7/widget/RecyclerView.html
 
 Chanobol is a 4Chan reader app on steroids\* inspired by [Chanu][].
 
@@ -105,11 +106,11 @@ dependencies and a scoped `UiModule` for fragment- and activity-related
 dependencies. The package structure roughly follows the module structure. The debug
 build type overwrites some module definitions in `DebugAppModule`. The top-level
 package contains a couple of `Base`*X* classes which mainly hide some Dagger-related
-injection boilerplate. `BindableAdapter` is inspired by [Jacke Wharton's
-Bindable Adapter][Bindable Adapter]. So there is no need for the `ViewHolder`
-pattern and instead custom view classes like `PostView` are used. The classes
-`UiFragment` and `SwipeRefreshFragment` in the `ui` package contain code which
-is shared by most of the concrete fragments.
+injection boilerplate. Where it makes sense the new [`RecyclerView`][RecyclerView]
+is used in place of `ListView` or `GridView` which has several advantages like
+better scrolling performance and more precise scrolling information.
+The classes `UiFragment` and `SwipeRefreshFragment` in the `ui` package contain
+code which is shared by most of the concrete fragments.
 
 Chanobol can be seen as a UI for the [4Chan API][API]. To this end, the great
 [Ion][] library is employed. With Ion 4Chan's API is mapped to the interface
@@ -133,9 +134,3 @@ to. If you find anything you can improve please do so or let me know. Also, the
 code is currently not very tidy in some sense. E.g., not all strings are
 centralized in `strings.xml` and styles not extracted. If you like to tidy
 things up be my guest :).
-
-
-Useful Links
-------------
-
-* [4Chan API][API]

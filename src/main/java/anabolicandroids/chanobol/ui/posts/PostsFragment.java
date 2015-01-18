@@ -3,6 +3,9 @@ package anabolicandroids.chanobol.ui.posts;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -30,6 +33,7 @@ import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.images.ImagesFragment;
+import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
 public class PostsFragment extends SwipeRefreshFragment {
@@ -70,7 +74,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         }
     };
 
-    @InjectView(R.id.posts) ListView postsView;
+    @InjectView(R.id.posts) RecyclerView postsView;
 
     Menu menu;
     Post op;
@@ -98,21 +102,26 @@ public class PostsFragment extends SwipeRefreshFragment {
     }
 
     @Override
-    protected int getLayoutResource() {
-        return R.layout.fragment_posts;
-    }
+    protected int getLayoutResource() { return R.layout.fragment_posts; }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         posts = new ArrayList<>();
-        postsAdapter = new PostsAdapter();
-        postsView.setAdapter(postsAdapter);
-        posts.add(op);
-        postsAdapter.notifyDataSetChanged();
         postsMap = new HashMap<>();
         answers = new HashMap<>();
+        posts.add(op);
+
+        postsAdapter = new PostsAdapter();
+        postsView.setAdapter(postsAdapter);
+        postsView.setHasFixedSize(true);
+        postsView.setLayoutManager(new LinearLayoutManager(context));
+        postsView.setItemAnimator(new DefaultItemAnimator());
+        // TODO: I assume SpacesItemDecoration expects pixels
+        // TODO: Extract 6 into dimens.xml
+        postsView.addItemDecoration(new SpacesItemDecoration((int) Util.dpToPx(6, context)));
+        postsAdapter.notifyDataSetChanged();
 
         load();
         initBackgroundUpdater();
@@ -223,7 +232,7 @@ public class PostsFragment extends SwipeRefreshFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.down:
-                postsView.setSelection(postsAdapter.getCount()-1);
+                postsView.scrollToPosition(postsAdapter.getItemCount() - 1);
                 break;
             case R.id.refresh:
                 load();
@@ -257,15 +266,19 @@ public class PostsFragment extends SwipeRefreshFragment {
 
     class PostsAdapter extends UiAdapter<Post> {
         public PostsAdapter() {
-            this(posts);
+            this(posts, null, null);
         }
         public PostsAdapter(List<Post> posts) {
-            super(context);
+            this(posts, null, null);
+        }
+        public PostsAdapter(List<Post> posts,
+                            View.OnClickListener clickListener,
+                            View.OnLongClickListener longClickListener) {
+            super(PostsFragment.this.context, clickListener, longClickListener);
             this.items = posts;
         }
 
-        @Override
-        public View newView(LayoutInflater inflater, int position, ViewGroup container) {
+        @Override public View newView(ViewGroup container) {
             return inflater.inflate(R.layout.view_post, container, false);
         }
 

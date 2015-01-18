@@ -5,14 +5,14 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.view.LayoutInflater;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import com.koushikdutta.async.future.FutureCallback;
 
@@ -32,7 +32,7 @@ import anabolicandroids.chanobol.ui.posts.PostsFragment;
 import butterknife.InjectView;
 
 public class ThreadsFragment extends SwipeRefreshFragment {
-    @InjectView(R.id.threads) GridView threadsView;
+    @InjectView(R.id.threads) RecyclerView threadsView;
 
     Menu menu;
     String name;
@@ -65,16 +65,11 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         threads = new ArrayList<>();
         threadMap = new HashMap<>();
         bitMap = new WeakHashMap<>();
-        threadsAdapter = new ThreadsAdapter();
-        threadsView.setAdapter(threadsAdapter);
 
-        load();
-        initBackgroundUpdater();
-
-        threadsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Thread thread = threads.get(position);
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                ThreadView tv = (ThreadView) v;
+                Thread thread = tv.thread;
                 if (thread.dead) {
                     showToast("Thread is dead");
                     return;
@@ -88,7 +83,17 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 //f.setExitTransition(new Slide(Gravity.RIGHT));
                 startFragment(f);
             }
-        });
+        };
+
+        threadsAdapter = new ThreadsAdapter(clickListener, null);
+        threadsView.setAdapter(threadsAdapter);
+        threadsView.setHasFixedSize(true);
+        // TODO: dynamic number of columns
+        threadsView.setLayoutManager(new GridLayoutManager(context, 4));
+        threadsView.setItemAnimator(new DefaultItemAnimator());
+
+        load();
+        initBackgroundUpdater();
     }
 
     private void initBackgroundUpdater() {
@@ -205,7 +210,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 load();
                 break;
             case R.id.up:
-                threadsView.setSelection(0);
+                threadsView.scrollToPosition(0);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -213,18 +218,16 @@ public class ThreadsFragment extends SwipeRefreshFragment {
 
     class ThreadsAdapter extends UiAdapter<Thread> {
 
-        public ThreadsAdapter() {
-            super(context);
+        public ThreadsAdapter(View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
+            super(ThreadsFragment.this.context, clickListener, longClickListener);
             this.items = threads;
         }
 
-        @Override
-        public View newView(LayoutInflater inflater, int position, ViewGroup container) {
+        @Override public View newView(ViewGroup container) {
             return inflater.inflate(R.layout.view_thread, container, false);
         }
 
-        @Override
-        public void bindView(Thread item, int position, View view) {
+        @Override public void bindView(Thread item, int position, View view) {
             ((ThreadView) view).bindTo(item, name, ion, bitMap);
         }
     }

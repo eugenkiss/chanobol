@@ -18,6 +18,8 @@ public class BoardView extends CardView {
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.title) TextView title;
 
+    public Board board;
+
     public BoardView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -28,6 +30,7 @@ public class BoardView extends CardView {
     }
 
     public void bindTo(Board board, Ion ion) {
+        this.board = board;
         name.setText(board.name);
         title.setText(board.title);
         ion.build(image).load("file:///android_asset/boardimages/"+board.name+".jpg");

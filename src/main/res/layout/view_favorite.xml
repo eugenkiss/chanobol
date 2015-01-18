@@ -10,7 +10,7 @@
     android:paddingLeft="14dp"
     android:paddingRight="14dp"
     android:descendantFocusability="blocksDescendants"
-    android:background="?android:selectableItemBackground"
+    android:background="?attr/selectableItemBackground"
     >
 
     <TextView

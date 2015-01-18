@@ -49,6 +49,8 @@ public class PostView extends CardView {
     private int maxWidth;
     private int maxHeight;
 
+    public Post post;
+
     public PostView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -177,6 +179,7 @@ public class PostView extends CardView {
                          PostsFragment.RepliesCallback repliesCallback,
                          PostsFragment.ReferencedPostCallback referencedPostCallback,
                          PostsFragment.ImageCallback imageCallback) {
+        this.post = post;
         reset();
         initText(post, repliesCallback, referencedPostCallback);
         initImageListener(post.imageId + post.imageExtension, imageCallback);
@@ -199,6 +202,7 @@ public class PostView extends CardView {
                        PostsFragment.RepliesCallback repliesCallback,
                        PostsFragment.ReferencedPostCallback referencedPostCallback,
                        PostsFragment.ImageCallback imageCallback) {
+        this.post = post;
         reset();
         initText(post, repliesCallback, referencedPostCallback);
 

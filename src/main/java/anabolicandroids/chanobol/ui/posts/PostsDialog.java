@@ -1,11 +1,17 @@
 package anabolicandroids.chanobol.ui.posts;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 
 import anabolicandroids.chanobol.R;
@@ -15,7 +21,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class PostsDialog extends UiFragment {
-    @InjectView(R.id.posts) ListView postsView;
+    @InjectView(R.id.posts) RecyclerView postsView;
 
     public static final String STACK_ID = "postsdialog";
 
@@ -36,6 +42,12 @@ public class PostsDialog extends UiFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         postsView.setAdapter(adapter);
+        postsView.setHasFixedSize(true);
+        LinearLayoutManager llm = new LinearLayoutManager(context);
+        // Since elements have different heights -> no weird growing/shrinking scrollbar
+        llm.setSmoothScrollbarEnabled(false);
+        postsView.setLayoutManager(llm);
+        postsView.setItemAnimator(new DefaultItemAnimator());
         adapter.notifyDataSetChanged();
     }
 

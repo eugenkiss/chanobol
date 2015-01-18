@@ -4,12 +4,13 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import java.util.List;
 
@@ -22,7 +23,7 @@ import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
 import butterknife.InjectView;
 
 public class BoardsFragment extends UiFragment {
-    @InjectView(R.id.boards) GridView boardsView;
+    @InjectView(R.id.boards) RecyclerView boardsView;
 
     @Inject List<Board> boards;
     BoardsAdapter boardsAdapter;
@@ -35,27 +36,24 @@ public class BoardsFragment extends UiFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        boardsAdapter = new BoardsAdapter(context, ion, boards);
-        boardsView.setAdapter(boardsAdapter);
 
-        boardsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Fragment f = ThreadsFragment.create(boardsAdapter.getItem(position).name);
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override public void onClick(View v) {
+                BoardView bv = (BoardView) v;
+                Fragment f = ThreadsFragment.create(bv.board.name);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.container, f, null)
                         .commit();
             }
-        });
-
-        boardsView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
-            @Override
-            public boolean onItemLongClick(AdapterView<?> parent, View view, final int position, long id) {
+        };
+        View.OnLongClickListener longClickListener = new View.OnLongClickListener() {
+            @Override public boolean onLongClick(View v) {
+                final BoardView bv = (BoardView) v;
                 new AlertDialog.Builder(context)
                         .setTitle("Favorize?")
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
-                                Board board = boardsAdapter.getItem(position);
+                                Board board = bv.board;
                                 persistentData.addFavorite(board);
                                 showToast(board.name + " added to favorites");
                             }
@@ -66,7 +64,15 @@ public class BoardsFragment extends UiFragment {
                 }).show();
                 return true;
             }
-        });
+        };
+
+        boardsAdapter = new BoardsAdapter(context, ion, boards, clickListener, longClickListener);
+        boardsView.setAdapter(boardsAdapter);
+        boardsView.setHasFixedSize(true);
+        // TODO: dynamic number of columns
+        // http://stackoverflow.com/questions/26666143/recyclerview-gridlayoutmanager-how-to-auto-detect-span-count
+        boardsView.setLayoutManager(new GridLayoutManager(context, 4));
+        boardsView.setItemAnimator(new DefaultItemAnimator());
     }
 
     @Override

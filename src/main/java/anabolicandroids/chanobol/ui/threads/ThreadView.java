@@ -28,6 +28,8 @@ public class ThreadView extends CardView {
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.text) TextView text;
 
+    public Thread thread;
+
     public ThreadView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
@@ -38,6 +40,7 @@ public class ThreadView extends CardView {
     }
 
     public void bindTo(final Thread thread, String boardName, Ion ion, final WeakHashMap<String, Bitmap> bitMap) {
+        this.thread = thread;
         numReplies.setText(thread.replies+"r");
         numImages.setText(thread.images+"i");
         ion.build(image).load(ApiModule.thumbUrl(boardName, thread.imageId)).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {

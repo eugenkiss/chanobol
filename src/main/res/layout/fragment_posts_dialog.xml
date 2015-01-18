@@ -8,7 +8,7 @@
     android:clickable="true"
     >
 
-    <ListView
+    <android.support.v7.widget.RecyclerView
         android:id="@+id/posts"
         style="@style/Widget.Chanobol.AdapterView.PostsDialogListView"
         android:layout_width="match_parent"
