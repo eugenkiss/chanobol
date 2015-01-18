@@ -272,6 +272,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         @Override
         public void bindView(final Post item, int position, View view) {
             PostView v = (PostView) view;
+            if (item == null) return;
             if (position == 0 && opImage != null) {
                 v.bindToOp(opImage, item, board, threadId, ion,
                         repliesCallback, referencedPostCallback, imageCallback);
