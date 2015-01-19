@@ -25,6 +25,7 @@ import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.PersistentData;
 import anabolicandroids.chanobol.ui.UiFragment;
 import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
+import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
 public class FavoritesFragment extends UiFragment {
@@ -69,10 +70,11 @@ public class FavoritesFragment extends UiFragment {
                                           clickListener, longClickListener);
         favoritesView.setAdapter(boardsAdapter);
         favoritesView.setHasFixedSize(true);
-        // TODO: dynamic number of columns
-        favoritesView.setLayoutManager(new GridLayoutManager(context, 4));
+        GridLayoutManager glm = new GridLayoutManager(context, 2);
+        favoritesView.setLayoutManager(glm);
         favoritesView.setItemAnimator(new DefaultItemAnimator());
         boardsAdapter.notifyDataSetChanged();
+        Util.calcDynamicSpanCount(context, favoritesView, glm);
 
         persistentData.addFavoritesChangedCallback(new PersistentData.FavoritesCallback() {
             @Override

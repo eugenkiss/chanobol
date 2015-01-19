@@ -29,6 +29,7 @@ import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.posts.PostsFragment;
+import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
 public class ThreadsFragment extends SwipeRefreshFragment {
@@ -87,9 +88,10 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         threadsAdapter = new ThreadsAdapter(clickListener, null);
         threadsView.setAdapter(threadsAdapter);
         threadsView.setHasFixedSize(true);
-        // TODO: dynamic number of columns
-        threadsView.setLayoutManager(new GridLayoutManager(context, 4));
+        GridLayoutManager glm = new GridLayoutManager(context, 2);
+        threadsView.setLayoutManager(glm);
         threadsView.setItemAnimator(new DefaultItemAnimator());
+        Util.calcDynamicSpanCount(context, threadsView, glm);
 
         load();
         initBackgroundUpdater();

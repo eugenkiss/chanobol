@@ -69,7 +69,7 @@
     </style>
 
     <style name="Widget.Chanobol.AdapterView.BoardsGridView">
-        <item name="android:columnWidth">120dp</item>
+        <item name="android:columnWidth">@dimen/column_width</item>
         <item name="android:gravity">center</item>
         <item name="android:horizontalSpacing">10dp</item>
         <item name="android:verticalSpacing">10dp</item>

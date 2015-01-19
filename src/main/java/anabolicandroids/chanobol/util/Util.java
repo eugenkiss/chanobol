@@ -8,6 +8,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.ActionProvider;
@@ -16,6 +18,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -128,6 +131,25 @@ public class Util {
         DisplayMetrics metrics = resources.getDisplayMetrics();
         float dp = px / (metrics.densityDpi / 160f);
         return dp;
+    }
+
+    // Unsatisfactory compared to GridView but given the current constraint best solution
+    // http://stackoverflow.com/questions/26666143/recyclerview-gridlayoutmanager-how-to-auto-detect-span-count
+    public static void calcDynamicSpanCount(final Context cxt,
+                                            final RecyclerView rv,
+                                            final GridLayoutManager glm) {
+        rv.getViewTreeObserver().addOnGlobalLayoutListener(
+                new ViewTreeObserver.OnGlobalLayoutListener() {
+                    @Override
+                    public void onGlobalLayout() {
+                        rv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+                        int viewWidth = rv.getMeasuredWidth();
+                        float cardViewWidth = cxt.getResources().getDimension(R.dimen.column_width);
+                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+                        glm.setSpanCount(newSpanCount);
+                        glm.requestLayout();
+                    }
+                });
     }
 
     public static void animateHeight(final View view, int from, int to, int duration) {

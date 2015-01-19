@@ -20,6 +20,7 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.UiFragment;
 import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
+import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
 public class BoardsFragment extends UiFragment {
@@ -69,10 +70,10 @@ public class BoardsFragment extends UiFragment {
         boardsAdapter = new BoardsAdapter(context, ion, boards, clickListener, longClickListener);
         boardsView.setAdapter(boardsAdapter);
         boardsView.setHasFixedSize(true);
-        // TODO: dynamic number of columns
-        // http://stackoverflow.com/questions/26666143/recyclerview-gridlayoutmanager-how-to-auto-detect-span-count
-        boardsView.setLayoutManager(new GridLayoutManager(context, 4));
+        GridLayoutManager glm = new GridLayoutManager(context, 2);
+        boardsView.setLayoutManager(glm);
         boardsView.setItemAnimator(new DefaultItemAnimator());
+        Util.calcDynamicSpanCount(context, boardsView, glm);
     }
 
     @Override
