@@ -67,13 +67,10 @@ public class MainActivity extends BaseActivity {
     @InjectView(R.id.favoriteBoardsHeader) CompatTextView favoriteBoardsHeader;
     @InjectView(R.id.favoriteBoards) ListView favoriteBoardsView;
 
-    Menu menu;
     ActionBarDrawerToggle drawerToggle;
     FavoritesAdapter favoriteBoardsAdapter;
     FragmentManager fm;
     FragmentManager.OnBackStackChangedListener backStackChangedListener;
-
-    //boolean isToolbarShowing = true;
 
     @Override
     protected List<Object> getModules() {
@@ -233,7 +230,6 @@ public class MainActivity extends BaseActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main, menu);
-        this.menu = menu;
         return true;
     }
 

@@ -1,18 +1,14 @@
 package anabolicandroids.chanobol.ui.posts;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Post;
@@ -24,8 +20,6 @@ public class PostsDialog extends UiFragment {
     @InjectView(R.id.posts) RecyclerView postsView;
 
     public static final String STACK_ID = "postsdialog";
-
-    Menu menu;
 
     Post repliedTo;
     Post quotedBy;
@@ -58,20 +52,12 @@ public class PostsDialog extends UiFragment {
             activity.setTitle("Replies to " + repliedTo.id);
         else
             activity.setTitle("Quoted by " + quotedBy.id);
-        if (menu != null) {
-            menu.setGroupVisible(R.id.posts, false);
-            menu.setGroupVisible(R.id.postsDialog, true);
-        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        if (menu.findItem(R.id.close) == null) {
-            inflater.inflate(R.menu.posts_dialog, menu);
-            menu.setGroupVisible(R.id.posts, false);
-        }
-        this.menu = menu;
+        inflater.inflate(R.menu.posts_dialog, menu);
     }
 
     @Override

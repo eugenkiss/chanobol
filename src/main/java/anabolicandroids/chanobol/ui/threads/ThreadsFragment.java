@@ -34,7 +34,6 @@ import butterknife.InjectView;
 public class ThreadsFragment extends SwipeRefreshFragment {
     @InjectView(R.id.threads) RecyclerView threadsView;
 
-    Menu menu;
     String name;
     ArrayList<Thread> threads;
     HashMap<String, Integer> threadMap;
@@ -121,7 +120,6 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     public void onResume() {
         super.onResume();
         activity.setTitle(name);
-        if (menu != null) menu.setGroupVisible(R.id.threads, true);
         update();
         initBackgroundUpdater();
         pauseUpdating = false;
@@ -200,7 +198,6 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.threads, menu);
-        this.menu = menu;
     }
 
     @Override

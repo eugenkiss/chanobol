@@ -6,13 +6,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 
 import com.koushikdutta.async.future.FutureCallback;
 
@@ -76,7 +74,6 @@ public class PostsFragment extends SwipeRefreshFragment {
 
     @InjectView(R.id.posts) RecyclerView postsView;
 
-    Menu menu;
     Post op;
     Drawable opImage;
     String threadId;
@@ -152,10 +149,6 @@ public class PostsFragment extends SwipeRefreshFragment {
     public void onResume() {
         super.onResume();
         activity.setTitle(board + "/" + threadId);
-        if (menu != null) {
-            menu.setGroupVisible(R.id.threads, false);
-            menu.setGroupVisible(R.id.posts, true);
-        }
         postsAdapter.notifyDataSetChanged();
         initBackgroundUpdater();
         pauseUpdating = false;
@@ -224,8 +217,6 @@ public class PostsFragment extends SwipeRefreshFragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.posts, menu);
-        menu.setGroupVisible(R.id.threads, false);
-        this.menu = menu;
     }
 
     @Override

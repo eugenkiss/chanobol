@@ -1,26 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
-    <group android:id="@+id/threads">
-        <!--<item android:id="@+id/search"-->
-              <!--android:icon="@drawable/ic_search"-->
-              <!--android:title="Search"-->
-              <!--app:showAsAction="always"-->
-            <!--/>-->
-        <item android:id="@+id/up"
-              android:icon="@drawable/ic_up"
-              android:title="Go to top"
-              app:showAsAction="ifRoom"
-            />
-        <item android:id="@+id/favorite"
-              android:icon="@drawable/ic_favorite"
-              android:title="Favorize"
-              app:showAsAction="never"
-            />
-        <item android:id="@+id/refresh"
-              android:icon="@drawable/ic_refresh"
-              android:title="Refresh"
-              app:showAsAction="never"
-            />
-    </group>
+    <!--<item android:id="@+id/search"-->
+          <!--android:icon="@drawable/ic_search"-->
+          <!--android:title="Search"-->
+          <!--app:showAsAction="always"-->
+        <!--/>-->
+    <item android:id="@+id/up"
+          android:icon="@drawable/ic_up"
+          android:title="Go to top"
+          app:showAsAction="ifRoom"
+        />
+    <item android:id="@+id/favorite"
+          android:icon="@drawable/ic_favorite"
+          android:title="Favorize"
+          app:showAsAction="never"
+        />
+    <item android:id="@+id/refresh"
+          android:icon="@drawable/ic_refresh"
+          android:title="Refresh"
+          app:showAsAction="never"
+        />
 </menu>

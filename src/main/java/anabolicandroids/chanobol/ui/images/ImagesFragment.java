@@ -19,7 +19,6 @@ import uk.co.senab.photoview.PhotoView;
 public class ImagesFragment extends UiFragment {
     @InjectView(R.id.image) PhotoView imageView;
 
-    private Menu menu;
     private String boardName;
     private String threadId;
     private Drawable image;
@@ -59,20 +58,12 @@ public class ImagesFragment extends UiFragment {
     public void onResume() {
         super.onResume();
         activity.setTitle(boardName+"/imgs/"+threadId);
-        if (menu != null) {
-            menu.setGroupVisible(R.id.posts, false);
-            menu.setGroupVisible(R.id.postsDialog, false);
-            menu.setGroupVisible(R.id.images, true);
-        }
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.images, menu);
-        menu.setGroupVisible(R.id.posts, false);
-        menu.setGroupVisible(R.id.postsDialog, false);
-        this.menu = menu;
     }
 
     @Override
