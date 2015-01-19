@@ -3,12 +3,10 @@ package anabolicandroids.chanobol.ui.posts;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Post;
@@ -17,13 +15,17 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 
 public class PostsDialog extends UiFragment {
-    @InjectView(R.id.posts) RecyclerView postsView;
+    // Why not RecyclerView? It _used to be_ RecyclerView but as the by default provided
+    // Layoutmanagers do not support wrap_content and thus no easy ability to center the
+    // inline posts, it seemed to be the best course of action to simply go back to ListView
+    // in the meantime even if it means that PostsFragment.PostsAdapter cannot be reused.
+    @InjectView(R.id.posts) ListView postsView;
 
     public static final String STACK_ID = "postsdialog";
 
     Post repliedTo;
     Post quotedBy;
-    PostsFragment.PostsAdapter adapter;
+    PostsFragment.PostsDialogAdapter adapter;
 
     @OnClick(R.id.blackness) void dismiss() { getFragmentManager().popBackStack(); }
 
@@ -36,12 +38,6 @@ public class PostsDialog extends UiFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         postsView.setAdapter(adapter);
-        postsView.setHasFixedSize(true);
-        LinearLayoutManager llm = new LinearLayoutManager(context);
-        // Since elements have different heights -> no weird growing/shrinking scrollbar
-        llm.setSmoothScrollbarEnabled(false);
-        postsView.setLayoutManager(llm);
-        postsView.setItemAnimator(new DefaultItemAnimator());
         adapter.notifyDataSetChanged();
     }
 
@@ -69,4 +65,6 @@ public class PostsDialog extends UiFragment {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 }

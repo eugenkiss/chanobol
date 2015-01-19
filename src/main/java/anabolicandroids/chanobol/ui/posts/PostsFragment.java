@@ -6,6 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -24,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import anabolicandroids.chanobol.BindableAdapter;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
@@ -235,14 +237,14 @@ public class PostsFragment extends SwipeRefreshFragment {
     private void showPostsDialog(Post repliedTo, List<Post> posts) {
         PostsDialog dialog = new PostsDialog();
         dialog.repliedTo = repliedTo;
-        dialog.adapter = new PostsAdapter(posts);
+        dialog.adapter = new PostsDialogAdapter(posts);
         startFragment(dialog, PostsDialog.STACK_ID);
     }
 
     private void showPostsDialog(Post quotedBy, Post post) {
         PostsDialog dialog = new PostsDialog();
         dialog.quotedBy = quotedBy;
-        dialog.adapter = new PostsAdapter(Arrays.asList(post));
+        dialog.adapter = new PostsDialogAdapter(Arrays.asList(post));
         startFragment(dialog, PostsDialog.STACK_ID);
     }
 
@@ -255,11 +257,9 @@ public class PostsFragment extends SwipeRefreshFragment {
         return refs;
     }
 
+
     class PostsAdapter extends UiAdapter<Post> {
         public PostsAdapter() {
-            this(posts, null, null);
-        }
-        public PostsAdapter(List<Post> posts) {
             this(posts, null, null);
         }
         public PostsAdapter(List<Post> posts,
@@ -270,22 +270,62 @@ public class PostsFragment extends SwipeRefreshFragment {
         }
 
         @Override public View newView(ViewGroup container) {
-            return inflater.inflate(R.layout.view_post, container, false);
+            return newViewDRY(container);
         }
 
         @Override
         public void bindView(final Post item, int position, View view) {
-            PostView v = (PostView) view;
-            if (item == null) return;
-            if (position == 0 && opImage != null) {
-                v.bindToOp(opImage, item, board, threadId, ion,
-                        repliesCallback, referencedPostCallback, imageCallback);
-                opImage = null;
-            } else {
-                v.bindTo(item, board, threadId, ion,
-                        repliesCallback, referencedPostCallback, imageCallback);
-            }
+            bindViewDRY(item, position, view);
         }
+    }
+
+    private View newViewDRY(ViewGroup container) {
+        return inflater.inflate(R.layout.view_post, container, false);
+    }
+
+    private void bindViewDRY(final Post item, int position, View view) {
+        PostView v = (PostView) view;
+        if (item == null) return;
+        if (position == 0 && opImage != null) {
+            v.bindToOp(opImage, item, board, threadId, ion,
+                    repliesCallback, referencedPostCallback, imageCallback);
+            opImage = null;
+        } else {
+            v.bindTo(item, board, threadId, ion,
+                    repliesCallback, referencedPostCallback, imageCallback);
+        }
+    }
+
+    class PostsDialogAdapter extends BindableAdapter<Post> {
+        List<Post> items;
+
+        public PostsDialogAdapter(List<Post> posts) {
+            super(context);
+            this.items = posts;
+        }
+
+        @Override
+        public View newView(LayoutInflater inflater, int position, ViewGroup container) {
+            return newViewDRY(container);
+        }
+
+        @Override
+        public void bindView(final Post item, int position, View view) {
+            bindViewDRY(item, position, view);
+        }
+
+        @Override public int getCount() {
+            return items.size();
+        }
+
+        @Override public Post getItem(int position) {
+            return items.get(position);
+        }
+
+        @Override public long getItemId(int position) {
+            return position;
+        }
+
     }
 }
 
