@@ -77,6 +77,7 @@
         <item name="android:numColumns">auto_fit</item>
         <item name="android:scrollbarStyle">outsideOverlay</item>
         <item name="android:stretchMode">columnWidth</item>
+        <item name="android:scrollbars">vertical</item>
     </style>
 
     <style name="Widget.Chanobol.AdapterView.PostsListView">
@@ -85,6 +86,7 @@
         <item name="android:orientation">vertical</item>
         <item name="android:padding">10dp</item>
         <item name="android:scrollbarStyle">outsideOverlay</item>
+        <item name="android:scrollbars">vertical</item>
     </style>
 
     <style name="Widget.Chanobol.AdapterView.PostsDialogListView">
