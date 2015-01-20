@@ -112,8 +112,7 @@ public class MainActivity extends BaseActivity {
                 // and rehide it on return if necessary.
                 if (fragment instanceof UiFragment) {
                     UiFragment f = (UiFragment) fragment;
-                    if (!f.wasToolbarShowing) hideToolbar();
-                    else showToolbar();
+                    ViewHelper.setTranslationY(toolbar, f.toolbarPosition);
                 }
             }
         };

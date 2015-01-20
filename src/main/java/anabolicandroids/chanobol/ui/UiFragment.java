@@ -45,7 +45,10 @@ public abstract class UiFragment extends BaseFragment {
     View rootView;
 
     protected boolean loading;
-    public boolean wasToolbarShowing = true;
+    // To remember the toolbar's position for this fragment when another get's on top
+    // of the stack so that when this one's back on top it'll have the toolbar just
+    // where it was before.
+    float toolbarPosition = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,8 @@ public abstract class UiFragment extends BaseFragment {
         return view;
     }
 
+    protected boolean shouldAddPaddingForToolbar() { return true; }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -83,15 +88,21 @@ public abstract class UiFragment extends BaseFragment {
         activity.showToolbar();
 
         // Implementation of 'Quick Return Toolbar'
-        final TypedArray styledAttributes = activity.getTheme().obtainStyledAttributes(
-                new int[]{android.support.v7.appcompat.R.attr.actionBarSize});
-        final int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
-        styledAttributes.recycle();
-        rootView.setPadding(
-                rootView.getPaddingLeft(),
-                rootView.getPaddingTop() + actionBarHeight,
-                rootView.getPaddingRight(),
-                rootView.getPaddingBottom());
+        if (shouldAddPaddingForToolbar()) {
+            // I'd love to just use `toolbar.getHeight()` but it might not yet be known
+            // at this point. Going the global layout listener route led to jumps.
+            // One could combine both approaches but as long as the toolbar's height is
+            // fixed and known beforehand anyway why go through the trouble...
+            final TypedArray styledAttributes = activity.getTheme().obtainStyledAttributes(
+                    new int[]{android.support.v7.appcompat.R.attr.actionBarSize});
+            final int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
+            styledAttributes.recycle();
+            rootView.setPadding(
+                    rootView.getPaddingLeft(),
+                    rootView.getPaddingTop() + actionBarHeight,
+                    rootView.getPaddingRight(),
+                    rootView.getPaddingBottom());
+        }
         if (rootView instanceof RecyclerView) {
             RecyclerView rv = (RecyclerView) rootView;
             if (Build.VERSION.SDK_INT >= 11) {
@@ -122,9 +133,7 @@ public abstract class UiFragment extends BaseFragment {
     }
 
     protected void startFragment(Fragment f, String backStack) {
-        // These should be used to remember the visibility of the toolbar
-        // and thus rehide it on return to this fragment if necessary.
-        wasToolbarShowing = activity.isToolbarFullyShowing();
+        toolbarPosition = ViewHelper.getTranslationY(toolbar);
         activity.getSupportFragmentManager().beginTransaction()
                 .add(R.id.container, f, null)
                 .addToBackStack(backStack)

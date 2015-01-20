@@ -38,10 +38,9 @@ public class ImagesFragment extends UiFragment {
         return f;
     }
 
-    @Override
-    protected int getLayoutResource() {
-        return R.layout.fragment_images;
-    }
+    @Override protected int getLayoutResource() { return R.layout.fragment_images; }
+
+    @Override protected boolean shouldAddPaddingForToolbar() { return false; }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
