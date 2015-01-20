@@ -2,10 +2,7 @@ package anabolicandroids.chanobol.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v7.widget.GridLayoutManager;
@@ -17,25 +14,22 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AlphaAnimation;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.nineoldandroids.animation.ValueAnimator;
+import com.nineoldandroids.view.ViewHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import anabolicandroids.chanobol.R;
 
-// TODO: I think it would be better to make it a Singleton thats defined in a Module
-// This way the implementation of the functions could be replaced if wanted (e.g. for testing purposes)
-// However, I also think that static functions that are pure are not a real problem.
 public class Util {
 
     public static int clamp(double min, double val, double max) {
@@ -44,7 +38,7 @@ public class Util {
 
     public static List<Object> extendedList(List<Object> base, Object... others) {
         ArrayList<Object> list = new ArrayList<>();
-        for (Object o : others) list.add(o);
+        Collections.addAll(list, others);
         list.addAll(base);
         return list;
     }
@@ -61,6 +55,7 @@ public class Util {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static void setAlpha(View view, float alpha) {
         if (Build.VERSION.SDK_INT < 11) {
             final AlphaAnimation animation = new AlphaAnimation(alpha, alpha);
@@ -70,27 +65,13 @@ public class Util {
         } else view.setAlpha(alpha);
     }
 
-    public static Bitmap getBitmapFromAsset(Context context, String filePath) {
-        AssetManager assetManager = context.getAssets();
-
-        InputStream istr;
-        Bitmap bitmap = null;
-        try {
-            istr = assetManager.open(filePath);
-            bitmap = BitmapFactory.decodeStream(istr);
-        } catch (IOException e) {
-            // do nothing
-        }
-
-        return bitmap;
-    }
-
     public static String loadJSONFromAsset(Context context, String path) {
         String json;
         try {
             InputStream is = context.getAssets().open(path);
             int size = is.available();
             byte[] buffer = new byte[size];
+            //noinspection ResultOfMethodCallIgnored
             is.read(buffer);
             is.close();
             json = new String(buffer, "UTF-8");
@@ -103,11 +84,13 @@ public class Util {
 
     public static int getScreenHeight(Context context) {
         android.view.Display display = ((android.view.WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        //noinspection deprecation
         return display.getHeight();
     }
 
     public static int getScreenWidth(Context context) {
         android.view.Display display = ((android.view.WindowManager)context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        //noinspection deprecation
         return display.getWidth();
     }
 
@@ -122,15 +105,14 @@ public class Util {
     public static float dpToPx(float dp, Context context){
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float px = dp * (metrics.densityDpi / 160f);
-        return px;
+        return dp * (metrics.densityDpi / 160f);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public static float pxToDp(float px, Context context){
         Resources resources = context.getResources();
         DisplayMetrics metrics = resources.getDisplayMetrics();
-        float dp = px / (metrics.densityDpi / 160f);
-        return dp;
+        return px / (metrics.densityDpi / 160f);
     }
 
     // Unsatisfactory compared to GridView but given the current constraint best solution
@@ -142,6 +124,7 @@ public class Util {
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
                     public void onGlobalLayout() {
+                        //noinspection deprecation
                         rv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         int viewWidth = rv.getMeasuredWidth();
                         float cardViewWidth = cxt.getResources().getDimension(R.dimen.column_width);
@@ -152,74 +135,17 @@ public class Util {
                 });
     }
 
-    public static void animateHeight(final View view, int from, int to, int duration) {
-        ValueAnimator anim = ValueAnimator.ofInt(from, to);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-                layoutParams.height = val;
-                view.setLayoutParams(layoutParams);
-            }
-        });
-        anim.setDuration(duration);
-        anim.start();
-    }
-
     public static void animateY(final View view, int from, int to, int duration) {
         ValueAnimator anim = ValueAnimator.ofInt(from, to);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator valueAnimator) {
                 int val = (Integer) valueAnimator.getAnimatedValue();
-                setTopMargin(view, val);
+                ViewHelper.setTranslationY(view, val);
             }
         });
         anim.setDuration(duration);
         anim.start();
-    }
-
-    public static void animatePaddingTop(final View view, int from, int to, int duration) {
-        ValueAnimator anim = ValueAnimator.ofInt(from, to);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                int val = (Integer) valueAnimator.getAnimatedValue();
-                setTopPadding(view, val);
-            }
-        });
-        anim.setDuration(duration);
-        anim.start();
-    }
-
-    public static void animatePaddingTop(View view, int to, int duration) {
-        int pt = view.getPaddingTop();
-        animatePaddingTop(view, pt, to, duration);
-    }
-
-    public static void animatePaddingTopBy(View view, int by, int duration) {
-        int pt = view.getPaddingTop();
-        animatePaddingTop(view, pt, pt+by, duration);
-    }
-
-    public static int getTopMargin(View view) {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(view.getLayoutParams());
-        return layoutParams.topMargin;
-    }
-
-    public static void setTopMargin(View view, int margin) {
-        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(view.getLayoutParams());
-        layoutParams.topMargin = margin;
-        view.setLayoutParams(layoutParams);
-    }
-
-    public static void setTopPadding(View view, int padding) {
-        view.setPadding(
-                view.getPaddingLeft(),
-                padding,
-                view.getPaddingRight(),
-                view.getPaddingBottom());
     }
 
     // Fuck this

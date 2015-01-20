@@ -3,7 +3,6 @@ package anabolicandroids.chanobol.ui;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -93,10 +92,7 @@ public abstract class UiFragment extends BaseFragment {
             // at this point. Going the global layout listener route led to jumps.
             // One could combine both approaches but as long as the toolbar's height is
             // fixed and known beforehand anyway why go through the trouble...
-            final TypedArray styledAttributes = activity.getTheme().obtainStyledAttributes(
-                    new int[]{android.support.v7.appcompat.R.attr.actionBarSize});
-            final int actionBarHeight = (int) styledAttributes.getDimension(0, 0);
-            styledAttributes.recycle();
+            int actionBarHeight = Util.getActionBarHeight(context);
             rootView.setPadding(
                     rootView.getPaddingLeft(),
                     rootView.getPaddingTop() + actionBarHeight,

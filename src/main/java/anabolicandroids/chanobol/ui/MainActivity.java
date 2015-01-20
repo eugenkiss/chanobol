@@ -288,16 +288,13 @@ public class MainActivity extends BaseActivity {
             Util.animateY(toolbar, toolbar.getTop(), 0, dur);
     }
 
+    @SuppressWarnings("UnusedDeclaration")
     public void hideToolbar() {
         if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
         if (Build.VERSION.SDK_INT >= 14)
             toolbar.animate().y(-toolbar.getHeight()).setDuration(dur);
         else
-            Util.animateY(toolbar, 0, -toolbar.getHeight(), 120);
-    }
-
-    public boolean isToolbarFullyShowing() {
-        return ViewHelper.getTranslationY(toolbar) == 0;
+            Util.animateY(toolbar, 0, -toolbar.getHeight(), dur);
     }
 
     // As per the design guidelines
