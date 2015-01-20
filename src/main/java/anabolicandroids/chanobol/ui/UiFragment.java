@@ -38,7 +38,7 @@ public abstract class UiFragment extends BaseFragment {
     @Inject public PersistentData persistentData;
     @Inject public SharedPreferences prefs;
 
-    Toolbar toolbar;
+    public Toolbar toolbar;
     DrawerLayout drawer;
     // As getView apparently does not return the view returned by
     // onCreateView as suggested in the documentation but the container

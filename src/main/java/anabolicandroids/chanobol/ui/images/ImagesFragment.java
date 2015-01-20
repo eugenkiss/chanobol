@@ -57,6 +57,12 @@ public class ImagesFragment extends UiFragment {
     public void onResume() {
         super.onResume();
         activity.setTitle(boardName+"/imgs/"+threadId);
+        toolbar.getBackground().setAlpha(0);
+    }
+
+    @Override public void onDestroy() {
+        super.onDestroy();
+        toolbar.getBackground().setAlpha(255);
     }
 
     @Override
