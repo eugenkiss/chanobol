@@ -2,6 +2,8 @@
 <LinearLayout
     android:id="@+id/drawer"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedAttribute"
     android:layout_width="300dp"
     android:layout_height="match_parent"
     android:layout_gravity="start"
@@ -15,38 +17,38 @@
     <TextView
         android:id="@+id/favoriteBoardsBtn"
         style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="Favorite Boards"
+        android:text="@string/favorite_boards"
         />
 
     <TextView
         android:id="@+id/allBoards"
         style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="All Boards"
+        android:text="@string/all_boards"
         />
 
     <TextView
         android:id="@+id/settings"
         style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="Settings"
+        android:text="@string/settings"
         />
 
     <TextView
         android:id="@+id/debugSettings"
         style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="Debug Settings"
+        android:text="@string/debug_settings"
         android:visibility="gone"
         />
 
     <TextView
         android:id="@+id/about"
         style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="About"
+        android:text="@string/about"
         />
 
     <android.support.v7.internal.widget.CompatTextView
         android:id="@+id/favoriteBoardsHeader"
         style="@style/Widget.Chanobol.Drawer.Header"
-        android:text="Favorites"
+        android:text="@string/favorites"
         />
 
     <ListView

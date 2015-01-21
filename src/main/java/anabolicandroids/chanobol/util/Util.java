@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.util;
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -150,7 +151,7 @@ public class Util {
 
     // Fuck this
     public static MenuItem mockHomeButton = new MenuItem() {
-        @Override
+        @TargetApi(Build.VERSION_CODES.HONEYCOMB) @Override
         public int getItemId() {
             return android.R.id.home;
         }

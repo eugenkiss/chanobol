@@ -3,7 +3,7 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/close"
           android:icon="@drawable/ic_close"
-          android:title="Close All"
+          android:title="@string/close_all"
           app:showAsAction="always"
         />
 </menu>

@@ -3,7 +3,7 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/addFavorite"
           android:icon="@drawable/ic_plus"
-          android:title="Add Favorite"
+          android:title="@string/add_favorite"
           app:showAsAction="ifRoom"
         />
 </menu>

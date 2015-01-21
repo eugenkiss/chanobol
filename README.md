@@ -21,17 +21,19 @@ Chanobol is a 4Chan reader app on steroids\* inspired by [Chanu][].
 Status
 ------
 
-Chanobol is pretty much work in progress. The code is not particularly tidy in
-some places and the functionality is barebones.
+Chanobol is work in progress and currently offers a read-only 4Chan browsing
+experience. I am very happy to accept pull requests for new features or
+improvements! I have already created a bunch of issues which you could take as a
+starting point.
 
-I am very happy to accept pull requests for new features or improvements! There
-are already a bunch of issues I have created which you could start working on.
-
-<sub>FYI: As I used only a subset of Chanu's functionality I actually do not
-really care about features beyond this subset like for example posting a reply
-or having choosable themes. Basically, I wanted to create an optimized Chanu for
-myself. That does not mean I would not accept pull requests for these features.
-It only means that I probably will not implement them myself.</sub>
+<sub>
+FYI: Basically, I wanted to create an optimized Chanu for myself with Chanobol.
+As I used only a subset of Chanu's functionality I actually do not really care
+about Chanobol gaining features beyond this subset like for example posting
+replies or choosable themes. My aim was and is to have a polished read-only
+4Chan experience. That does not mean I would reject pull requests for these
+features. It only means that I probably will not implement them myself.
+</sub>
 
 
 Motivation
@@ -81,7 +83,7 @@ Code Architecture
 This section gives a broad overview of the code, some (non-obvious) code design
 decisions and the reasons for the application of some libraries. There are many
 more decisions, of course, which can be found by studying the code. I tried to
-follow best practices to the best of my knowledge. As pure Android development
+follow good practices to the best of my knowledge. As pure Android development
 without the help of libraries is often relatively tedious I employ useful
 libraries where possible.
 
@@ -126,11 +128,3 @@ Why static factory methods for fragment creation? Actually, I could have used
 non-static constructors as well. Many arguments you can find in favor of factory
 methods for fragments are not convincing at all. In the end, it makes no
 substantial difference either way, it is more a matter of personal preference.
-
-I think the high-level structure of the code is good. But there are some parts
-in the guts of the classes that I don't like. For some of those things I already
-have created issues but not for all - especially not for those that I am blind
-to. If you find anything you can improve please do so or let me know. Also, the
-code is currently not very tidy in some sense. E.g., not all strings are
-centralized in `strings.xml` and styles not extracted. If you like to tidy
-things up be my guest :).

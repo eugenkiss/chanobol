@@ -3,11 +3,11 @@
       xmlns:app="http://schemas.android.com/apk/res-auto"
     >
     <item android:id="@+id/openExternal"
-          android:title="Open External"
+          android:title="@string/open_external"
           app:showAsAction="never"
         />
     <item android:id="@+id/chooseExternal"
-          android:title="Choose External"
+          android:title="@string/choose_external"
           app:showAsAction="never"
         />
 </menu>

@@ -1,9 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Chanobol</string>
-    <string name="action_settings">Settings</string>
+    <string name="settings">Settings</string>
+    <string name="debug_settings">Debug Settings</string>
+    <!-- Menu -->
+    <string name="add_favorite">Add Favorite</string>
+    <string name="open_external">Open External</string>
+    <string name="choose_external">Choose External</string>
+    <string name="close_all">Close All</string>
+    <string name="show_gallery">Show Gallery</string>
+    <string name="go_to_bottom">Go to Bottom</string>
+    <string name="go_to_top">Go to Top</string>
+    <string name="refresh">Refresh</string>
+    <string name="favorize">Favorize</string>
+    <!-- Drawer -->
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Closed</string>
-
+    <string name="favorite_boards">Favorite Boards</string>
+    <string name="all_boards">All Boards</string>
+    <string name="about">About</string>
+    <string name="favorites">Favorites</string>
 </resources>
