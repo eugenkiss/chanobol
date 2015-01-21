@@ -237,7 +237,7 @@ public class PostView extends CardView {
                                         if(intent.resolveActivity(getContext().getPackageManager()) != null)
                                             getContext().startActivity(intent);
                                         else
-                                            Util.showToast(getContext(), "No suitable app");
+                                            Util.showToast(getContext(), R.string.no_app);
                                     }
                                 });
                                 break;

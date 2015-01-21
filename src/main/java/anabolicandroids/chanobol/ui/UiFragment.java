@@ -3,6 +3,7 @@ package anabolicandroids.chanobol.ui;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -32,6 +33,7 @@ import butterknife.ButterKnife;
 public abstract class UiFragment extends BaseFragment {
     @Inject @ForActivity public Context context;
     @Inject public MainActivity activity;
+    @Inject public Resources resources;
     @Inject public ChanService service;
     @Inject public Ion ion;
     @Inject public PersistentData persistentData;
@@ -141,6 +143,10 @@ public abstract class UiFragment extends BaseFragment {
 
     protected void showToast(String msg) {
         Util.showToast(appContext, msg);
+    }
+
+    protected void showToast(int res) {
+        Util.showToast(appContext, res);
     }
 
     protected void load() {

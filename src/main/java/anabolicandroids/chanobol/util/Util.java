@@ -56,6 +56,10 @@ public class Util {
         Toast.makeText(context, msg, Toast.LENGTH_SHORT).show();
     }
 
+    public static void showToast(Context context, int res) {
+        Toast.makeText(context, res, Toast.LENGTH_SHORT).show();
+    }
+
     @SuppressWarnings("UnusedDeclaration")
     public static void setAlpha(View view, float alpha) {
         if (Build.VERSION.SDK_INT < 11) {

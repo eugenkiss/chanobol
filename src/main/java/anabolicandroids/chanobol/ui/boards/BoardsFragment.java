@@ -51,12 +51,12 @@ public class BoardsFragment extends UiFragment {
             @Override public boolean onLongClick(View v) {
                 final BoardView bv = (BoardView) v;
                 new AlertDialog.Builder(context)
-                        .setTitle("Favorize?")
+                        .setTitle(R.string.favorize_title)
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
                                 Board board = bv.board;
                                 persistentData.addFavorite(board);
-                                showToast(board.name + " added to favorites");
+                                showToast(board.name + " " + resources.getString(R.string.favorite_added));
                             }
                         }).setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
@@ -79,7 +79,7 @@ public class BoardsFragment extends UiFragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setTitle("All Boards");
+        activity.setTitle(R.string.all_boards);
     }
 
     @Override

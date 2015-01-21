@@ -54,7 +54,7 @@ public class FavoritesFragment extends UiFragment {
             @Override public boolean onLongClick(View v) {
                 final BoardView bv = (BoardView) v;
                 new AlertDialog.Builder(context)
-                        .setTitle("Delete?")
+                        .setTitle(R.string.delete_title)
                         .setNegativeButton(android.R.string.cancel, null)
                         .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int whichButton) {
@@ -87,7 +87,7 @@ public class FavoritesFragment extends UiFragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setTitle("Favorite Boards");
+        activity.setTitle(R.string.favorite_boards);
     }
 
     @Override
@@ -101,7 +101,7 @@ public class FavoritesFragment extends UiFragment {
         if (item.getItemId() == R.id.addFavorite) {
             final EditText input = new EditText(context);
             new AlertDialog.Builder(context)
-                    .setTitle("Add Favorite Board")
+                    .setTitle(R.string.add_favorite_title)
                     .setView(input)
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
@@ -110,11 +110,11 @@ public class FavoritesFragment extends UiFragment {
                             for (Board board : allBoards) {
                                 if (board.name.equals(normalizedName)) {
                                     persistentData.addFavorite(board);
-                                    showToast(board.name + " added as favorite");
+                                    showToast(board.name + " " + resources.getString(R.string.favorite_added));
                                     return;
                                 }
                             }
-                            showToast("Board doesn't exist");
+                            showToast(R.string.no_board);
                         }
                     }).show();
         }

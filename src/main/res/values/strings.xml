@@ -3,6 +3,9 @@
     <string name="app_name">Chanobol</string>
     <string name="settings">Settings</string>
     <string name="debug_settings">Debug Settings</string>
+    <!-- Screens -->
+    <string name="replies_to">Replies to</string>
+    <string name="quoted_by">Quoted by</string>
     <!-- Menu -->
     <string name="add_favorite">Add Favorite</string>
     <string name="open_external">Open External</string>
@@ -20,4 +23,18 @@
     <string name="all_boards">All Boards</string>
     <string name="about">About</string>
     <string name="favorites">Favorites</string>
+    <!-- About -->
+    <string name="about_app_title">About Chanobol</string>
+    <string name="about_app">
+        Chanobol is a fast and usable 4Chan reader inspired by Chanu.\nFind the source code here: https://github.com/eugenkiss/chanobol
+    </string>
+    <!-- Dialogs -->
+    <string name="exit_sure">Are you sure you want to exit?</string>
+    <string name="delete_title">Delete?</string>
+    <string name="add_favorite_title">Add favorite board</string>
+    <string name="favorize_title">Favorize?</string>
+    <string name="favorite_added">added as favorite</string>
+    <!-- Toasts -->
+    <string name="no_app">No suitable app</string>
+    <string name="no_board">Board doesn\'t exist</string>
 </resources>

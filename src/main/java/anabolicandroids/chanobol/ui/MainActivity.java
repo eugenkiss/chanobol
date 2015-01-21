@@ -197,15 +197,11 @@ public class MainActivity extends BaseActivity {
     }
 
     @OnClick(R.id.about) void onAbout() {
-        SpannableString s = new SpannableString(
-            "Chanobol is a fast and usable 4Chan reader inspired by Chanu.\n" +
-            "Find the source code here: " +
-            "https://github.com/eugenkiss/chanobol"
-        );
+        SpannableString s = new SpannableString(getResources().getString(R.string.about_app));
         Linkify.addLinks(s, Linkify.ALL);
 
         AlertDialog d = new AlertDialog.Builder(this)
-                .setTitle("About Chanobol")
+                .setTitle(R.string.about_app_title)
                 .setMessage(s)
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
@@ -251,7 +247,7 @@ public class MainActivity extends BaseActivity {
             drawerLayout.closeDrawers();
         } else if (fm.getBackStackEntryCount() == 0) {
             new AlertDialog.Builder(this)
-                    .setMessage("Are you sure you want to exit?")
+                    .setMessage(R.string.exit_sure)
                     .setCancelable(false)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int id) {

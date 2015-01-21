@@ -45,9 +45,9 @@ public class PostsDialog extends UiFragment {
     public void onResume() {
         super.onResume();
         if (repliedTo != null)
-            activity.setTitle("Replies to " + repliedTo.id);
+            activity.setTitle(resources.getString(R.string.replies_to) + " " + repliedTo.id);
         else
-            activity.setTitle("Quoted by " + quotedBy.id);
+            activity.setTitle(resources.getString(R.string.quoted_by) + " " + quotedBy.id);
     }
 
     @Override
