@@ -15,7 +15,11 @@ def versionPatch = 0
 def versionBuild = 0
 
 apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
+// TODO: This would be so nice but it doesn't work
+//if (project.hasProperty('apiKey') && project.hasProperty('apiSecret')) {
+// FYI: Comment the following line to prevent crashlytics errors from building the project
+    apply plugin: 'io.fabric'
+//}
 
 repositories {
     jcenter()
@@ -60,6 +64,8 @@ android {
     }
     // http://stackoverflow.com/a/21020469/283607
     signingConfigs {
+        // FYI: Comment the following lines and the one under
+        // buildTypes.release to prevent Gradle from aborting the build
         release {
             storeFile file(RELEASE_STORE_FILE)
             storePassword RELEASE_STORE_PASSWORD
