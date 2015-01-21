@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity {
                 if (fragment != null) fragment.onResume();
                 // To remember the visibility of the toolbar
                 // and rehide it on return if necessary.
-                if (fragment instanceof UiFragment) {
+                if (fragment instanceof UiFragment && prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) {
                     UiFragment f = (UiFragment) fragment;
                     ViewHelper.setTranslationY(toolbar, f.toolbarPosition);
                 }
