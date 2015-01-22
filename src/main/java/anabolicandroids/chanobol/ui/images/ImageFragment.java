@@ -16,37 +16,37 @@ import anabolicandroids.chanobol.ui.UiFragment;
 import butterknife.InjectView;
 import uk.co.senab.photoview.PhotoView;
 
-public class ImagesFragment extends UiFragment {
+public class ImageFragment extends UiFragment {
     @InjectView(R.id.image) PhotoView imageView;
 
     private String boardName;
     private String threadId;
     private Drawable image;
     private int index;
-    private List<String> imageIdAndExts;
+    private List<ImgIdExt> imagePointers;
 
     private String url;
 
-    public static ImagesFragment create(String boardName, String threadId,
-                                        Drawable image, int index, List<String> imageIdAndExts) {
-        ImagesFragment f = new ImagesFragment();
+    public static ImageFragment create(String boardName, String threadId,
+                                        Drawable image, int index, List<ImgIdExt> imageIdAndExts) {
+        ImageFragment f = new ImageFragment();
         f.boardName = boardName;
         f.threadId = threadId;
         f.image = image;
         f.index = index;
-        f.imageIdAndExts = imageIdAndExts;
+        f.imagePointers = imageIdAndExts;
         return f;
     }
 
-    @Override protected int getLayoutResource() { return R.layout.fragment_images; }
+    @Override protected int getLayoutResource() { return R.layout.fragment_image; }
 
     @Override protected boolean shouldAddPaddingForToolbar() { return false; }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        String[] imageIdAndExt = imageIdAndExts.get(index).split("\\.");
-        url = ApiModule.imgUrl(boardName, imageIdAndExt[0], "."+imageIdAndExt[1]);
+        ImgIdExt imagePointer = imagePointers.get(index);
+        url = ApiModule.imgUrl(boardName, imagePointer.id, imagePointer.ext);
         // TODO: Makes application break after a while of zooming in and out
         //imageView.setMaximumScale(25); // Default value is to small for some images
         // TODO: Would be great if deepZoom was more configurable. Too early too low resolution.
@@ -56,7 +56,7 @@ public class ImagesFragment extends UiFragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setTitle(boardName+"/imgs/"+threadId);
+        activity.setTitle(boardName+"/img/"+threadId);
         toolbar.getBackground().setAlpha(0);
     }
 
@@ -68,7 +68,7 @@ public class ImagesFragment extends UiFragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.images, menu);
+        inflater.inflate(R.menu.image, menu);
     }
 
     @Override

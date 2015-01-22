@@ -74,7 +74,7 @@ public class FavoritesFragment extends UiFragment {
         favoritesView.setLayoutManager(glm);
         favoritesView.setItemAnimator(new DefaultItemAnimator());
         boardsAdapter.notifyDataSetChanged();
-        Util.calcDynamicSpanCount(context, favoritesView, glm);
+        Util.calcDynamicSpanCountById(context, favoritesView, glm, R.dimen.column_width);
 
         persistentData.addFavoritesChangedCallback(new PersistentData.FavoritesCallback() {
             @Override

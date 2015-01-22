@@ -91,7 +91,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         GridLayoutManager glm = new GridLayoutManager(context, 2);
         threadsView.setLayoutManager(glm);
         threadsView.setItemAnimator(new DefaultItemAnimator());
-        Util.calcDynamicSpanCount(context, threadsView, glm);
+        Util.calcDynamicSpanCountById(context, threadsView, glm, R.dimen.column_width);
 
         load();
         initBackgroundUpdater();

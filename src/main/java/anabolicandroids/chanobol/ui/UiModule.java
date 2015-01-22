@@ -8,7 +8,8 @@ import anabolicandroids.chanobol.AppModule;
 import anabolicandroids.chanobol.annotations.ForActivity;
 import anabolicandroids.chanobol.ui.boards.BoardsFragment;
 import anabolicandroids.chanobol.ui.boards.FavoritesFragment;
-import anabolicandroids.chanobol.ui.images.ImagesFragment;
+import anabolicandroids.chanobol.ui.images.GalleryFragment;
+import anabolicandroids.chanobol.ui.images.ImageFragment;
 import anabolicandroids.chanobol.ui.posts.PostsDialog;
 import anabolicandroids.chanobol.ui.posts.PostsFragment;
 import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
@@ -23,7 +24,8 @@ import dagger.Provides;
                 ThreadsFragment.class,
                 PostsFragment.class,
                 PostsDialog.class,
-                ImagesFragment.class
+                ImageFragment.class,
+                GalleryFragment.class
         },
         addsTo = AppModule.class,
         library = true

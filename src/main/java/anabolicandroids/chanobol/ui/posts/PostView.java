@@ -29,6 +29,7 @@ import com.koushikdutta.ion.builder.Builders;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
+import anabolicandroids.chanobol.ui.images.ImgIdExt;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -96,7 +97,7 @@ public class PostView extends CardView {
         size[H] = (int) h;
     }
 
-    private void initImageListener(final String imageIdAndExt, final PostsFragment.ImageCallback cb) {
+    private void initImageListener(final ImgIdExt imageIdAndExt, final PostsFragment.ImageCallback cb) {
         image.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -182,7 +183,7 @@ public class PostView extends CardView {
         this.post = post;
         reset();
         initText(post, repliesCallback, referencedPostCallback);
-        initImageListener(post.imageId + post.imageExtension, imageCallback);
+        initImageListener(new ImgIdExt(post.imageId, post.imageExtension), imageCallback);
 
         image.setVisibility(View.VISIBLE);
         progress.setVisibility(View.VISIBLE);
@@ -207,7 +208,7 @@ public class PostView extends CardView {
         initText(post, repliesCallback, referencedPostCallback);
 
         if (post.imageId != null && !"null".equals(post.imageId)) {
-            initImageListener(post.imageId + post.imageExtension, imageCallback);
+            initImageListener(new ImgIdExt(post.imageId, post.imageExtension), imageCallback);
 
             final int[] size = new int[2]; calcSize(size, post);
             progress.setVisibility(View.VISIBLE);

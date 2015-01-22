@@ -73,7 +73,7 @@ public class BoardsFragment extends UiFragment {
         GridLayoutManager glm = new GridLayoutManager(context, 2);
         boardsView.setLayoutManager(glm);
         boardsView.setItemAnimator(new DefaultItemAnimator());
-        Util.calcDynamicSpanCount(context, boardsView, glm);
+        Util.calcDynamicSpanCountById(context, boardsView, glm, R.dimen.column_width);
     }
 
     @Override

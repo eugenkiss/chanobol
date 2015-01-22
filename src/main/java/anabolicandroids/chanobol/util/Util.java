@@ -122,9 +122,9 @@ public class Util {
 
     // Unsatisfactory compared to GridView but given the current constraint best solution
     // http://stackoverflow.com/questions/26666143/recyclerview-gridlayoutmanager-how-to-auto-detect-span-count
-    public static void calcDynamicSpanCount(final Context cxt,
-                                            final RecyclerView rv,
-                                            final GridLayoutManager glm) {
+    public static void calcDynamicSpanCount(final RecyclerView rv,
+                                            final GridLayoutManager glm,
+                                            final float cardWidth) {
         rv.getViewTreeObserver().addOnGlobalLayoutListener(
                 new ViewTreeObserver.OnGlobalLayoutListener() {
                     @Override
@@ -132,12 +132,19 @@ public class Util {
                         //noinspection deprecation
                         rv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         int viewWidth = rv.getMeasuredWidth();
-                        float cardViewWidth = cxt.getResources().getDimension(R.dimen.column_width);
-                        int newSpanCount = (int) Math.floor(viewWidth / cardViewWidth);
+                        //float cardViewWidth = cxt.getResources().getDimension(R.dimen.column_width);
+                        int newSpanCount = (int) Math.floor(viewWidth / cardWidth);
                         glm.setSpanCount(newSpanCount);
                         glm.requestLayout();
                     }
                 });
+    }
+    public static void calcDynamicSpanCountById(final Context cxt,
+                                                final RecyclerView rv,
+                                                final GridLayoutManager glm,
+                                                final int cardWidthId) {
+        float cardWidth = cxt.getResources().getDimension(cardWidthId);
+        calcDynamicSpanCount(rv, glm, cardWidth);
     }
 
     public static void animateY(final View view, int from, int to, int duration) {

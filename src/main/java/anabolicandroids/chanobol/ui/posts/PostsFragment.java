@@ -3,6 +3,7 @@ package anabolicandroids.chanobol.ui.posts;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,7 +33,9 @@ import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
 import anabolicandroids.chanobol.ui.UiAdapter;
-import anabolicandroids.chanobol.ui.images.ImagesFragment;
+import anabolicandroids.chanobol.ui.images.GalleryFragment;
+import anabolicandroids.chanobol.ui.images.ImageFragment;
+import anabolicandroids.chanobol.ui.images.ImgIdExt;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
@@ -64,12 +67,12 @@ public class PostsFragment extends SwipeRefreshFragment {
     };
 
     public static interface ImageCallback {
-        public void onClick(String imageIdAndExt, Drawable preview);
+        public void onClick(ImgIdExt imageIdAndExt, Drawable preview);
     }
     ImageCallback imageCallback = new ImageCallback() {
         @Override
-        public void onClick(String imageIdAndExt, Drawable preview) {
-            ImagesFragment f = ImagesFragment.create(board, threadId, preview, 0, Arrays.asList(imageIdAndExt));
+        public void onClick(ImgIdExt imageIdAndExt, Drawable preview) {
+            ImageFragment f = ImageFragment.create(board, threadId, preview, 0, Arrays.asList(imageIdAndExt));
             startFragment(f);
         }
     };
@@ -84,6 +87,7 @@ public class PostsFragment extends SwipeRefreshFragment {
     PostsAdapter postsAdapter;
     HashMap<String, Post> postsMap;
     HashMap<String, ArrayList<String>> answers;
+    ArrayList<ImgIdExt> imagePointers;
 
     // TODO: Isn't there a more elegant solution?
     long lastUpdate;
@@ -110,6 +114,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         posts = new ArrayList<>();
         postsMap = new HashMap<>();
         answers = new HashMap<>();
+        imagePointers = new ArrayList<>();
         posts.add(op);
 
         postsAdapter = new PostsAdapter();
@@ -177,6 +182,7 @@ public class PostsFragment extends SwipeRefreshFragment {
                 posts.clear();
                 postsMap.clear();
                 answers.clear();
+                imagePointers.clear();
                 for (Post p : result) {
                     posts.add(p);
                     postsMap.put(p.id, p);
@@ -188,8 +194,11 @@ public class PostsFragment extends SwipeRefreshFragment {
                             referenced.postReplies++;
                         }
                     }
-                    if (p.imageId != null && prefs.getBoolean(Settings.PRELOAD_THUMBNAILS, true))
-                        ion.build(context).load(ApiModule.thumbUrl(board, p.imageId)).asBitmap().tryGet();
+                    if (p.imageId != null) {
+                        if (prefs.getBoolean(Settings.PRELOAD_THUMBNAILS, true))
+                            ion.build(context).load(ApiModule.thumbUrl(board, p.imageId)).asBitmap().tryGet();
+                        imagePointers.add(new ImgIdExt(p.imageId, p.imageExtension));
+                    }
                 }
                 postsAdapter.notifyDataSetChanged();
                 loaded();
@@ -229,6 +238,10 @@ public class PostsFragment extends SwipeRefreshFragment {
                 break;
             case R.id.refresh:
                 load();
+                break;
+            case R.id.gallery:
+                Fragment f = GalleryFragment.create(board, threadId, imagePointers);
+                startFragment(f);
                 break;
         }
         return super.onOptionsItemSelected(item);
