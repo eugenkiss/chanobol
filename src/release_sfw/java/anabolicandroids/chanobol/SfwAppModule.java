@@ -11,7 +11,7 @@ import dagger.Provides;
         library = true,
         overrides = true
 )
-public final class DebugAppModule {
+public final class SfwAppModule {
 
     @Provides @Singleton @SfwMode
     boolean provideSfwMode() {
