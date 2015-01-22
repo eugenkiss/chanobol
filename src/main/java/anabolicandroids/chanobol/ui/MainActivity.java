@@ -148,7 +148,7 @@ public class MainActivity extends BaseActivity {
         favoriteBoardsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 clearBackStackOnDrawerClick();
-                Fragment f = ThreadsFragment.create(favoriteBoardsAdapter.getItem(position).name);
+                Fragment f = ThreadsFragment.create(favoriteBoardsAdapter.getItem(position));
                 fm.beginTransaction()
                         .replace(R.id.container, f, null)
                         .commit();

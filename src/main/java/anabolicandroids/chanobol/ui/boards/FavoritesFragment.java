@@ -44,7 +44,7 @@ public class FavoritesFragment extends UiFragment {
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override public void onClick(View v) {
                 BoardView bv = (BoardView) v;
-                Fragment f = ThreadsFragment.create(bv.board.name);
+                Fragment f = ThreadsFragment.create(bv.board);
                 getFragmentManager().beginTransaction()
                         .replace(R.id.container, f, null)
                         .commit();

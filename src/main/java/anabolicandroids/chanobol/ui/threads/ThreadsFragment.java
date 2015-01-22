@@ -24,10 +24,12 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import anabolicandroids.chanobol.R;
+import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.api.data.Thread;
 import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
 import anabolicandroids.chanobol.ui.UiAdapter;
+import anabolicandroids.chanobol.ui.boards.BoardsFragment;
 import anabolicandroids.chanobol.ui.posts.PostsFragment;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
@@ -35,7 +37,7 @@ import butterknife.InjectView;
 public class ThreadsFragment extends SwipeRefreshFragment {
     @InjectView(R.id.threads) RecyclerView threadsView;
 
-    String name;
+    Board board;
     ArrayList<Thread> threads;
     HashMap<String, Integer> threadMap;
     WeakHashMap<String, Bitmap> bitMap;
@@ -47,9 +49,9 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     boolean pauseUpdating = false;
     private ScheduledThreadPoolExecutor executor;
 
-    public static ThreadsFragment create(String name) {
+    public static ThreadsFragment create(Board board) {
         ThreadsFragment f = new ThreadsFragment();
-        f.name = name;
+        f.board = board;
         return f;
     }
 
@@ -71,13 +73,13 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 ThreadView tv = (ThreadView) v;
                 Thread thread = tv.thread;
                 if (thread.dead) {
-                    showToast("Thread is dead");
+                    showToast(R.string.no_thread);
                     return;
                 }
                 pauseUpdating = true;
                 Bitmap b = bitMap.get(thread.id);
                 Drawable d = b == null ? null : new BitmapDrawable(getResources(), b);
-                PostsFragment f = PostsFragment.create(name, thread.toOpPost(), d);
+                PostsFragment f = PostsFragment.create(board.name, thread.toOpPost(), d);
                 // Doesn't work, see: https://code.google.com/p/android/issues/detail?id=82832&thanks=82832&ts=1418767240
                 //f.setEnterTransition(new Slide(Gravity.RIGHT));
                 //f.setExitTransition(new Slide(Gravity.RIGHT));
@@ -121,7 +123,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setTitle(name);
+        activity.setTitle(board.name);
         update();
         initBackgroundUpdater();
         pauseUpdating = false;
@@ -136,7 +138,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     @Override
     protected void load() {
         super.load();
-        service.listThreads(this, name, new FutureCallback<List<Thread>>() {
+        service.listThreads(this, board.name, new FutureCallback<List<Thread>>() {
             @Override public void onCompleted(Exception e, List<Thread> result) {
                 if (e != null) {
                     if (e.getMessage() != null) showToast(e.getMessage());
@@ -161,7 +163,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     private void update() {
         if (loading) return;
         lastUpdate = System.currentTimeMillis();
-        service.listThreads(this, name, new FutureCallback<List<Thread>>() {
+        service.listThreads(this, board.name, new FutureCallback<List<Thread>>() {
             @Override public void onCompleted(Exception e, List<Thread> result) {
                 if (e != null) {
                     System.out.println("" + e.getMessage());
@@ -211,6 +213,9 @@ public class ThreadsFragment extends SwipeRefreshFragment {
             case R.id.up:
                 threadsView.scrollToPosition(0);
                 break;
+            case R.id.favorize:
+                BoardsFragment.showAddFavoriteDialog(context, persistentData, board);
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -227,7 +232,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         }
 
         @Override public void bindView(Thread item, int position, View view) {
-            ((ThreadView) view).bindTo(item, name, ion, bitMap);
+            ((ThreadView) view).bindTo(item, board.name, ion, bitMap);
         }
     }
 }

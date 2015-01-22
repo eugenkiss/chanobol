@@ -37,4 +37,5 @@
     <!-- Toasts -->
     <string name="no_app">No suitable app</string>
     <string name="no_board">Board doesn\'t exist</string>
+    <string name="no_thread">Thread is dead</string>
 </resources>
