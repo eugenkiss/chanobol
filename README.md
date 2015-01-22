@@ -121,8 +121,9 @@ and caching images.
 
 Why fragments over activites? It's easier to communicate / pass complex data
 between fragments than between activites. It's also more natural to use fragments
-for a navigation drawer based UI. There are many more arguments in favor
-of fragments that a Google search will reveal.
+for a navigation drawer based UI. See
+[these points](https://github.com/futurice/android-best-practices#activities-and-fragments)
+for a good summary of the advantages.
 
 Why static factory methods for fragment creation? Actually, I could have used
 non-static constructors as well. Many arguments you can find in favor of factory

@@ -100,6 +100,7 @@ public class FavoritesFragment extends UiFragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.addFavorite) {
             final EditText input = new EditText(context);
+            input.setHint("ck");
             new AlertDialog.Builder(context)
                     .setTitle(R.string.add_favorite_title)
                     .setView(input)
