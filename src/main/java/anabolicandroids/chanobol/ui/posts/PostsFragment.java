@@ -48,7 +48,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         @Override
         public void onClick(Post post) {
             ArrayList<Post> posts = new ArrayList<>(post.postReplies);
-            for (String id : answers.get(post.id)) {
+            for (String id : replies.get(post.id)) {
                 posts.add(postsMap.get(id));
             }
             showPostsDialog(post, posts);
@@ -86,7 +86,7 @@ public class PostsFragment extends SwipeRefreshFragment {
     ArrayList<Post> posts;
     PostsAdapter postsAdapter;
     HashMap<String, Post> postsMap;
-    HashMap<String, ArrayList<String>> answers;
+    HashMap<String, ArrayList<String>> replies;
     ArrayList<ImgIdExt> imagePointers;
 
     // TODO: Isn't there a more elegant solution?
@@ -113,7 +113,7 @@ public class PostsFragment extends SwipeRefreshFragment {
 
         posts = new ArrayList<>();
         postsMap = new HashMap<>();
-        answers = new HashMap<>();
+        replies = new HashMap<>();
         imagePointers = new ArrayList<>();
         posts.add(op);
 
@@ -181,16 +181,16 @@ public class PostsFragment extends SwipeRefreshFragment {
                 }
                 posts.clear();
                 postsMap.clear();
-                answers.clear();
+                replies.clear();
                 imagePointers.clear();
                 for (Post p : result) {
                     posts.add(p);
                     postsMap.put(p.id, p);
                     for (String id : referencedPosts(p)) {
-                        if (!answers.containsKey(id)) answers.put(id, new ArrayList<String>());
+                        if (!replies.containsKey(id)) replies.put(id, new ArrayList<String>());
                         Post referenced = postsMap.get(id);
                         if (referenced != null) { // e.g. stale reference to deleted post
-                            answers.get(id).add(p.id);
+                            replies.get(id).add(p.id);
                             referenced.postReplies++;
                         }
                     }
