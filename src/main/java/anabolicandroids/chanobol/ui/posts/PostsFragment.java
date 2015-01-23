@@ -293,7 +293,7 @@ public class PostsFragment extends SwipeRefreshFragment {
     }
 
     private View newViewDRY(ViewGroup container) {
-        return inflater.inflate(R.layout.view_post, container, false);
+        return activity.getLayoutInflater().inflate(R.layout.view_post, container, false);
     }
 
     private void bindViewDRY(final Post item, int position, View view) {
