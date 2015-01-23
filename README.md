@@ -36,6 +36,10 @@ replies or choosable themes. My aim was and is to have a polished read-only
 features. It only means that I probably will not implement them myself.
 </sub>
 
+Mockmode currently is not really working, see issues
+[#34](https://github.com/eugenkiss/chanobol/issues/34) and
+[#47](https://github.com/eugenkiss/chanobol/issues/34).
+
 
 Motivation
 ----------

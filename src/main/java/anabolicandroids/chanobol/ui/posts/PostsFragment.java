@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.ui.posts;
 
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -157,6 +158,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         super.onResume();
         activity.setTitle(board + "/" + threadId);
         postsAdapter.notifyDataSetChanged();
+        postsView.requestLayout();
         initBackgroundUpdater();
         pauseUpdating = false;
     }
@@ -164,6 +166,15 @@ public class PostsFragment extends SwipeRefreshFragment {
     @Override public void onStop() {
         super.onStop();
         pauseUpdating = true;
+    }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        postsView.postDelayed(new Runnable() {
+            @Override public void run() {
+                postsView.requestLayout();
+            }
+        }, 100);
     }
 
     @Override

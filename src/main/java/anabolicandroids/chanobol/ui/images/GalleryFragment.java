@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.ui.images;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -73,6 +74,11 @@ public class GalleryFragment extends SwipeRefreshFragment {
         super.onResume();
         activity.setTitle(board + "/gal/" + threadId);
         galleryAdapter.notifyDataSetChanged();
+    }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Util.updateRecyclerViewGridOnConfigChange(galleryView, R.dimen.column_width_gallery);
     }
 
     @Override

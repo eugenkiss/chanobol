@@ -5,4 +5,5 @@
     <dimen name="column_width">140dp</dimen>
     <dimen name="column_width_gallery">90dp</dimen>
     <dimen name="row_height_gallery">90dp</dimen>
+    <dimen name="max_post_width">600sp</dimen>
 </resources>

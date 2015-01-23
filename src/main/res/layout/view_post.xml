@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
+    app:maxWidth="@dimen/max_post_width"
     card_view:cardCornerRadius="0dp"
     app:cardBackgroundColor="@color/fg"
     >

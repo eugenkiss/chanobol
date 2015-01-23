@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.ui.threads;
 
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -127,6 +128,11 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         update();
         initBackgroundUpdater();
         pauseUpdating = false;
+    }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Util.updateRecyclerViewGridOnConfigChange(threadsView, R.dimen.column_width);
     }
 
     @Override

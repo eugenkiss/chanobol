@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
-import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
@@ -30,11 +29,12 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.images.ImgIdExt;
+import anabolicandroids.chanobol.util.MaxWidthCardView;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class PostView extends CardView {
+public class PostView extends MaxWidthCardView {
     @InjectView(R.id.header) ViewGroup header;
     @InjectView(R.id.id) TextView id;
     @InjectView(R.id.date) TextView date;
@@ -47,8 +47,8 @@ public class PostView extends CardView {
     @InjectView(R.id.footer) TextView footer;
 
     private static final int W = 0, H = 1;
-    private int maxWidth;
-    private int maxHeight;
+    private int maxImgWidth;
+    private int maxImgHeight;
 
     public Post post;
 
@@ -61,8 +61,8 @@ public class PostView extends CardView {
         ButterKnife.inject(this);
         int screenWidth = Util.getScreenWidth(getContext());
         int screenHeight = Util.getScreenHeight(getContext());
-        maxWidth = screenWidth;
-        maxHeight = (int) (screenHeight * 0.85);
+        maxImgWidth = screenWidth;
+        maxImgHeight = (int) (screenHeight * 0.85);
     }
 
     private void reset() {
@@ -83,14 +83,14 @@ public class PostView extends CardView {
     // screen height.
     private void calcSize(int[] size, Post post) {
         double w = post.imageWidth, h = post.imageHeight;
-        if (w >= maxWidth) {
+        if (w >= maxImgWidth) {
             double w_old = w;
-            w = maxWidth;
+            w = maxImgWidth;
             h *= w / w_old;
         }
-        if (h >= maxHeight) {
+        if (h >= maxImgHeight) {
             double h_old = h;
-            h = maxHeight;
+            h = maxImgHeight;
             w *= h / h_old;
         }
         size[W] = (int) w;

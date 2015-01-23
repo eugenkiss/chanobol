@@ -2,6 +2,7 @@ package anabolicandroids.chanobol.ui.boards;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
@@ -88,6 +89,12 @@ public class FavoritesFragment extends UiFragment {
     public void onResume() {
         super.onResume();
         activity.setTitle(R.string.favorite_boards);
+    }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        // Why is there no onPostConfigurationChanged...
+        Util.updateRecyclerViewGridOnConfigChange(favoritesView, R.dimen.column_width);
     }
 
     @Override

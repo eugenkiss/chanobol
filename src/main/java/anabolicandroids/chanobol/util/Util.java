@@ -132,7 +132,6 @@ public class Util {
                         //noinspection deprecation
                         rv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         int viewWidth = rv.getMeasuredWidth();
-                        //float cardViewWidth = cxt.getResources().getDimension(R.dimen.column_width);
                         int newSpanCount = (int) Math.floor(viewWidth / cardWidth);
                         glm.setSpanCount(newSpanCount);
                         glm.requestLayout();
@@ -145,6 +144,16 @@ public class Util {
                                                 final int cardWidthId) {
         float cardWidth = cxt.getResources().getDimension(cardWidthId);
         calcDynamicSpanCount(rv, glm, cardWidth);
+    }
+
+    public static void updateRecyclerViewGridOnConfigChange(final RecyclerView rv, final int cardWidthId) {
+        rv.postDelayed(new Runnable() {
+            @Override public void run() {
+                GridLayoutManager glm = (GridLayoutManager) rv.getLayoutManager();
+                Util.calcDynamicSpanCountById(rv.getContext(), rv, glm, cardWidthId);
+                rv.requestLayout();
+            }
+        }, 100);
     }
 
     public static void animateY(final View view, int from, int to, int duration) {

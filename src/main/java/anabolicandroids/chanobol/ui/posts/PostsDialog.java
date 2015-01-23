@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.ui.posts;
 
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
@@ -44,10 +45,21 @@ public class PostsDialog extends UiFragment {
     @Override
     public void onResume() {
         super.onResume();
+        adapter.notifyDataSetChanged();
+        postsView.requestLayout();
         if (repliedTo != null)
             activity.setTitle(resources.getString(R.string.replies_to) + " " + repliedTo.id);
         else
             activity.setTitle(resources.getString(R.string.quoted_by) + " " + quotedBy.id);
+    }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        postsView.postDelayed(new Runnable() {
+            @Override public void run() {
+                postsView.requestLayout();
+            }
+        }, 100);
     }
 
     @Override
