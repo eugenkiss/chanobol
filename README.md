@@ -87,10 +87,11 @@ Code Architecture
 
 This section gives a broad overview of the code, some (non-obvious) code design
 decisions and the reasons for the application of some libraries. There are many
-more decisions, of course, which can be found by studying the code. I tried to
-follow good practices to the best of my knowledge. As pure Android development
-without the help of libraries is often relatively tedious I employ useful
-libraries where possible.
+more decisions, of course, which can be found by studying the code or the [FAQ
+in the wiki](https://github.com/eugenkiss/chanobol/wiki#faq).  I tried to follow
+good practices to the best of my knowledge. As pure Android development without
+the help of libraries is often relatively tedious I employ useful libraries
+where possible.
 
 A constraint I set is that Chanobol must be runnable on API Level 9 to see what
 kind of workarounds are needed and what pitfalls there are for developing an
@@ -123,14 +124,3 @@ Chanobol can be seen as a UI for the [4Chan API][API]. To this end, the great
 [Ion][] library is employed. With Ion 4Chan's API is mapped to the interface
 `ChanService` in the `api` package. On top of that, Ion takes care of loading
 and caching images.
-
-Why fragments over activites? It's easier to communicate / pass complex data
-between fragments than between activites. It's also more natural to use fragments
-for a navigation drawer based UI. See
-[these points](https://github.com/futurice/android-best-practices#activities-and-fragments)
-for a good summary of the advantages.
-
-Why static factory methods for fragment creation? Actually, I could have used
-non-static constructors as well. Many arguments you can find in favor of factory
-methods for fragments are not convincing at all. In the end, it makes no
-substantial difference either way, it is more a matter of personal preference.
