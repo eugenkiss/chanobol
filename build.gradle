@@ -59,6 +59,9 @@ android {
         minSdkVersion 9
         targetSdkVersion 21
 
+        renderscriptTargetApi 19
+        renderscriptSupportModeEnabled true
+
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }

@@ -4,10 +4,15 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v8.renderscript.Allocation;
+import android.support.v8.renderscript.Element;
+import android.support.v8.renderscript.RenderScript;
+import android.support.v8.renderscript.ScriptIntrinsicBlur;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.ActionProvider;
@@ -167,6 +172,37 @@ public class Util {
         });
         anim.setDuration(duration);
         anim.start();
+    }
+
+    // http://stackoverflow.com/a/21051758/283607
+    public static Bitmap blur(Context ctx, Bitmap image, float radius) {
+        int width = Math.round(image.getWidth());
+        int height = Math.round(image.getHeight());
+
+        Bitmap inputBitmap = Bitmap.createScaledBitmap(image, width, height, false);
+        Bitmap outputBitmap = Bitmap.createBitmap(inputBitmap);
+
+        RenderScript rs = RenderScript.create(ctx);
+        ScriptIntrinsicBlur theIntrinsic = ScriptIntrinsicBlur.create(rs, Element.U8_4(rs));
+        Allocation tmpIn = Allocation.createFromBitmap(rs, inputBitmap);
+        Allocation tmpOut = Allocation.createFromBitmap(rs, outputBitmap);
+        theIntrinsic.setRadius(radius);
+        theIntrinsic.setInput(tmpIn);
+        theIntrinsic.forEach(tmpOut);
+        tmpOut.copyTo(outputBitmap);
+
+        return outputBitmap;
+    }
+
+    // http://stackoverflow.com/a/24313590/283607
+    public static Bitmap setHasAlphaCompat(Bitmap bit) {
+        int width =  bit.getWidth();
+        int height = bit.getHeight();
+        Bitmap myBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        int [] allpixels = new int [ myBitmap.getHeight()*myBitmap.getWidth()];
+        bit.getPixels(allpixels, 0, myBitmap.getWidth(), 0, 0, myBitmap.getWidth(),myBitmap.getHeight());
+        myBitmap.setPixels(allpixels, 0, width, 0, 0, width, height);
+        return myBitmap;
     }
 
     // Fuck this

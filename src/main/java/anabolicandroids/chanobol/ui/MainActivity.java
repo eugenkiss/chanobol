@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
@@ -60,6 +61,7 @@ public class MainActivity extends BaseActivity {
     @Inject @Named("DebugSettings") Class debugSettingsClass;
 
     @InjectView(R.id.toolbar) Toolbar toolbar;
+    @InjectView(R.id.toolbarShadow) ImageView toolbarShadow;
     @InjectView(R.id.loadingBar) ProgressBar loadingBar;
     @InjectView(R.id.drawerLayout) DrawerLayout drawerLayout;
     @InjectView(R.id.drawer) LinearLayout drawer;
@@ -108,11 +110,12 @@ public class MainActivity extends BaseActivity {
                 // http://stackoverflow.com/a/18752763/283607
                 Fragment fragment = fm.getFragments().get(stackHeight);
                 if (fragment != null) fragment.onResume();
-                // To remember the visibility of the toolbar
-                // and rehide it on return if necessary.
+                // To remember the visibility of the toolbar and reset it on return if necessary.
                 if (fragment instanceof UiFragment && prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) {
                     UiFragment f = (UiFragment) fragment;
+                    // TODO: Animate
                     ViewHelper.setTranslationY(toolbar, f.toolbarPosition);
+                    ViewHelper.setTranslationY(toolbarShadow, f.toolbarPosition);
                 }
             }
         };
@@ -278,10 +281,14 @@ public class MainActivity extends BaseActivity {
     private static int dur = 120;
 
     public void showToolbar() {
-        if (Build.VERSION.SDK_INT >= 14)
+        if (Build.VERSION.SDK_INT >= 14) {
             toolbar.animate().y(0).setDuration(dur);
-        else
+            toolbarShadow.animate().y(0).setDuration(dur);
+        }
+        else {
             Util.animateY(toolbar, toolbar.getTop(), 0, dur);
+            Util.animateY(toolbarShadow, toolbarShadow.getTop(), 0, dur);
+        }
     }
 
     @SuppressWarnings("UnusedDeclaration")

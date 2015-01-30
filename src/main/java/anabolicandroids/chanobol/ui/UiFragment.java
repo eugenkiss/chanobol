@@ -17,6 +17,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.koushikdutta.ion.Ion;
 import com.nineoldandroids.view.ViewHelper;
@@ -40,6 +41,7 @@ public abstract class UiFragment extends BaseFragment {
     @Inject public SharedPreferences prefs;
 
     public Toolbar toolbar;
+    public ImageView toolbarShadow;
     DrawerLayout drawer;
     // As getView apparently does not return the view returned by
     // onCreateView as suggested in the documentation but the container
@@ -85,6 +87,7 @@ public abstract class UiFragment extends BaseFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         toolbar = activity.toolbar;
+        toolbarShadow = activity.toolbarShadow;
         drawer = activity.drawerLayout;
         activity.showToolbar();
 
@@ -110,6 +113,7 @@ public abstract class UiFragment extends BaseFragment {
                         if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
                         float y = Util.clamp(-toolbar.getHeight(), toolbar.getTranslationY() - dy, 0);
                         toolbar.setTranslationY(y);
+                        toolbarShadow.setTranslationY(y);
                     }
                 });
             } else {
@@ -118,6 +122,7 @@ public abstract class UiFragment extends BaseFragment {
                         if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
                         float y = Util.clamp(-toolbar.getHeight(), ViewHelper.getTranslationY(toolbar) - dy, 0);
                         ViewHelper.setTranslationY(toolbar, y);
+                        ViewHelper.setTranslationY(toolbarShadow, y);
                     }
                 });
             }
