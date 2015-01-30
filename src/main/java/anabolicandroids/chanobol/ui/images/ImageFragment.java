@@ -61,7 +61,7 @@ public class ImageFragment extends UiFragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setTitle(boardName + "/img/" + threadId);
+        activity.setTitle("");
         toolbar.getBackground().setAlpha(0);
         toolbar.post(new Runnable() {
             @Override public void run() {
