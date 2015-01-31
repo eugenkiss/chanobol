@@ -49,7 +49,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         @Override
         public void onClick(Post post) {
             ArrayList<Post> posts = new ArrayList<>(post.postReplies);
-            for (String id : replies.get(post.id)) {
+            for (String id : replies.get(post.number)) {
                 posts.add(postsMap.get(id));
             }
             showPostsDialog(post, posts);
@@ -101,7 +101,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         f.board = board;
         f.op = op;
         f.opImage = opImage;
-        f.threadId = op.id;
+        f.threadId = op.number;
         return f;
     }
 
@@ -196,12 +196,12 @@ public class PostsFragment extends SwipeRefreshFragment {
                 imagePointers.clear();
                 for (Post p : result) {
                     posts.add(p);
-                    postsMap.put(p.id, p);
+                    postsMap.put(p.number, p);
                     for (String id : referencedPosts(p)) {
                         if (!replies.containsKey(id)) replies.put(id, new ArrayList<String>());
                         Post referenced = postsMap.get(id);
                         if (referenced != null) { // e.g. stale reference to deleted post
-                            replies.get(id).add(p.id);
+                            replies.get(id).add(p.number);
                             referenced.postReplies++;
                         }
                     }

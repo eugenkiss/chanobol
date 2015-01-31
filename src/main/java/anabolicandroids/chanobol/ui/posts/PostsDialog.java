@@ -48,9 +48,9 @@ public class PostsDialog extends UiFragment {
         adapter.notifyDataSetChanged();
         postsView.requestLayout();
         if (repliedTo != null)
-            activity.setTitle(resources.getString(R.string.replies_to) + " " + repliedTo.id);
+            activity.setTitle(resources.getString(R.string.replies_to) + " " + repliedTo.number);
         else
-            activity.setTitle(resources.getString(R.string.quoted_by) + " " + quotedBy.id);
+            activity.setTitle(resources.getString(R.string.quoted_by) + " " + quotedBy.number);
     }
 
     @Override public void onConfigurationChanged(Configuration newConfig) {

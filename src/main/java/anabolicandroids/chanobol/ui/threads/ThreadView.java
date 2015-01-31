@@ -46,7 +46,7 @@ public class ThreadView extends CardView {
         ion.build(image).load(ApiModule.thumbUrl(boardName, thread.imageId)).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
             @Override public void onCompleted(Exception e, ImageViewBitmapInfo result) {
                 if (e == null && result.getBitmapInfo() != null)
-                    bitMap.put(thread.id, result.getBitmapInfo().bitmap);
+                    bitMap.put(thread.number, result.getBitmapInfo().bitmap);
             }
         });
         String s = thread.subject;

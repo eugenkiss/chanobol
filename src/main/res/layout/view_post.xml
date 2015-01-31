@@ -30,7 +30,7 @@
             >
 
             <TextView
-                android:id="@+id/id"
+                android:id="@+id/number"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="?android:textColorPrimary"
@@ -123,17 +123,34 @@
             tools:text="Hello"
             />
 
-        <TextView
+        <LinearLayout
             android:id="@+id/footer"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
             android:paddingBottom="12dp"
             android:paddingLeft="12dp"
             android:paddingRight="12dp"
-            android:textSize="13sp"
-            android:textStyle="italic"
-            tools:text="500x375 ~ 32KB ~ 924edx.jpg"
-            />
+            >
+
+            <TextView
+                android:id="@+id/footerPoster"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textStyle="italic"
+                tools:text="Ish76dfzzh!"
+                />
+
+            <TextView
+                android:id="@+id/footerImage"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textStyle="italic"
+                tools:text="500x375 ~ 32KB ~ 924edx.jpg"
+                />
+        </LinearLayout>
     </LinearLayout>
 
 </anabolicandroids.chanobol.ui.posts.PostView>

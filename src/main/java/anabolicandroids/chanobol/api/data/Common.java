@@ -4,7 +4,7 @@ import com.google.gson.annotations.SerializedName;
 
 public abstract class Common {
     @SerializedName("no")
-    public String id;
+    public String number;
 
     @SerializedName("now")
     public String date;

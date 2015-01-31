@@ -78,7 +78,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                     return;
                 }
                 pauseUpdating = true;
-                Bitmap b = bitMap.get(thread.id);
+                Bitmap b = bitMap.get(thread.number);
                 Drawable d = b == null ? null : new BitmapDrawable(getResources(), b);
                 PostsFragment f = PostsFragment.create(board.name, thread.toOpPost(), d);
                 // Doesn't work, see: https://code.google.com/p/android/issues/detail?id=82832&thanks=82832&ts=1418767240
@@ -157,7 +157,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 for (int i = 0; i < result.size(); i++) {
                     Thread thread = result.get(i);
                     threads.add(thread);
-                    threadMap.put(thread.id, i);
+                    threadMap.put(thread.number, i);
                 }
                 threadsAdapter.notifyDataSetChanged();
                 loaded();
@@ -178,7 +178,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 if (loading) return; // cancel on real refresh
                 boolean[] positions = new boolean[threads.size()];
                 for (Thread thread : result) {
-                    Integer position = threadMap.get(thread.id);
+                    Integer position = threadMap.get(thread.number);
                     if (position != null) {
                         positions[position] = true;
                         threads.set(position, thread);

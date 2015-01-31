@@ -36,7 +36,7 @@ import butterknife.InjectView;
 
 public class PostView extends MaxWidthCardView {
     @InjectView(R.id.header) ViewGroup header;
-    @InjectView(R.id.id) TextView id;
+    @InjectView(R.id.number) TextView number;
     @InjectView(R.id.date) TextView date;
     @InjectView(R.id.repliesContainer) ViewGroup repliesContainer;
     @InjectView(R.id.replies) TextView replies;
@@ -44,7 +44,9 @@ public class PostView extends MaxWidthCardView {
     @InjectView(R.id.play) ImageView play;
     @InjectView(R.id.progressbar) ProgressBar progress;
     @InjectView(R.id.text) TextView text;
-    @InjectView(R.id.footer) TextView footer;
+    @InjectView(R.id.footer) ViewGroup footer;
+    @InjectView(R.id.footerPoster) TextView footerPoster;
+    @InjectView(R.id.footerImage) TextView footerImage;
 
     private static final int W = 0, H = 1;
     private int maxImgWidth;
@@ -59,6 +61,8 @@ public class PostView extends MaxWidthCardView {
     @Override protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.inject(this);
+        // TODO: Is onFinishInflate called on a configuration change if the containing fragment's instance is retained?
+        // If not these values should be recalculated.
         int screenWidth = Util.getScreenWidth(getContext());
         int screenHeight = Util.getScreenHeight(getContext());
         maxImgWidth = screenWidth;
@@ -74,6 +78,8 @@ public class PostView extends MaxWidthCardView {
         play.setVisibility(View.GONE);
         progress.setVisibility(View.GONE);
         footer.setVisibility(View.GONE);
+        footerPoster.setVisibility(View.GONE);
+        footerImage.setVisibility(View.GONE);
     }
 
     // If needed reduce the image size such that it is only as big as needed and is
@@ -109,7 +115,7 @@ public class PostView extends MaxWidthCardView {
     private void initText(final Post post,
                           final PostsFragment.RepliesCallback repliesCallback,
                           final PostsFragment.ReferencedPostCallback referencedPostCallback) {
-        id.setText(post.id);
+        number.setText(post.number);
         date.setText(DateUtils.getRelativeTimeSpanString(
                 post.time * 1000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS));
         if (post.postReplies != 0) {
@@ -136,12 +142,18 @@ public class PostView extends MaxWidthCardView {
                 .replaceAll("(?!href=\")("+Patterns.WEB_URL.pattern()+")", "<a href=\"$1\">$1</a>")
                 .replaceAll("<span class=\"quote\">", "<font color=\"#23b423\">")
                 .replaceAll("</span>", "</font>");
-        setTextViewHTML(post.id, text, r, referencedPostCallback);
+        setTextViewHTML(post.number, text, r, referencedPostCallback);
 
         if (post.imageId != null && !"null".equals(post.imageId)) {
             footer.setVisibility(VISIBLE);
-            footer.setText(String.format("%dx%d ~ %s ~ %s%s", post.imageWidth, post.imageHeight,
+            footerImage.setVisibility(VISIBLE);
+            footerImage.setText(String.format("%dx%d ~ %s ~ %s%s", post.imageWidth, post.imageHeight,
                     Util.readableFileSize(post.filesize), post.filename, post.imageExtension));
+        }
+        if (post.tripCode != null) {
+            footer.setVisibility(VISIBLE);
+            footerPoster.setVisibility(VISIBLE);
+            footerPoster.setText(post.tripCode);
         }
     }
 
