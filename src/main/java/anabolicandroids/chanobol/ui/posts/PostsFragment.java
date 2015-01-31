@@ -73,7 +73,8 @@ public class PostsFragment extends SwipeRefreshFragment {
     ImageCallback imageCallback = new ImageCallback() {
         @Override
         public void onClick(ImgIdExt imageIdAndExt, Drawable preview) {
-            ImageFragment f = ImageFragment.create(boardName, threadNumber, preview, 0, Arrays.asList(imageIdAndExt));
+            ImageFragment f = ImageFragment.create(boardName, threadNumber, preview,
+                                                   0, Util.arrayListOf(imageIdAndExt));
             startFragment(f);
         }
     };
@@ -318,6 +319,8 @@ public class PostsFragment extends SwipeRefreshFragment {
         }
     }
 
+    // The reason for these methods is that I need both a RecyclerView adapter
+    // and a ListView adapter that are almost identical. See 8ebd8a30115e2e62ffc28cc02f47873d4035290d
     private View newViewDRY(ViewGroup container) {
         return activity.getLayoutInflater().inflate(R.layout.view_post, container, false);
     }

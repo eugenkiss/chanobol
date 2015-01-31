@@ -15,7 +15,6 @@ import android.view.ViewGroup;
 import com.koushikdutta.async.future.FutureCallback;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import anabolicandroids.chanobol.R;
@@ -63,7 +62,8 @@ public class GalleryFragment extends SwipeRefreshFragment {
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override public void onClick(View v) {
                 GalleryThumbView g = (GalleryThumbView) v;
-                ImageFragment f = ImageFragment.create(boardName, threadNumber, g.getDrawable(), 0, Arrays.asList(g.imagePointer));
+                ImageFragment f = ImageFragment.create(boardName, threadNumber, g.getDrawable(),
+                        0, Util.arrayListOf(g.imagePointer));
                 startFragment(f);
             }
         };

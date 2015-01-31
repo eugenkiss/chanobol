@@ -12,6 +12,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import anabolicandroids.chanobol.R;
@@ -24,22 +25,29 @@ import uk.co.senab.photoview.PhotoView;
 public class ImageFragment extends UiFragment {
     @InjectView(R.id.image) PhotoView imageView;
 
+    // Needed to form a valid request to 4Chan
     private String boardName;
-    private String threadId;
-    private Drawable image;
-    private int index;
+    private String threadNumber; // Probably unnecessary
+    // Currently not really used (has always length 1), but the idea is to have swipes to
+    // the left/right reveal the next/previous image, see issue #85
     private List<ImgIdExt> imagePointers;
+    private int index;
+
+    private Drawable preview;
 
     private String url;
 
-    public static ImageFragment create(String boardName, String threadId,
-                                        Drawable image, int index, List<ImgIdExt> imageIdAndExts) {
+    public static ImageFragment create(String boardName, String threadNumber,
+                                       Drawable image, int index, ArrayList<ImgIdExt> imageIdAndExts) {
         ImageFragment f = new ImageFragment();
-        f.boardName = boardName;
-        f.threadId = threadId;
-        f.image = image;
-        f.index = index;
-        f.imagePointers = imageIdAndExts;
+        Bundle b = new Bundle();
+        b.putString("boardName", boardName);
+        b.putString("threadNumber", threadNumber);
+        b.putInt("index", index);
+        b.putParcelableArrayList("imagePointers", imageIdAndExts);
+        f.setArguments(b);
+        // No need to put in bundle - it's transient state anyway
+        f.preview = image;
         return f;
     }
 
@@ -50,12 +58,18 @@ public class ImageFragment extends UiFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        Bundle b = getArguments();
+        boardName = b.getString("boardName");
+        threadNumber = b.getString("threadNumber");
+        index = b.getInt("index");
+        imagePointers = b.getParcelableArrayList("imagePointers");
+
         ImgIdExt imagePointer = imagePointers.get(index);
         url = ApiModule.imgUrl(boardName, imagePointer.id, imagePointer.ext);
         // TODO: Makes application break after a while of zooming in and out
         //imageView.setMaximumScale(25); // Default value is too small for some images
         // TODO: Would be great if deepZoom was more configurable. Too early too low resolution.
-        ion.build(imageView).placeholder(image).deepZoom().load(url);
+        ion.build(imageView).placeholder(preview).deepZoom().load(url);
     }
 
     @Override

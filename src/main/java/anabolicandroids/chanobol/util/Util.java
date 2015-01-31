@@ -35,6 +35,12 @@ public class Util {
         return (int) Math.max(min, Math.min(max, val));
     }
 
+    public static <T> ArrayList<T> arrayListOf(T... args) {
+        ArrayList<T> result = new ArrayList<>();
+        Collections.addAll(result, args);
+        return result;
+    }
+
     public static List<Object> extendedList(List<Object> base, Object... others) {
         ArrayList<Object> list = new ArrayList<>();
         Collections.addAll(list, others);
