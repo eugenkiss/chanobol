@@ -52,7 +52,9 @@ public class ThreadsFragment extends SwipeRefreshFragment {
 
     public static ThreadsFragment create(Board board) {
         ThreadsFragment f = new ThreadsFragment();
-        f.board = board;
+        Bundle b = new Bundle();
+        b.putParcelable("board", board);
+        f.setArguments(b);
         return f;
     }
 
@@ -65,6 +67,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        board = getArguments().getParcelable("board");
         threads = new ArrayList<>();
         threadMap = new HashMap<>();
         bitMap = new WeakHashMap<>();
