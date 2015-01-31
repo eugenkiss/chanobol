@@ -39,8 +39,8 @@ public class FavoritesFragment extends UiFragment {
     protected int getLayoutResource() { return R.layout.fragment_boards; }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onActivityCreated2(Bundle savedInstanceState) {
+        super.onActivityCreated2(savedInstanceState);
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override public void onClick(View v) {

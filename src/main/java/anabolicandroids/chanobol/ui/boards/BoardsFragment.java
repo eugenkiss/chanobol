@@ -38,8 +38,8 @@ public class BoardsFragment extends UiFragment {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onActivityCreated2(Bundle savedInstanceState) {
+        super.onActivityCreated2(savedInstanceState);
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override public void onClick(View v) {

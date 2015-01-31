@@ -36,8 +36,8 @@ public class PostsDialog extends UiFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onActivityCreated2(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated2(savedInstanceState);
         postsView.setAdapter(adapter);
         adapter.notifyDataSetChanged();
     }

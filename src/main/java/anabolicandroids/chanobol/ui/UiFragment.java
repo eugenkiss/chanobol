@@ -53,6 +53,11 @@ public abstract class UiFragment extends BaseFragment {
     // where it was before.
     float toolbarPosition = 0;
 
+    // Workaround for fragment transition bug
+    // see https://code.google.com/p/android/issues/detail?id=82832#c4
+    // see http://stackoverflow.com/questions/11353075/how-can-i-maintain-fragment-state-when-added-to-the-back-stack/23533575#23533575
+    boolean alreadyCreated;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,6 +80,10 @@ public abstract class UiFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (rootView != null) {
+            ((ViewGroup)rootView.getParent()).removeView(rootView);
+            return rootView;
+        }
         View view = inflater.inflate(getLayoutResource(), container, false);
         ButterKnife.inject(this, view);
         rootView = view;
@@ -83,9 +92,7 @@ public abstract class UiFragment extends BaseFragment {
 
     protected boolean shouldAddPaddingForToolbar() { return true; }
 
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    protected void onActivityCreated2(Bundle savedInstanceState) {
         toolbar = activity.toolbar;
         toolbarShadow = activity.toolbarShadow;
         drawer = activity.drawerLayout;
@@ -130,6 +137,16 @@ public abstract class UiFragment extends BaseFragment {
     }
 
     @Override
+    public final void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        if (alreadyCreated) return;
+        alreadyCreated = true;
+
+        onActivityCreated2(savedInstanceState);
+    }
+
+    @Override
     public void onDestroy() {
         super.onDestroy();
         cancelPending();
@@ -138,7 +155,7 @@ public abstract class UiFragment extends BaseFragment {
     protected void startFragment(Fragment f, String backStack) {
         toolbarPosition = ViewHelper.getTranslationY(toolbar);
         activity.getSupportFragmentManager().beginTransaction()
-                .add(R.id.container, f, null)
+                .replace(R.id.container, f, null)
                 .addToBackStack(backStack)
                 .commit();
     }

@@ -56,8 +56,8 @@ public class ImageFragment extends UiFragment {
     @Override protected boolean shouldAddPaddingForToolbar() { return false; }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onActivityCreated2(Bundle savedInstanceState) {
+        super.onActivityCreated2(savedInstanceState);
         Bundle b = getArguments();
         boardName = b.getString("boardName");
         threadNumber = b.getString("threadNumber");

@@ -52,8 +52,8 @@ public class GalleryFragment extends SwipeRefreshFragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onActivityCreated2(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated2(savedInstanceState);
 
         Bundle b = getArguments();
         boardName = b.getString("boardName");
