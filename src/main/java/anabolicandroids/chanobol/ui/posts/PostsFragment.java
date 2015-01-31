@@ -94,7 +94,8 @@ public class PostsFragment extends SwipeRefreshFragment {
     HashMap<String, Post> postsMap;
     // Map from a post number X to the post numbers of the posts that refer to X
     HashMap<String, ArrayList<String>> replies;
-    // This is provided to the gallery fragment so that it can load and display its images
+    // This is provided to the gallery fragment so that it can immediately load its images without
+    // waiting for the result of requesting the thread json and extracting its image references once more
     ArrayList<ImgIdExt> imagePointers;
 
     // TODO: Isn't there a more elegant solution?
@@ -109,7 +110,7 @@ public class PostsFragment extends SwipeRefreshFragment {
         b.putString("boardName", boardName);
         b.putString("threadNumber", op.number);
         f.setArguments(b);
-        // No need to put in bundle - is transient state anyway
+        // No need to put in bundle - it's transient state anyway
         f.op = op;
         f.opImage = opImage;
         return f;

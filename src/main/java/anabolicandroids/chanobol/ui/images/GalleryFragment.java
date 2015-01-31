@@ -28,15 +28,21 @@ import butterknife.InjectView;
 public class GalleryFragment extends SwipeRefreshFragment {
     @InjectView(R.id.threads) RecyclerView galleryView;
 
-    String board;
-    String threadId;
+    // The necessary information to request the data from 4Chan
+    String boardName;
+    String threadNumber;
+
+    // To instantly load and display thumbnails
     ArrayList<ImgIdExt> imagePointers;
     GalleryAdapter galleryAdapter;
 
-    public static GalleryFragment create(String board, String threadId, ArrayList<ImgIdExt> imagePointers) {
+    public static GalleryFragment create(String boardName, String threadNumber, ArrayList<ImgIdExt> imagePointers) {
         GalleryFragment f = new GalleryFragment();
-        f.board = board;
-        f.threadId = threadId;
+        Bundle b = new Bundle();
+        b.putString("boardName", boardName);
+        b.putString("threadNumber", threadNumber);
+        f.setArguments(b);
+        // No need to put in bundle - it's transient state anyway
         f.imagePointers = imagePointers;
         return f;
     }
@@ -50,10 +56,14 @@ public class GalleryFragment extends SwipeRefreshFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        Bundle b = getArguments();
+        boardName = b.getString("boardName");
+        threadNumber = b.getString("threadNumber");
+
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override public void onClick(View v) {
                 GalleryThumbView g = (GalleryThumbView) v;
-                ImageFragment f = ImageFragment.create(board, threadId, g.getDrawable(), 0, Arrays.asList(g.imagePointer));
+                ImageFragment f = ImageFragment.create(boardName, threadNumber, g.getDrawable(), 0, Arrays.asList(g.imagePointer));
                 startFragment(f);
             }
         };
@@ -72,7 +82,7 @@ public class GalleryFragment extends SwipeRefreshFragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setTitle(board + "/gal/" + threadId);
+        activity.setTitle(boardName + "/gal/" + threadNumber);
         galleryAdapter.notifyDataSetChanged();
     }
 
@@ -84,7 +94,7 @@ public class GalleryFragment extends SwipeRefreshFragment {
     @Override
     protected void load() {
         super.load();
-        service.listPosts(this, board, threadId, new FutureCallback<List<Post>>() {
+        service.listPosts(this, boardName, threadNumber, new FutureCallback<List<Post>>() {
             @Override public void onCompleted(Exception e, List<Post> result) {
                 if (e != null) {
                     showToast(e.getMessage());
@@ -133,7 +143,7 @@ public class GalleryFragment extends SwipeRefreshFragment {
         }
 
         @Override public void bindView(ImgIdExt imagePointer, int position, View view) {
-            ((GalleryThumbView) view).bindTo(ion, board, imagePointer);
+            ((GalleryThumbView) view).bindTo(ion, boardName, imagePointer);
         }
     }
 }
