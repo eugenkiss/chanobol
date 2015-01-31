@@ -87,6 +87,13 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         fm = getSupportFragmentManager();
 
+        // Workaround to fragment transition bug, see: https://code.google.com/p/android/issues/detail?id=82832#c4
+        fm.beginTransaction()
+                .add(R.id.container, new Fragment())
+                .addToBackStack("dummy")
+                .commit();
+        fm.executePendingTransactions();
+
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
 
@@ -99,7 +106,7 @@ public class MainActivity extends BaseActivity {
             public void onBackStackChanged() {
                 FragmentManager fm = getSupportFragmentManager();
                 int stackHeight = fm.getBackStackEntryCount();
-                if (stackHeight > 0) {
+                if (stackHeight > 1) {
                     drawerToggle.setDrawerIndicatorEnabled(false);
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 } else {
@@ -239,7 +246,7 @@ public class MainActivity extends BaseActivity {
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(drawer)) {
             drawerLayout.closeDrawers();
-        } else if (fm.getBackStackEntryCount() == 0) {
+        } else if (fm.getBackStackEntryCount() <= 1) {
             new AlertDialog.Builder(this)
                     .setMessage(R.string.exit_sure)
                     .setCancelable(false)
