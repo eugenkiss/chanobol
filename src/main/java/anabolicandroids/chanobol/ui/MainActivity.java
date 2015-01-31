@@ -123,14 +123,11 @@ public class MainActivity extends BaseActivity {
 
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
                 R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        // If the drawerindicator is disabled the onOptionsItemSelected of
-        // MainActivity used to be called with the old actionbar. But not so
-        // with the retarted toolbar.
         drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (!drawerToggle.isDrawerIndicatorEnabled()) {
-                    onOptionsItemSelected(Util.mockHomeButton);
+                    onBackPressed();
                 }
             }
         });
@@ -235,12 +232,6 @@ public class MainActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (drawerToggle.isDrawerIndicatorEnabled() &&
                 drawerToggle.onOptionsItemSelected(item)) return true;
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                getSupportFragmentManager().popBackStack();
-                drawerLayout.closeDrawers();
-                return true;
-        }
         return super.onOptionsItemSelected(item);
     }
 
