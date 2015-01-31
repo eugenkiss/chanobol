@@ -73,21 +73,28 @@ public class PostsFragment extends SwipeRefreshFragment {
     ImageCallback imageCallback = new ImageCallback() {
         @Override
         public void onClick(ImgIdExt imageIdAndExt, Drawable preview) {
-            ImageFragment f = ImageFragment.create(board, threadId, preview, 0, Arrays.asList(imageIdAndExt));
+            ImageFragment f = ImageFragment.create(boardName, threadNumber, preview, 0, Arrays.asList(imageIdAndExt));
             startFragment(f);
         }
     };
 
     @InjectView(R.id.posts) RecyclerView postsView;
 
+    // To make first post instantly visible
     Post op;
+    // To make image of first post instantly visible
     Drawable opImage;
-    String threadId;
-    String board;
+    // To load the respective posts from 4Chan
+    String threadNumber;
+    String boardName;
+
     ArrayList<Post> posts;
     PostsAdapter postsAdapter;
+    // Map from a post number to its post POJO
     HashMap<String, Post> postsMap;
+    // Map from a post number X to the post numbers of the posts that refer to X
     HashMap<String, ArrayList<String>> replies;
+    // This is provided to the gallery fragment so that it can load and display its images
     ArrayList<ImgIdExt> imagePointers;
 
     // TODO: Isn't there a more elegant solution?
@@ -96,12 +103,15 @@ public class PostsFragment extends SwipeRefreshFragment {
     boolean pauseUpdating = false;
     private ScheduledThreadPoolExecutor executor;
 
-    public static PostsFragment create(String board, Post op, Drawable opImage) {
+    public static PostsFragment create(String boardName, Post op, Drawable opImage) {
         PostsFragment f = new PostsFragment();
-        f.board = board;
+        Bundle b = new Bundle();
+        b.putString("boardName", boardName);
+        b.putString("threadNumber", op.number);
+        f.setArguments(b);
+        // No need to put in bundle - is transient state anyway
         f.op = op;
         f.opImage = opImage;
-        f.threadId = op.number;
         return f;
     }
 
@@ -112,11 +122,15 @@ public class PostsFragment extends SwipeRefreshFragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        Bundle b = getArguments();
+        boardName = b.getString("boardName");
+        threadNumber = b.getString("threadNumber");
+
         posts = new ArrayList<>();
         postsMap = new HashMap<>();
         replies = new HashMap<>();
         imagePointers = new ArrayList<>();
-        posts.add(op);
+        if (op != null) posts.add(op);
 
         postsAdapter = new PostsAdapter();
         postsView.setAdapter(postsAdapter);
@@ -156,7 +170,7 @@ public class PostsFragment extends SwipeRefreshFragment {
     @Override
     public void onResume() {
         super.onResume();
-        activity.setTitle(board + "/" + threadId);
+        activity.setTitle(boardName + "/" + threadNumber);
         postsAdapter.notifyDataSetChanged();
         postsView.requestLayout();
         initBackgroundUpdater();
@@ -182,7 +196,7 @@ public class PostsFragment extends SwipeRefreshFragment {
 
     private void load(final boolean silent) {
         if (!silent) super.load();
-        service.listPosts(this, board, threadId, new FutureCallback<List<Post>>() {
+        service.listPosts(this, boardName, threadNumber, new FutureCallback<List<Post>>() {
             @Override public void onCompleted(Exception e, List<Post> result) {
                 if (e != null) {
                     if (!silent && e.getMessage() != null) showToast(e.getMessage());
@@ -197,17 +211,17 @@ public class PostsFragment extends SwipeRefreshFragment {
                 for (Post p : result) {
                     posts.add(p);
                     postsMap.put(p.number, p);
-                    for (String id : referencedPosts(p)) {
-                        if (!replies.containsKey(id)) replies.put(id, new ArrayList<String>());
-                        Post referenced = postsMap.get(id);
-                        if (referenced != null) { // e.g. stale reference to deleted post
-                            replies.get(id).add(p.number);
+                    for (String number : referencedPosts(p)) {
+                        if (!replies.containsKey(number)) replies.put(number, new ArrayList<String>());
+                        Post referenced = postsMap.get(number);
+                        if (referenced != null) { // e.g. a stale reference to deleted post could be null
+                            replies.get(number).add(p.number);
                             referenced.replyCount++;
                         }
                     }
                     if (p.imageId != null) {
                         if (prefs.getBoolean(Settings.PRELOAD_THUMBNAILS, true))
-                            ion.build(context).load(ApiModule.thumbUrl(board, p.imageId)).asBitmap().tryGet();
+                            ion.build(context).load(ApiModule.thumbUrl(boardName, p.imageId)).asBitmap().tryGet();
                         imagePointers.add(new ImgIdExt(p.imageId, p.imageExtension));
                     }
                 }
@@ -251,7 +265,7 @@ public class PostsFragment extends SwipeRefreshFragment {
                 load();
                 break;
             case R.id.gallery:
-                Fragment f = GalleryFragment.create(board, threadId, imagePointers);
+                Fragment f = GalleryFragment.create(boardName, threadNumber, imagePointers);
                 startFragment(f);
                 break;
         }
@@ -311,11 +325,11 @@ public class PostsFragment extends SwipeRefreshFragment {
         PostView v = (PostView) view;
         if (item == null) return;
         if (position == 0 && opImage != null) {
-            v.bindToOp(opImage, item, board, threadId, ion,
+            v.bindToOp(opImage, item, boardName, threadNumber, ion,
                     repliesCallback, referencedPostCallback, imageCallback);
             opImage = null;
         } else {
-            v.bindTo(item, board, threadId, ion,
+            v.bindTo(item, boardName, threadNumber, ion,
                     repliesCallback, referencedPostCallback, imageCallback);
         }
     }
