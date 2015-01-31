@@ -2,6 +2,7 @@ package anabolicandroids.chanobol.ui.posts;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -45,7 +46,9 @@ public class PostView extends MaxWidthCardView {
     @InjectView(R.id.progressbar) ProgressBar progress;
     @InjectView(R.id.text) TextView text;
     @InjectView(R.id.footer) ViewGroup footer;
-    @InjectView(R.id.footerPoster) TextView footerPoster;
+    @InjectView(R.id.footerTripCode) TextView footerTripCode;
+    @InjectView(R.id.footerFlag) ImageView footerFlag;
+    @InjectView(R.id.footerCountryName) TextView footerCountryName;
     @InjectView(R.id.footerImage) TextView footerImage;
 
     private static final int W = 0, H = 1;
@@ -78,7 +81,10 @@ public class PostView extends MaxWidthCardView {
         play.setVisibility(View.GONE);
         progress.setVisibility(View.GONE);
         footer.setVisibility(View.GONE);
-        footerPoster.setVisibility(View.GONE);
+        footerTripCode.setVisibility(View.GONE);
+        footerFlag.setVisibility(View.GONE);
+        footerFlag.setImageBitmap(null);
+        footerCountryName.setVisibility(View.GONE);
         footerImage.setVisibility(View.GONE);
     }
 
@@ -112,15 +118,16 @@ public class PostView extends MaxWidthCardView {
         });
     }
 
-    private void initText(final Post post,
+    private void initText(final Ion ion,
+                          final Post post,
                           final PostsFragment.RepliesCallback repliesCallback,
                           final PostsFragment.ReferencedPostCallback referencedPostCallback) {
         number.setText(post.number);
         date.setText(DateUtils.getRelativeTimeSpanString(
                 post.time * 1000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS));
-        if (post.postReplies != 0) {
+        if (post.replyCount != 0) {
             repliesContainer.setVisibility(View.VISIBLE);
-            replies.setText(post.postReplies + "r");
+            replies.setText(post.replyCount + "r");
             header.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -152,8 +159,17 @@ public class PostView extends MaxWidthCardView {
         }
         if (post.tripCode != null) {
             footer.setVisibility(VISIBLE);
-            footerPoster.setVisibility(VISIBLE);
-            footerPoster.setText(post.tripCode);
+            footerTripCode.setVisibility(VISIBLE);
+            footerTripCode.setText(post.tripCode);
+        }
+        if (post.country != null) {
+            footer.setVisibility(VISIBLE);
+            footerCountryName.setVisibility(VISIBLE);
+            footerFlag.setVisibility(VISIBLE);
+            footerCountryName.setText(post.countryName);
+            ion.build(footerFlag)
+                    .fitCenter()
+                    .load("file:///android_asset/flags/"+post.country.toLowerCase()+".png");
         }
     }
 
@@ -194,7 +210,7 @@ public class PostView extends MaxWidthCardView {
                          PostsFragment.ImageCallback imageCallback) {
         this.post = post;
         reset();
-        initText(post, repliesCallback, referencedPostCallback);
+        initText(ion, post, repliesCallback, referencedPostCallback);
         initImageListener(new ImgIdExt(post.imageId, post.imageExtension), imageCallback);
 
         image.setVisibility(View.VISIBLE);
@@ -217,7 +233,7 @@ public class PostView extends MaxWidthCardView {
                        PostsFragment.ImageCallback imageCallback) {
         this.post = post;
         reset();
-        initText(post, repliesCallback, referencedPostCallback);
+        initText(ion, post, repliesCallback, referencedPostCallback);
 
         if (post.imageId != null && !"null".equals(post.imageId)) {
             initImageListener(new ImgIdExt(post.imageId, post.imageExtension), imageCallback);

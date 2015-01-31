@@ -48,7 +48,7 @@ public class PostsFragment extends SwipeRefreshFragment {
     RepliesCallback repliesCallback = new RepliesCallback() {
         @Override
         public void onClick(Post post) {
-            ArrayList<Post> posts = new ArrayList<>(post.postReplies);
+            ArrayList<Post> posts = new ArrayList<>(post.replyCount);
             for (String id : replies.get(post.number)) {
                 posts.add(postsMap.get(id));
             }
@@ -202,7 +202,7 @@ public class PostsFragment extends SwipeRefreshFragment {
                         Post referenced = postsMap.get(id);
                         if (referenced != null) { // e.g. stale reference to deleted post
                             replies.get(id).add(p.number);
-                            referenced.postReplies++;
+                            referenced.replyCount++;
                         }
                     }
                     if (p.imageId != null) {
