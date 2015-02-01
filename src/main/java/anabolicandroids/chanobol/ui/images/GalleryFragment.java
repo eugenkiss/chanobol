@@ -25,34 +25,32 @@ import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
 public class GalleryFragment extends SwipeRefreshFragment {
+
+    // Construction ////////////////////////////////////////////////////////////////////////////////
+
     @InjectView(R.id.threads) RecyclerView galleryView;
 
+    // Transient state - Only necessary for transitions
+    public ArrayList<ImgIdExt> imagePointers; // To instantly load and display thumbnails
+
     // The necessary information to request the data from 4Chan
-    String boardName;
-    String threadNumber;
+    private String boardName;
+    private String threadNumber;
 
-    // To instantly load and display thumbnails
-    ArrayList<ImgIdExt> imagePointers;
-    GalleryAdapter galleryAdapter;
+    private GalleryAdapter galleryAdapter;
 
-    public static GalleryFragment create(String boardName, String threadNumber, ArrayList<ImgIdExt> imagePointers) {
+    public static GalleryFragment create(String boardName, String threadNumber) {
         GalleryFragment f = new GalleryFragment();
         Bundle b = new Bundle();
         b.putString("boardName", boardName);
         b.putString("threadNumber", threadNumber);
         f.setArguments(b);
-        // No need to put in bundle - it's transient state anyway
-        f.imagePointers = imagePointers;
         return f;
     }
 
-    @Override
-    protected int getLayoutResource() {
-        return R.layout.fragment_threads;
-    }
+    @Override protected int getLayoutResource() { return R.layout.fragment_threads; }
 
-    @Override
-    public void onActivityCreated2(@Nullable Bundle savedInstanceState) {
+    @Override public void onActivityCreated2(Bundle savedInstanceState) {
         super.onActivityCreated2(savedInstanceState);
 
         Bundle b = getArguments();
@@ -62,9 +60,10 @@ public class GalleryFragment extends SwipeRefreshFragment {
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override public void onClick(View v) {
                 GalleryThumbView g = (GalleryThumbView) v;
-                ImageFragment f = ImageFragment.create(boardName, threadNumber, g.getDrawable(),
+                ImageFragment f = ImageFragment.create(boardName, threadNumber,
                         0, Util.arrayListOf(g.imagePointer));
-                startFragment(f);
+                f.preview = g.getDrawable();
+                startTransaction(f).commit();
             }
         };
 
@@ -79,20 +78,9 @@ public class GalleryFragment extends SwipeRefreshFragment {
         load();
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        activity.setTitle(boardName + "/gal/" + threadNumber);
-        galleryAdapter.notifyDataSetChanged();
-    }
+    // Data Loading ////////////////////////////////////////////////////////////////////////////////
 
-    @Override public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Util.updateRecyclerViewGridOnConfigChange(galleryView, R.dimen.column_width_gallery);
-    }
-
-    @Override
-    protected void load() {
+    @Override protected void load() {
         super.load();
         service.listPosts(this, boardName, threadNumber, new FutureCallback<List<Post>>() {
             @Override public void onCompleted(Exception e, List<Post> result) {
@@ -112,24 +100,38 @@ public class GalleryFragment extends SwipeRefreshFragment {
         });
     }
 
-    @Override
-    protected void cancelPending() {
+    @Override protected void cancelPending() {
         super.cancelPending();
         ion.cancelAll(this);
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+    // Lifecycle ///////////////////////////////////////////////////////////////////////////////////
+
+    @Override public void onResume() {
+        super.onResume();
+        activity.setTitle(boardName + "/gal/" + threadNumber);
+        galleryAdapter.notifyDataSetChanged();
+    }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Util.updateRecyclerViewGridOnConfigChange(galleryView, R.dimen.column_width_gallery);
+    }
+
+    // Toolbar Menu ////////////////////////////////////////////////////////////////////////////////
+
+    @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         inflater.inflate(R.menu.gallery, menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    // Adapters ////////////////////////////////////////////////////////////////////////////////////
 
     class GalleryAdapter extends UiAdapter<ImgIdExt> {
 

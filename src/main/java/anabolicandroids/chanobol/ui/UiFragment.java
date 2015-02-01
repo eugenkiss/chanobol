@@ -8,9 +8,12 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -152,15 +155,20 @@ public abstract class UiFragment extends BaseFragment {
         cancelPending();
     }
 
-    protected void startFragment(Fragment f, String backStack) {
+    protected FragmentTransaction startTransaction(Fragment f, String backStack) {
         toolbarPosition = ViewHelper.getTranslationY(toolbar);
-        activity.getSupportFragmentManager().beginTransaction()
+        return activity.getSupportFragmentManager().beginTransaction()
                 .replace(R.id.container, f, null)
-                .addToBackStack(backStack)
-                .commit();
+                .addToBackStack(backStack);
     }
-    protected void startFragment(Fragment f) {
-        startFragment(f, null);
+    protected FragmentTransaction startTransaction(Fragment f) {
+        return startTransaction(f, null);
+    }
+    protected FragmentTransaction startAddTransaction(Fragment f, String backStack) {
+        toolbarPosition = ViewHelper.getTranslationY(toolbar);
+        return activity.getSupportFragmentManager().beginTransaction()
+                .add(R.id.container, f, null)
+                .addToBackStack(backStack);
     }
 
     protected void showToast(String msg) {
@@ -185,4 +193,14 @@ public abstract class UiFragment extends BaseFragment {
         loading = false;
         activity.loadingBar.setVisibility(View.GONE);
     }
+
+    protected Transition inflateTransition(int id) {
+        return TransitionInflater.from(activity).inflateTransition(id);
+    }
+
+    protected boolean transitionsAllowed() {
+        return activity.transitionsAllowed();
+    }
+
+    protected boolean onBackPressed() { return false; }
 }

@@ -1,13 +1,17 @@
 package anabolicandroids.chanobol.ui.boards;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.transition.TransitionManager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -73,7 +77,6 @@ public class FavoritesFragment extends UiFragment {
         favoritesView.setHasFixedSize(true);
         GridLayoutManager glm = new GridLayoutManager(context, 2);
         favoritesView.setLayoutManager(glm);
-        favoritesView.setItemAnimator(new DefaultItemAnimator());
         boardsAdapter.notifyDataSetChanged();
         Util.calcDynamicSpanCountById(context, favoritesView, glm, R.dimen.column_width);
 
@@ -83,6 +86,21 @@ public class FavoritesFragment extends UiFragment {
                 boardsAdapter.replaceWith(new ArrayList<>(newFavorites));
             }
         });
+
+        setupTransitions();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void setupTransitions() {
+        if (transitionsAllowed()) {
+            this.setExitTransition(new Slide(Gravity.TOP));
+            favoritesView.setVisibility(View.INVISIBLE);
+            favoritesView.postDelayed(new Runnable() {
+                @Override public void run() {
+                    TransitionManager.beginDelayedTransition(favoritesView, new Slide(Gravity.TOP));
+                    favoritesView.setVisibility(View.VISIBLE);
+                }
+            }, 100);
+        }
     }
 
     @Override

@@ -1,14 +1,18 @@
 package anabolicandroids.chanobol.ui.threads;
 
+import android.annotation.TargetApi;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.transition.TransitionManager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -36,19 +40,58 @@ import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
 public class ThreadsFragment extends SwipeRefreshFragment {
+
+    // Callbacks ///////////////////////////////////////////////////////////////////////////////////
+
+    View.OnClickListener clickCallback = new View.OnClickListener() {
+        @Override public void onClick(View v) {
+            ThreadView tv = (ThreadView) v;
+            Thread thread = tv.thread;
+            if (thread.dead) {
+                showToast(R.string.no_thread);
+                return;
+            }
+            pauseUpdating = true;
+            Drawable d = null;
+            // Why not just `b = ((BitmapDrawable) tv.image.getDrawable()).getBitmap();`
+            // You see, tv.image.getDrawable is not of type BitmapDrawable but IonDrawable and
+            // IonDrawable is not public so bad luck. That's the whole reason for bitMap.
+            Bitmap b = bitMap.get(thread.number);
+            if (b != null) {
+                b = b.copy(b.getConfig(), true);
+                d = new BitmapDrawable(getResources(), b);
+            }
+            final PostsFragment f = PostsFragment.create(board.name, thread.number);
+            f.opPost = thread.toOpPost();
+            f.opImage = d;
+            if (transitionsAllowed()) {
+                if (Build.VERSION.SDK_INT >= 21) { // To make inspection shut up
+                    ThreadsFragment.this.setExitTransition(null);
+                    f.setEnterTransition(inflateTransition(android.R.transition.slide_bottom));
+                    f.setReturnTransition(inflateTransition(android.R.transition.fade));
+                    f.setSharedElementEnterTransition(inflateTransition(android.R.transition.move));
+                    f.setSharedElementReturnTransition(null);
+                    f.transitionDuration = 450;
+                    tv.image.setTransitionName("op");
+                    startTransaction(f)
+                            .addSharedElement(tv.image, "op")
+                            .commit();
+                }
+            } else {
+                startTransaction(f).commit();
+            }
+        }
+    };
+
+    // Construction ////////////////////////////////////////////////////////////////////////////////
+
     @InjectView(R.id.threads) RecyclerView threadsView;
 
-    Board board;
-    ArrayList<Thread> threads;
-    HashMap<String, Integer> threadMap;
-    WeakHashMap<String, Bitmap> bitMap;
-    ThreadsAdapter threadsAdapter;
-
-    // TODO: Isn't there a more elegant solution?
-    long lastUpdate;
-    static final long updateInterval = 30_000;
-    boolean pauseUpdating = false;
-    private ScheduledThreadPoolExecutor executor;
+    private Board board;
+    private ArrayList<Thread> threads;
+    private HashMap<String, Integer> threadMap;
+    private WeakHashMap<String, Bitmap> bitMap; // To work around IonDrawable not being public
+    private ThreadsAdapter threadsAdapter;
 
     public static ThreadsFragment create(Board board) {
         ThreadsFragment f = new ThreadsFragment();
@@ -58,10 +101,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         return f;
     }
 
-    @Override
-    protected int getLayoutResource() {
-        return R.layout.fragment_threads;
-    }
+    @Override protected int getLayoutResource() { return R.layout.fragment_threads; }
 
     @Override
     public void onActivityCreated2(@Nullable Bundle savedInstanceState) {
@@ -72,80 +112,20 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         threadMap = new HashMap<>();
         bitMap = new WeakHashMap<>();
 
-        View.OnClickListener clickListener = new View.OnClickListener() {
-            @Override public void onClick(View v) {
-                ThreadView tv = (ThreadView) v;
-                Thread thread = tv.thread;
-                if (thread.dead) {
-                    showToast(R.string.no_thread);
-                    return;
-                }
-                pauseUpdating = true;
-                Bitmap b = bitMap.get(thread.number);
-                Drawable d = b == null ? null : new BitmapDrawable(getResources(), b);
-                PostsFragment f = PostsFragment.create(board.name, thread.toOpPost(), d);
-                // Doesn't work, see: https://code.google.com/p/android/issues/detail?id=82832&thanks=82832&ts=1418767240
-                //f.setEnterTransition(new Slide(Gravity.RIGHT));
-                //f.setExitTransition(new Slide(Gravity.RIGHT));
-                startFragment(f);
-            }
-        };
-
-        threadsAdapter = new ThreadsAdapter(clickListener, null);
+        threadsAdapter = new ThreadsAdapter(clickCallback, null);
         threadsView.setAdapter(threadsAdapter);
         threadsView.setHasFixedSize(true);
         GridLayoutManager glm = new GridLayoutManager(context, 2);
         threadsView.setLayoutManager(glm);
-        threadsView.setItemAnimator(new DefaultItemAnimator());
         Util.calcDynamicSpanCountById(context, threadsView, glm, R.dimen.column_width);
 
         load();
         initBackgroundUpdater();
     }
 
-    private void initBackgroundUpdater() {
-        if (executor == null) {
-            executor = new ScheduledThreadPoolExecutor(1);
-            executor.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    if (!prefs.getBoolean(Settings.REFRESH, true)) return;
-                    if (pauseUpdating) return;
-                    if (System.currentTimeMillis() - lastUpdate > updateInterval) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                update();
-                            }
-                        });
-                    }
-                }
-            }, 5000, 5000, TimeUnit.MILLISECONDS);
-        }
-    }
+    // Data Loading ////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        activity.setTitle(board.name);
-        update();
-        initBackgroundUpdater();
-        pauseUpdating = false;
-    }
-
-    @Override public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        Util.updateRecyclerViewGridOnConfigChange(threadsView, R.dimen.column_width);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        pauseUpdating = true;
-    }
-
-    @Override
-    protected void load() {
+    @Override protected void load() {
         super.load();
         service.listThreads(this, board.name, new FutureCallback<List<Thread>>() {
             @Override public void onCompleted(Exception e, List<Thread> result) {
@@ -155,6 +135,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                     loaded();
                     return;
                 }
+                boolean empty = threads.isEmpty();
                 threads.clear();
                 threadMap.clear();
                 for (int i = 0; i < result.size(); i++) {
@@ -162,7 +143,11 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                     threads.add(thread);
                     threadMap.put(thread.number, i);
                 }
-                threadsAdapter.notifyDataSetChanged();
+                if (empty && transitionsAllowed()) {
+                    animateThreadsArrival();
+                } else {
+                    threadsAdapter.notifyDataSetChanged();
+                }
                 loaded();
                 lastUpdate = System.currentTimeMillis();
             }
@@ -201,11 +186,32 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         ion.cancelAll(this);
     }
 
+    // Lifecycle ///////////////////////////////////////////////////////////////////////////////////
+
     @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (executor != null) executor.shutdown();
+    public void onResume() {
+        super.onResume();
+        activity.setTitle(board.name);
+        update();
+        threadsAdapter.notifyDataSetChanged();
+        initBackgroundUpdater();
+        pauseUpdating = false;
+        setupTransitions();
     }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Util.updateRecyclerViewGridOnConfigChange(threadsView, R.dimen.column_width);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        pauseUpdating = true;
+    }
+
+
+    // Toolbar Menu ////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -229,7 +235,63 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         return super.onOptionsItemSelected(item);
     }
 
+    // Background Refresh //////////////////////////////////////////////////////////////////////////
+
+    // TODO: Isn't there a more elegant solution?
+    long lastUpdate;
+    static final long updateInterval = 30_000;
+    boolean pauseUpdating = false;
+    private ScheduledThreadPoolExecutor executor;
+
+    private void initBackgroundUpdater() {
+        if (executor == null) {
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    if (!prefs.getBoolean(Settings.REFRESH, true)) return;
+                    if (pauseUpdating) return;
+                    if (System.currentTimeMillis() - lastUpdate > updateInterval) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                update();
+                            }
+                        });
+                    }
+                }
+            }, 5000, 5000, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    // Transitions /////////////////////////////////////////////////////////////////////////////////
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void animateThreadsArrival() {
+        if (transitionsAllowed()) {
+            threadsAdapter.hide = true;
+            threadsAdapter.notifyDataSetChanged();
+            TransitionManager.beginDelayedTransition(threadsView, new Slide(Gravity.BOTTOM));
+            threadsAdapter.hide = false;
+            threadsAdapter.notifyDataSetChanged();
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void setupTransitions() {
+        if (transitionsAllowed()) {
+            setExitTransition(new Slide(Gravity.BOTTOM));
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (executor != null) executor.shutdown();
+    }
+
+    // Adapters ////////////////////////////////////////////////////////////////////////////////////
+
     class ThreadsAdapter extends UiAdapter<Thread> {
+        boolean hide;
 
         public ThreadsAdapter(View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
             super(ThreadsFragment.this.context, clickListener, longClickListener);
@@ -241,7 +303,13 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         }
 
         @Override public void bindView(Thread item, int position, View view) {
-            ((ThreadView) view).bindTo(item, board.name, ion, bitMap);
+            ThreadView tv = (ThreadView) view;
+            tv.bindTo(item, board.name, ion, bitMap);
+            if (hide) tv.setVisibility(View.GONE);
+            else tv.setVisibility(View.VISIBLE);
+            if (Build.VERSION.SDK_INT >= 21) {
+                tv.image.setTransitionName(null);
+            }
         }
     }
 }

@@ -35,6 +35,10 @@ public class Util {
         return (int) Math.max(min, Math.min(max, val));
     }
 
+    public static boolean implies(boolean p, boolean q) {
+        return !p || q;
+    }
+
     public static <T> ArrayList<T> arrayListOf(T... args) {
         ArrayList<T> result = new ArrayList<>();
         Collections.addAll(result, args);

@@ -7,11 +7,14 @@
     android:layout_height="wrap_content"
     android:layout_gravity="top"
     android:layout_margin="4dp"
-    app:cardBackgroundColor="@color/fg">
+    app:cardBackgroundColor="@color/fg"
+    >
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/fg"
+        >
 
         <LinearLayout
             android:layout_width="fill_parent"
