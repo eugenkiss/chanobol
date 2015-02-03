@@ -210,7 +210,6 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         pauseUpdating = true;
     }
 
-
     // Toolbar Menu ////////////////////////////////////////////////////////////////////////////////
 
     @Override

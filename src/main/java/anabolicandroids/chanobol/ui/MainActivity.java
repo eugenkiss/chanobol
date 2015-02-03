@@ -56,134 +56,40 @@ import butterknife.OnClick;
 // The following resources have been helpful:
 // http://stackoverflow.com/questions/17258020/switching-between-android-navigation-drawer-image-and-up-caret-when-using-fragme?lq=1
 public class MainActivity extends BaseActivity {
-    @Inject SharedPreferences prefs;
-    @Inject PersistentData persistentData;
-    @Inject @Named("DebugSettings") Class debugSettingsClass;
 
-    @InjectView(R.id.toolbar) Toolbar toolbar;
-    @InjectView(R.id.toolbarShadow) ImageView toolbarShadow;
-    @InjectView(R.id.loadingBar) public ProgressBar loadingBar;
-    @InjectView(R.id.drawerLayout) DrawerLayout drawerLayout;
-    @InjectView(R.id.drawer) LinearLayout drawer;
-    @InjectView(R.id.debugSettings) TextView debugSettings;
-    @InjectView(R.id.favoriteBoardsHeader) CompatTextView favoriteBoardsHeader;
-    @InjectView(R.id.favoriteBoards) ListView favoriteBoardsView;
+    // Callbacks ///////////////////////////////////////////////////////////////////////////////////
 
-    ActionBarDrawerToggle drawerToggle;
-    FavoritesAdapter favoriteBoardsAdapter;
-    FragmentManager fm;
-    FragmentManager.OnBackStackChangedListener backStackChangedListener;
-
-    @Override
-    protected List<Object> getModules() {
-        return Util.extendedList(super.getModules(), new UiModule(this));
-    }
-
-    @Override
-    protected int getLayoutResource() { return R.layout.activity_main; }
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        fm = getSupportFragmentManager();
-
-        addDummyFragment();
-
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setHomeButtonEnabled(true);
-
-        if (BuildConfig.DEBUG) debugSettings.setVisibility(View.VISIBLE);
-
-        // Make the up button work as a back button
-        // http://stackoverflow.com/a/24878407/283607
-        backStackChangedListener = new FragmentManager.OnBackStackChangedListener() {
-            @Override
-            public void onBackStackChanged() {
-                FragmentManager fm = getSupportFragmentManager();
-                int stackHeight = fm.getBackStackEntryCount();
-                if (stackHeight > 1) {
-                    drawerToggle.setDrawerIndicatorEnabled(false);
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    // Make the up button work as a back button
+    // http://stackoverflow.com/a/24878407/283607
+    private FragmentManager.OnBackStackChangedListener backStackChangedListener =
+            new FragmentManager.OnBackStackChangedListener() {
+        @Override
+        public void onBackStackChanged() {
+            updateUpButtonState();
+            // http://stackoverflow.com/a/18752763/283607
+            int stackHeight = fm.getBackStackEntryCount();
+            Fragment fragment = fm.getFragments().get(stackHeight);
+            // To remember the visibility of the toolbar and reset it on return if necessary.
+            if (fragment instanceof UiFragment && prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) {
+                UiFragment f = (UiFragment) fragment;
+                if (Build.VERSION.SDK_INT >= 14) {
+                    toolbar.animate().y(f.toolbarPosition).setDuration(dur);
+                    toolbarShadow.animate().y(f.toolbarPosition).setDuration(dur);
                 } else {
-                    getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-                    drawerToggle.setDrawerIndicatorEnabled(true);
-                    drawerToggle.syncState();
-                }
-                // http://stackoverflow.com/a/18752763/283607
-                Fragment fragment = fm.getFragments().get(stackHeight);
-                // To remember the visibility of the toolbar and reset it on return if necessary.
-                if (fragment instanceof UiFragment && prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) {
-                    UiFragment f = (UiFragment) fragment;
-                    if (Build.VERSION.SDK_INT >= 14) {
-                        toolbar.animate().y(f.toolbarPosition).setDuration(dur);
-                        toolbarShadow.animate().y(f.toolbarPosition).setDuration(dur);
-                    } else {
-                        ViewHelper.setTranslationY(toolbar, f.toolbarPosition);
-                        ViewHelper.setTranslationY(toolbarShadow, f.toolbarPosition);
-                    }
+                    ViewHelper.setTranslationY(toolbar, f.toolbarPosition);
+                    ViewHelper.setTranslationY(toolbarShadow, f.toolbarPosition);
                 }
             }
-        };
-        fm.addOnBackStackChangedListener(backStackChangedListener);
-
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawerToggle.setToolbarNavigationClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!drawerToggle.isDrawerIndicatorEnabled()) {
-                    onBackPressed();
-                }
-            }
-        });
-        drawerLayout.setDrawerListener(drawerToggle);
-
-        favoriteBoardsAdapter = new FavoritesAdapter(this, new ArrayList<>(persistentData.getFavorites()));
-        favoriteBoardsView.setAdapter(favoriteBoardsAdapter);
-        favoriteBoardsAdapter.notifyDataSetChanged();
-        persistentData.addFavoritesChangedCallback(new PersistentData.FavoritesCallback() {
-            @Override public void onChanged(Set<Board> newFavorites) {
-                favoriteBoardsAdapter.updateItems(new ArrayList<>(newFavorites));
-                if (newFavorites.isEmpty())
-                    favoriteBoardsHeader.setVisibility(View.GONE);
-                else
-                    favoriteBoardsHeader.setVisibility(View.VISIBLE);
-            }
-        });
-        favoriteBoardsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                clearBackStackOnDrawerClick();
-                Fragment f = ThreadsFragment.create(favoriteBoardsAdapter.getItem(position));
-                fm.beginTransaction()
-                        .replace(R.id.container, f, null)
-                        .commit();
-            }
-        });
-
-        if (persistentData.getFavorites().size() == 0) {
-            favoriteBoardsHeader.setVisibility(View.GONE);
-            Fragment f = new BoardsFragment();
-            fm.beginTransaction()
-                    .replace(R.id.container, f, null)
-                    .commit();
-        } else {
-            favoriteBoardsHeader.setVisibility(View.VISIBLE);
-            Fragment f = new FavoritesFragment();
-            fm.beginTransaction()
-                    .replace(R.id.container, f, null)
-                    .commit();
         }
-    }
+    };
 
-    private void addDummyFragment() {
-        // Workaround to fragment transition bug, see: https://code.google.com/p/android/issues/detail?id=82832#c4
-        fm.beginTransaction()
-                .add(R.id.container, new Fragment())
-                .addToBackStack("dummy")
-                .commit();
-        fm.executePendingTransactions();
-    }
+    private View.OnClickListener toolbarNavCallback = new View.OnClickListener() {
+        @Override public void onClick(View v) {
+            if (!drawerToggle.isDrawerIndicatorEnabled()) {
+                onBackPressed();
+            }
+        }
+    };
 
     @OnClick(R.id.allBoards) void onAllBoards() {
         clearBackStackOnDrawerClick();
@@ -226,31 +132,6 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        drawerToggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        drawerToggle.onConfigurationChanged(newConfig);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (drawerToggle.isDrawerIndicatorEnabled() &&
-                drawerToggle.onOptionsItemSelected(item)) return true;
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(drawer)) {
             drawerLayout.closeDrawers();
@@ -274,8 +155,94 @@ public class MainActivity extends BaseActivity {
         }
     }
 
-    @Override
-    protected void onDestroy() {
+    // Construction ////////////////////////////////////////////////////////////////////////////////
+
+    @Inject SharedPreferences prefs;
+    @Inject PersistentData persistentData;
+    @Inject @Named("DebugSettings") Class debugSettingsClass;
+
+    @InjectView(R.id.toolbar) Toolbar toolbar;
+    @InjectView(R.id.toolbarShadow) ImageView toolbarShadow;
+    @InjectView(R.id.loadingBar) public ProgressBar loadingBar;
+    @InjectView(R.id.drawerLayout) DrawerLayout drawerLayout;
+    @InjectView(R.id.drawer) LinearLayout drawer;
+    @InjectView(R.id.debugSettings) TextView debugSettings;
+    @InjectView(R.id.favoriteBoardsHeader) CompatTextView favoriteBoardsHeader;
+    @InjectView(R.id.favoriteBoards) ListView favoriteBoardsView;
+
+    ActionBarDrawerToggle drawerToggle;
+    FavoritesAdapter favoriteBoardsAdapter;
+    FragmentManager fm;
+
+    @Override protected List<Object> getModules() {
+        return Util.extendedList(super.getModules(), new UiModule(this));
+    }
+
+    @Override protected int getLayoutResource() { return R.layout.activity_main; }
+
+    // I don't like that the order of statements is so important here to guarantee proper initializiation
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setSupportActionBar(toolbar);
+        fm = getSupportFragmentManager();
+        if (BuildConfig.DEBUG) debugSettings.setVisibility(View.VISIBLE);
+
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
+                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawerToggle.setToolbarNavigationClickListener(toolbarNavCallback);
+        drawerLayout.setDrawerListener(drawerToggle);
+
+        favoriteBoardsAdapter = new FavoritesAdapter(this, new ArrayList<>(persistentData.getFavorites()));
+        favoriteBoardsView.setAdapter(favoriteBoardsAdapter);
+        favoriteBoardsAdapter.notifyDataSetChanged();
+        // Shit, I think here we have a memory leak. persistentData is a singleton and on the first
+        // start a callback is added which closes over favoriteBoardsAdapter which itself has a
+        // necessary reference to the activity. If the activity is recreated then that callback
+        // keeps a reference to the old activity and it won't be collected. One solution is to
+        // keep a weak reference in favoriteBoardsAdapter to the activity. But test it with the
+        // Memory Monitor.
+        persistentData.addFavoritesChangedCallback(new PersistentData.FavoritesCallback() {
+            @Override public void onChanged(Set<Board> newFavorites) {
+                favoriteBoardsAdapter.updateItems(new ArrayList<>(newFavorites));
+                if (newFavorites.isEmpty())
+                    favoriteBoardsHeader.setVisibility(View.GONE);
+                else
+                    favoriteBoardsHeader.setVisibility(View.VISIBLE);
+            }
+        });
+        favoriteBoardsView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                clearBackStackOnDrawerClick();
+                Fragment f = ThreadsFragment.create(favoriteBoardsAdapter.getItem(position));
+                fm.beginTransaction()
+                        .replace(R.id.container, f, null)
+                        .commit();
+            }
+        });
+
+        if (savedInstanceState == null) {
+            addDummyFragment();
+            if (persistentData.getFavorites().size() == 0) {
+                favoriteBoardsHeader.setVisibility(View.GONE);
+                Fragment f = new BoardsFragment();
+                fm.beginTransaction()
+                        .replace(R.id.container, f, null)
+                        .commit();
+            } else {
+                favoriteBoardsHeader.setVisibility(View.VISIBLE);
+                Fragment f = new FavoritesFragment();
+                fm.beginTransaction()
+                        .replace(R.id.container, f, null)
+                        .commit();
+            }
+        }
+        fm.addOnBackStackChangedListener(backStackChangedListener);
+        updateUpButtonState();
+    }
+
+    // Lifecycle ///////////////////////////////////////////////////////////////////////////////////
+
+    @Override protected void onDestroy() {
         fm.removeOnBackStackChangedListener(backStackChangedListener);
         super.onDestroy();
     }
@@ -287,6 +254,31 @@ public class MainActivity extends BaseActivity {
             App.needToProtractToolbar = false;
         }
     }
+
+    @Override protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        drawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    // Toolbar Menu ////////////////////////////////////////////////////////////////////////////////
+
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
+        if (drawerToggle.isDrawerIndicatorEnabled() &&
+                drawerToggle.onOptionsItemSelected(item)) return true;
+        return super.onOptionsItemSelected(item);
+    }
+
+    // Transitions /////////////////////////////////////////////////////////////////////////////////
 
     private static int dur = 120;
 
@@ -310,16 +302,40 @@ public class MainActivity extends BaseActivity {
             Util.animateY(toolbar, 0, -toolbar.getHeight(), dur);
     }
 
+    public boolean transitionsAllowed() {
+        return Build.VERSION.SDK_INT >= 21 && prefs.getBoolean(Settings.TRANSITIONS, true);
+    }
+
+    // Utility /////////////////////////////////////////////////////////////////////////////////////
+
     // As per the design guidelines
     private void clearBackStackOnDrawerClick() {
         fm.popBackStackImmediate("dummy", 0);
         drawerLayout.closeDrawers();
     }
 
-    public boolean transitionsAllowed() {
-        return Build.VERSION.SDK_INT >= 21 && prefs.getBoolean(Settings.TRANSITIONS, true);
+    private void addDummyFragment() {
+        // Workaround to fragment transition bug, see: https://code.google.com/p/android/issues/detail?id=82832#c4
+        fm.beginTransaction()
+                .add(R.id.container, new Fragment())
+                .addToBackStack("dummy")
+                .commit();
+        fm.executePendingTransactions();
     }
 
+    private void updateUpButtonState() {
+        int stackHeight = fm.getBackStackEntryCount();
+        if (stackHeight > 1) {
+            drawerToggle.setDrawerIndicatorEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        } else {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            drawerToggle.setDrawerIndicatorEnabled(true);
+            drawerToggle.syncState();
+        }
+    }
+
+    // Adapters ////////////////////////////////////////////////////////////////////////////////////
 
     private static class FavoritesAdapter extends BindableAdapter<Board> {
         private List<Board> items;
