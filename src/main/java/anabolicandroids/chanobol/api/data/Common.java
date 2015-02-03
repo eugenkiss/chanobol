@@ -55,4 +55,13 @@ public abstract class Common {
 
     @SerializedName("trip")
     public String tripCode;
+
+    // These may make no sense for a board but it is important that these are here
+    // Because of the shared transition from thread image to op post image s.t.
+    // the flags are immediately visible and not only after load
+
+    public String country;
+
+    @SerializedName("country_name")
+    public String countryName;
 }

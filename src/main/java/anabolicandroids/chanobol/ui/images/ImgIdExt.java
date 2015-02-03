@@ -3,7 +3,14 @@ package anabolicandroids.chanobol.ui.images;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import anabolicandroids.chanobol.api.data.Post;
+
 public class ImgIdExt implements Parcelable {
+
+    public static ImgIdExt from(Post post) {
+        return new ImgIdExt(post.imageId, post.imageExtension);
+    }
+
     public String id;
     public String ext;
 

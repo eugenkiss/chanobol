@@ -4,18 +4,20 @@
         android:defaultValue="true"
         android:key="pref_hidable_toolbar"
         android:title="Hidable Toolbar"
-        >
-    </CheckBoxPreference>
+        />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_preload_thumbnails"
-        android:title="Preload Thumbnails"
-        >
-    </CheckBoxPreference>
+        android:title="Thumbnail Preloading"
+        />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_refresh"
-        android:title="Refresh Threads/Posts in Background"
-        >
-    </CheckBoxPreference>
+        android:title="Background Refresh"
+        />
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="pref_transitions"
+        android:title="Transitions"
+        />
 </PreferenceScreen>

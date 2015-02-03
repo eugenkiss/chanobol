@@ -23,6 +23,7 @@ import android.widget.TextView;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.koushikdutta.ion.Ion;
+import com.koushikdutta.ion.bitmap.BitmapInfo;
 import com.koushikdutta.ion.builder.AnimateGifMode;
 import com.koushikdutta.ion.builder.Builders;
 
@@ -109,11 +110,15 @@ public class PostView extends MaxWidthCardView {
         size[H] = (int) h;
     }
 
-    private void initImageListener(final ImgIdExt imageIdAndExt, final PostsFragment.ImageCallback cb) {
+    private void initImageCallback(final ImgIdExt imgIdExt, final Bitmap b, final boolean thumbnail,
+                                   final PostsFragment.ImageCallback cb) {
         image.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                cb.onClick(imageIdAndExt, image.getDrawable());
+            Drawable cached;
+            @Override public void onClick(View v) {
+                if (cached == null && b != null) {
+                    cached = new BitmapDrawable(getResources(), b.copy(b.getConfig(), true));
+                }
+                cb.onClick(imgIdExt, cached, image, thumbnail);
             }
         });
     }
@@ -131,7 +136,7 @@ public class PostView extends MaxWidthCardView {
             header.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    repliesCallback.onClick(post);
+                    if (repliesCallback != null) repliesCallback.onClick(post);
                 }
             });
         }
@@ -175,8 +180,7 @@ public class PostView extends MaxWidthCardView {
 
     // http://stackoverflow.com/a/19989677/283607
     protected void setTextViewHTML(final String quoterId, TextView text, String html,
-                                   final PostsFragment.ReferencedPostCallback referencedPostCallback)
-    {
+                                   final PostsFragment.ReferencedPostCallback referencedPostCallback) {
         CharSequence sequence = Html.fromHtml(html);
         SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
         URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
@@ -187,7 +191,8 @@ public class PostView extends MaxWidthCardView {
             int flags = strBuilder.getSpanFlags(span);
             ClickableSpan clickable = new ClickableSpan() {
                 public void onClick(View view) {
-                    referencedPostCallback.onClick(quoterId, span.getURL().substring(2));
+                    if (referencedPostCallback != null)
+                        referencedPostCallback.onClick(quoterId, span.getURL().substring(2));
                 }
             };
             strBuilder.setSpan(clickable, start, end, flags);
@@ -204,39 +209,29 @@ public class PostView extends MaxWidthCardView {
     // (compare with the iOS splash screen concept).
     public void bindToOp(final Drawable opImage,
                          final Post post, final String boardName,
-                         final String threadId, final Ion ion,
-                         PostsFragment.RepliesCallback repliesCallback,
-                         PostsFragment.ReferencedPostCallback referencedPostCallback,
-                         PostsFragment.ImageCallback imageCallback) {
+                         final Ion ion) {
         this.post = post;
         reset();
-        initText(ion, post, repliesCallback, referencedPostCallback);
-        initImageListener(new ImgIdExt(post.imageId, post.imageExtension), imageCallback);
-
-        image.setVisibility(View.VISIBLE);
-        progress.setVisibility(View.VISIBLE);
+        initText(ion, post, null, null);
 
         final int[] size = new int[2]; calcSize(size, post);
+        image.setVisibility(View.VISIBLE);
         image.setImageDrawable(opImage);
         image.getLayoutParams().height = size[H];
         image.requestLayout();
-        ion.build(image)
-                .placeholder(opImage)
-                .resize(size[W], size[H])
-                .load(ApiModule.imgUrl(boardName, post.imageId, post.imageExtension));
+        ion.build(getContext()).load(ApiModule.imgUrl(boardName, post.imageId, post.imageExtension)).asBitmap().tryGet();
     }
 
     public void bindTo(final Post post, final String boardName,
                        final String threadId, final Ion ion,
-                       PostsFragment.RepliesCallback repliesCallback,
-                       PostsFragment.ReferencedPostCallback referencedPostCallback,
-                       PostsFragment.ImageCallback imageCallback) {
+                       final PostsFragment.RepliesCallback repliesCallback,
+                       final PostsFragment.ReferencedPostCallback referencedPostCallback,
+                       final PostsFragment.ImageCallback imageCallback) {
         this.post = post;
         reset();
         initText(ion, post, repliesCallback, referencedPostCallback);
 
         if (post.imageId != null && !"null".equals(post.imageId)) {
-            initImageListener(new ImgIdExt(post.imageId, post.imageExtension), imageCallback);
 
             final int[] size = new int[2]; calcSize(size, post);
             progress.setVisibility(View.VISIBLE);
@@ -249,7 +244,8 @@ public class PostView extends MaxWidthCardView {
                 .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                     @Override
                     public void onCompleted(Exception e, ImageViewBitmapInfo result) {
-                        if (e != null) {
+                        BitmapInfo bitmapInfo = result.getBitmapInfo();
+                        if (e != null || bitmapInfo == null) {
                             progress.setVisibility(View.GONE);
                             return;
                         }
@@ -261,34 +257,37 @@ public class PostView extends MaxWidthCardView {
                                 play.setVisibility(View.VISIBLE);
                                 image.setOnClickListener(new OnClickListener() {
                                     @Override public void onClick(View v) {
-                                        Intent intent = new Intent(Intent.ACTION_VIEW)
-                                                .setDataAndType(Uri.parse(url), "video/webm");
-                                        if(intent.resolveActivity(getContext().getPackageManager()) != null)
-                                            getContext().startActivity(intent);
-                                        else
-                                            Util.showToast(getContext(), R.string.no_app);
+                                    Intent intent = new Intent(Intent.ACTION_VIEW)
+                                            .setDataAndType(Uri.parse(url), "video/webm");
+                                    if(intent.resolveActivity(getContext().getPackageManager()) != null)
+                                        getContext().startActivity(intent);
+                                    else
+                                        Util.showToast(getContext(), R.string.no_app);
                                     }
                                 });
                                 break;
                             default:
-                                // Resized Gifs don't animate apparently that's the reason for the case analysis
+                                initImageCallback(ImgIdExt.from(post), bitmapInfo.bitmap, true, imageCallback);
+                                // Resized Gifs don't animate apparently, that's the reason for the case analysis
                                 Builders.IV.F<?> placeholder = ion.build(image);
-                                if (result.getBitmapInfo() != null)
-                                    placeholder = placeholder.placeholder(
-                                            new BitmapDrawable(getResources(),
-                                                               result.getBitmapInfo().bitmap));
+                                if (result.getBitmapInfo() != null) {
+                                    BitmapDrawable bd = new BitmapDrawable(getResources(), result.getBitmapInfo().bitmap);
+                                    placeholder = placeholder.placeholder(bd);
+                                }
                                 if (".gif".equals(ext))
                                     placeholder.animateGif(AnimateGifMode.ANIMATE).smartSize(true);
                                 else
                                     placeholder.resize(size[W], size[H]);
-                                placeholder.load(url).setCallback(new FutureCallback<ImageView>() {
+                                placeholder.load(url).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                                     @Override
-                                    public void onCompleted(Exception e, ImageView result) {
-                                        if (e != null) {
+                                    public void onCompleted(Exception e, final ImageViewBitmapInfo result) {
+                                        BitmapInfo bitmapInfo = result.getBitmapInfo();
+                                        if (e != null || bitmapInfo == null) {
                                             progress.setVisibility(View.GONE);
                                             return;
                                         }
                                         progress.setVisibility(View.GONE);
+                                        initImageCallback(ImgIdExt.from(post), bitmapInfo.bitmap, false, imageCallback);
                                     }
                                 });
                                 break;

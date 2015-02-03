@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.util.Util;
 
 public abstract class SwipeRefreshFragment extends UiFragment {
@@ -41,6 +42,7 @@ public abstract class SwipeRefreshFragment extends UiFragment {
                 load();
             }
         });
+        swipe.setBackgroundResource(R.color.bg); // Transition bug fix
         return swipe;
     }
 

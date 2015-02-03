@@ -66,6 +66,7 @@
         <item name="android:overScrollMode">never</item>
         <item name="android:background">@color/bg</item>
         <item name="android:clipToPadding">false</item>
+        <item name="android:padding">6dp</item>
     </style>
 
     <style name="Widget.Chanobol.AdapterView.BoardsGridView">
@@ -73,7 +74,6 @@
         <item name="android:gravity">center</item>
         <item name="android:horizontalSpacing">10dp</item>
         <item name="android:verticalSpacing">10dp</item>
-        <item name="android:padding">10dp</item>
         <item name="android:numColumns">auto_fit</item>
         <item name="android:scrollbarStyle">outsideOverlay</item>
         <item name="android:stretchMode">columnWidth</item>
@@ -85,7 +85,6 @@
         <item name="android:gravity">center</item>
         <item name="android:horizontalSpacing">10dp</item>
         <item name="android:verticalSpacing">10dp</item>
-        <item name="android:padding">10dp</item>
         <item name="android:numColumns">auto_fit</item>
         <item name="android:scrollbarStyle">outsideOverlay</item>
         <item name="android:stretchMode">columnWidth</item>
@@ -96,7 +95,6 @@
         <item name="android:divider">@android:color/transparent</item>
         <item name="android:dividerHeight">10.0dp</item>
         <item name="android:orientation">vertical</item>
-        <item name="android:padding">10dp</item>
         <item name="android:scrollbarStyle">outsideOverlay</item>
         <item name="android:scrollbars">vertical</item>
     </style>

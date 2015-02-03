@@ -1,14 +1,19 @@
 package anabolicandroids.chanobol.ui.boards;
 
+import android.annotation.TargetApi;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.transition.TransitionManager;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,8 +43,8 @@ public class BoardsFragment extends UiFragment {
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    public void onActivityCreated2(Bundle savedInstanceState) {
+        super.onActivityCreated2(savedInstanceState);
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override public void onClick(View v) {
@@ -65,6 +70,21 @@ public class BoardsFragment extends UiFragment {
         boardsView.setLayoutManager(glm);
         boardsView.setItemAnimator(new DefaultItemAnimator());
         Util.calcDynamicSpanCountById(context, boardsView, glm, R.dimen.column_width);
+
+        setupTransitions();
+    }
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void setupTransitions() {
+        if (transitionsAllowed()) {
+            this.setExitTransition(new Slide(Gravity.TOP));
+            boardsView.setVisibility(View.INVISIBLE);
+            boardsView.postDelayed(new Runnable() {
+                @Override public void run() {
+                    TransitionManager.beginDelayedTransition(boardsView, new Slide(Gravity.TOP));
+                    boardsView.setVisibility(View.VISIBLE);
+                }
+            }, 100);
+        }
     }
 
     @Override

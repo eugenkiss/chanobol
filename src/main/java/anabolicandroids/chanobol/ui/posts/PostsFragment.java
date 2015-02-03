@@ -1,19 +1,25 @@
 package anabolicandroids.chanobol.ui.posts;
 
+import android.annotation.TargetApi;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.transition.Slide;
+import android.transition.Transition;
+import android.transition.TransitionManager;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.koushikdutta.async.future.FutureCallback;
 
@@ -22,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
@@ -41,6 +48,8 @@ import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
 public class PostsFragment extends SwipeRefreshFragment {
+
+    // Callbacks ///////////////////////////////////////////////////////////////////////////////////
 
     public static interface RepliesCallback {
         public void onClick(Post post);
@@ -68,61 +77,72 @@ public class PostsFragment extends SwipeRefreshFragment {
     };
 
     public static interface ImageCallback {
-        public void onClick(ImgIdExt imageIdAndExt, Drawable preview);
+        public void onClick(ImgIdExt imageIdAndExt, Drawable preview, ImageView iv, boolean thumbnail);
     }
     ImageCallback imageCallback = new ImageCallback() {
-        @Override
-        public void onClick(ImgIdExt imageIdAndExt, Drawable preview) {
-            ImageFragment f = ImageFragment.create(boardName, threadNumber, preview,
+        @Override public void onClick(ImgIdExt imageIdAndExt, Drawable preview, ImageView iv, boolean thumbnail) {
+            ImageFragment f = ImageFragment.create(boardName, threadNumber,
                                                    0, Util.arrayListOf(imageIdAndExt));
-            startFragment(f);
+            f.preview = preview;
+            if (transitionsAllowed()) {
+                if (Build.VERSION.SDK_INT >= 21) { // To make inspection shut up
+                    f.setEnterTransition(inflateTransition(android.R.transition.fade));
+                    f.setReturnTransition(inflateTransition(android.R.transition.fade));
+                    f.setSharedElementEnterTransition(inflateTransition(android.R.transition.move));
+                    f.setSharedElementReturnTransition(inflateTransition(android.R.transition.move));
+                    String uuid = UUID.randomUUID().toString();
+                    iv.setTransitionName(uuid);
+                    f.transitionName = uuid;
+                    f.transitionDuration = 450;
+                    f.thumbnailPreview = thumbnail;
+                    f.postIv = iv;
+                    startTransaction(f)
+                            .addSharedElement(iv, uuid)
+                            .commit();
+                }
+            } else {
+                startTransaction(f).commit();
+            }
         }
     };
 
+    // Construction ////////////////////////////////////////////////////////////////////////////////
+
     @InjectView(R.id.posts) RecyclerView postsView;
 
-    // To make first post instantly visible
-    Post op;
-    // To make image of first post instantly visible
-    Drawable opImage;
-    // To load the respective posts from 4Chan
-    String threadNumber;
-    String boardName;
+    // Transient state - only necessary for transition and "illusion" of promptness
+    public Post opPost; // To make first post instantly visible
+    public Drawable opImage; // To make image of first post instantly visible
 
-    ArrayList<Post> posts;
-    PostsAdapter postsAdapter;
+    // To load the respective posts from 4Chan
+    private String threadNumber;
+    private String boardName;
+
+    private ArrayList<Post> posts;
+    private PostsAdapter postsAdapter;
     // Map from a post number to its post POJO
-    HashMap<String, Post> postsMap;
+    private HashMap<String, Post> postsMap;
     // Map from a post number X to the post numbers of the posts that refer to X
-    HashMap<String, ArrayList<String>> replies;
+    private HashMap<String, ArrayList<String>> replies;
     // This is provided to the gallery fragment so that it can immediately load its images without
     // waiting for the result of requesting the thread json and extracting its image references once more
-    ArrayList<ImgIdExt> imagePointers;
+    private ArrayList<ImgIdExt> imagePointers;
 
-    // TODO: Isn't there a more elegant solution?
-    long lastUpdate;
-    static final long updateInterval = 60_000;
-    boolean pauseUpdating = false;
-    private ScheduledThreadPoolExecutor executor;
-
-    public static PostsFragment create(String boardName, Post op, Drawable opImage) {
+    public static PostsFragment create(String boardName, String threadNumber) {
         PostsFragment f = new PostsFragment();
         Bundle b = new Bundle();
         b.putString("boardName", boardName);
-        b.putString("threadNumber", op.number);
+        b.putString("threadNumber", threadNumber);
         f.setArguments(b);
-        // No need to put in bundle - it's transient state anyway
-        f.op = op;
-        f.opImage = opImage;
         return f;
     }
 
-    @Override
-    protected int getLayoutResource() { return R.layout.fragment_posts; }
+    @Override protected int getLayoutResource() { return R.layout.fragment_posts; }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
+    @Override public void onActivityCreated2(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated2(savedInstanceState);
+
+        firstLoad = transitionsAllowed();
 
         Bundle b = getArguments();
         boardName = b.getString("boardName");
@@ -132,72 +152,41 @@ public class PostsFragment extends SwipeRefreshFragment {
         postsMap = new HashMap<>();
         replies = new HashMap<>();
         imagePointers = new ArrayList<>();
-        if (op != null) posts.add(op);
 
         postsAdapter = new PostsAdapter();
         postsView.setAdapter(postsAdapter);
-        postsView.setHasFixedSize(true);
         postsView.setLayoutManager(new LinearLayoutManager(context));
-        postsView.setItemAnimator(new DefaultItemAnimator());
-        // TODO: I assume SpacesItemDecoration expects pixels
-        // TODO: Extract 6 into dimens.xml
-        postsView.addItemDecoration(new SpacesItemDecoration((int) Util.dpToPx(6, context)));
-        postsAdapter.notifyDataSetChanged();
+        postsView.addItemDecoration(new SpacesItemDecoration((int) resources.getDimension(R.dimen.post_spacing)));
+
+        if (opPost != null) {
+            posts.add(opPost);
+            postsAdapter.notifyItemChanged(0);
+        }
 
         load();
         initBackgroundUpdater();
     }
 
-    private void initBackgroundUpdater() {
-        if (executor == null) {
-            executor = new ScheduledThreadPoolExecutor(1);
-            executor.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    if (!prefs.getBoolean(Settings.REFRESH, true)) return;
-                    if (pauseUpdating) return;
-                    if (System.currentTimeMillis() - lastUpdate > updateInterval) {
-                        activity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                update();
-                            }
-                        });
-                    }
-                }
-            }, 5000, 5000, TimeUnit.MILLISECONDS);
-        }
-    }
+    // Data Loading ////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        activity.setTitle(boardName + "/" + threadNumber);
-        postsAdapter.notifyDataSetChanged();
-        postsView.requestLayout();
-        initBackgroundUpdater();
-        pauseUpdating = false;
-    }
-
-    @Override public void onStop() {
-        super.onStop();
-        pauseUpdating = true;
-    }
-
-    @Override public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        postsView.postDelayed(new Runnable() {
-            @Override public void run() {
-                postsView.requestLayout();
-            }
-        }, 100);
-    }
-
-    @Override
-    protected void load() { load(false); }
+    @Override protected void load() { load(false); }
 
     private void load(final boolean silent) {
-        if (!silent) super.load();
+        super.load();
+        if (silent || firstLoad) activity.loadingBar.setVisibility(View.GONE);
+
+        // Indicate ongoing request after all if first load takes especially long
+        if (firstLoad) {
+            postsView.postDelayed(new Runnable() {
+                @Override public void run() {
+                    if (firstLoad && loading) {
+                        activity.loadingBar.setVisibility(View.VISIBLE);
+                    }
+                }
+            }, transitionDuration + 100);
+        }
+
+        final long start = System.currentTimeMillis();
         service.listPosts(this, boardName, threadNumber, new FutureCallback<List<Post>>() {
             @Override public void onCompleted(Exception e, List<Post> result) {
                 if (e != null) {
@@ -227,9 +216,21 @@ public class PostsFragment extends SwipeRefreshFragment {
                         imagePointers.add(new ImgIdExt(p.imageId, p.imageExtension));
                     }
                 }
-                postsAdapter.notifyDataSetChanged();
-                loaded();
                 lastUpdate = System.currentTimeMillis();
+                if (firstLoad) {
+                    long elapsed = System.currentTimeMillis() - start;
+                    postsView.postDelayed(new Runnable() {
+                        @Override public void run() {
+                            firstLoad = false;
+                            if (posts.size() > 1) animatePostsArrival();
+                            loaded();
+                        }
+                    }, Math.max(0, transitionDuration - elapsed));
+                } else {
+                    postsAdapter.notifyDataSetChanged();
+                    loaded();
+                }
+
             }
         });
     }
@@ -246,10 +247,52 @@ public class PostsFragment extends SwipeRefreshFragment {
         ion.cancelAll(this);
     }
 
+    // Lifecycle ///////////////////////////////////////////////////////////////////////////////////
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        activity.setTitle(boardName + "/" + threadNumber);
+        if (!firstLoad) {
+            // Somehow breaks shared element return transition
+            // But important such that e.g. gifs restart playing when coming back from image fragment
+            if (!transitionsAllowed()) {
+                postsAdapter.notifyDataSetChanged();
+                postsView.requestLayout();
+            } else {
+                postsView.postDelayed(new Runnable() {
+                    @Override public void run() {
+                        postsAdapter.notifyDataSetChanged();
+                        postsView.requestLayout();
+                    }
+                }, 450);
+            }
+        }
+        initBackgroundUpdater();
+        pauseUpdating = false;
+    }
+
+    @Override public void onStop() {
+        super.onStop();
+        pauseUpdating = true;
+    }
+
+    @Override public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        postsView.postDelayed(new Runnable() {
+            @Override public void run() {
+                postsView.requestLayout();
+            }
+        }, 100);
+    }
+
+
     @Override public void onDestroy() {
         super.onDestroy();
         if (executor != null) executor.shutdown();
     }
+
+    // Toolbar Menu ////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -267,25 +310,28 @@ public class PostsFragment extends SwipeRefreshFragment {
                 load();
                 break;
             case R.id.gallery:
-                Fragment f = GalleryFragment.create(boardName, threadNumber, imagePointers);
-                startFragment(f);
+                GalleryFragment f = GalleryFragment.create(boardName, threadNumber);
+                f.imagePointers = imagePointers;
+                startTransaction(f).commit();
                 break;
         }
         return super.onOptionsItemSelected(item);
     }
 
+    // Posts Dialogs ///////////////////////////////////////////////////////////////////////////////
+
     private void showPostsDialog(Post repliedTo, List<Post> posts) {
         PostsDialog dialog = new PostsDialog();
         dialog.repliedTo = repliedTo;
         dialog.adapter = new PostsDialogAdapter(posts);
-        startFragment(dialog, PostsDialog.STACK_ID);
+        startAddTransaction(dialog, PostsDialog.STACK_ID).commit();
     }
 
     private void showPostsDialog(Post quotedBy, Post post) {
         PostsDialog dialog = new PostsDialog();
         dialog.quotedBy = quotedBy;
         dialog.adapter = new PostsDialogAdapter(Arrays.asList(post));
-        startFragment(dialog, PostsDialog.STACK_ID);
+        startAddTransaction(dialog, PostsDialog.STACK_ID).commit();
     }
 
     public static Pattern postReferencePattern = Pattern.compile("#p(\\d+)");
@@ -297,8 +343,83 @@ public class PostsFragment extends SwipeRefreshFragment {
         return refs;
     }
 
+    // Background Refresh //////////////////////////////////////////////////////////////////////////
+
+    // TODO: Isn't there a more elegant solution?
+    long lastUpdate;
+    static final long updateInterval = 60_000;
+    boolean pauseUpdating = false;
+    private ScheduledThreadPoolExecutor executor;
+
+    private void initBackgroundUpdater() {
+        if (executor == null) {
+            executor = new ScheduledThreadPoolExecutor(1);
+            executor.scheduleWithFixedDelay(new Runnable() {
+                @Override
+                public void run() {
+                    if (!prefs.getBoolean(Settings.REFRESH, true)) return;
+                    if (pauseUpdating) return;
+                    if (System.currentTimeMillis() - lastUpdate > updateInterval) {
+                        activity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                update();
+                            }
+                        });
+                    }
+                }
+            }, 5000, 5000, TimeUnit.MILLISECONDS);
+        }
+    }
+
+    // Transitions /////////////////////////////////////////////////////////////////////////////////
+
+    public boolean firstLoad;
+    public long transitionDuration;
+
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void animatePostsArrival() {
+        postsAdapter.hide = true;
+        postsAdapter.firstLoad = true;
+        postsAdapter.notifyDataSetChanged();
+        TransitionManager.beginDelayedTransition(postsView, new Slide(Gravity.BOTTOM));
+        postsAdapter.hide = false;
+        postsAdapter.firstLoad = false;
+        postsAdapter.notifyDataSetChanged();
+        // Unreliable, often leads to https://code.google.com/p/android/issues/detail?id=77846
+        //postsAdapter.notifyItemChanged(0);
+        //postsAdapter.notifyItemRangeInserted(1, posts.size()-1);
+    }
+
+    // I'd loved to simply define a return transitions but no matter what I tried it looked bad
+    // so here is something that looks fine. Although the problem is that there is no animation
+    // overlap...
+    boolean abortBackCatch;
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP) @Override protected boolean onBackPressed() {
+        if (!transitionsAllowed()) return false;
+        if (abortBackCatch) return false;
+        super.onBackPressed();
+        Transition t = inflateTransition(android.R.transition.slide_bottom);
+        t.setDuration(230);
+        postsAdapter.notifyDataSetChanged();
+        TransitionManager.beginDelayedTransition(postsView, t);
+        postsAdapter.hide = true;
+        postsAdapter.notifyDataSetChanged();
+        postsView.postDelayed(new Runnable() {
+            @Override public void run() {
+                abortBackCatch = true;
+                activity.onBackPressed();
+                abortBackCatch = false;
+            }
+        }, 450);
+        return true;
+    }
+
+    // Adapters ////////////////////////////////////////////////////////////////////////////////////
 
     class PostsAdapter extends UiAdapter<Post> {
+        boolean hide;
+        boolean firstLoad;
+
         public PostsAdapter() {
             this(posts, null, null);
         }
@@ -316,6 +437,8 @@ public class PostsFragment extends SwipeRefreshFragment {
         @Override
         public void bindView(final Post item, int position, View view) {
             bindViewDRY(item, position, view);
+            if (hide && Util.implies(firstLoad, position != 0)) view.setVisibility(View.GONE);
+            else view.setVisibility(View.VISIBLE);
         }
     }
 
@@ -328,13 +451,16 @@ public class PostsFragment extends SwipeRefreshFragment {
     private void bindViewDRY(final Post item, int position, View view) {
         PostView v = (PostView) view;
         if (item == null) return;
-        if (position == 0 && opImage != null) {
-            v.bindToOp(opImage, item, boardName, threadNumber, ion,
-                    repliesCallback, referencedPostCallback, imageCallback);
-            opImage = null;
+        if (position == 0 && opImage != null && firstLoad) {
+            v.bindToOp(opImage, item, boardName, ion);
+            //opImage = null;
         } else {
             v.bindTo(item, boardName, threadNumber, ion,
                     repliesCallback, referencedPostCallback, imageCallback);
+        }
+        if (Build.VERSION.SDK_INT >= 21) {
+            if (position == 0) v.image.setTransitionName("op");
+            else v.image.setTransitionName(null);
         }
     }
 

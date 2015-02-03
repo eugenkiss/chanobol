@@ -62,7 +62,7 @@ public class MainActivity extends BaseActivity {
 
     @InjectView(R.id.toolbar) Toolbar toolbar;
     @InjectView(R.id.toolbarShadow) ImageView toolbarShadow;
-    @InjectView(R.id.loadingBar) ProgressBar loadingBar;
+    @InjectView(R.id.loadingBar) public ProgressBar loadingBar;
     @InjectView(R.id.drawerLayout) DrawerLayout drawerLayout;
     @InjectView(R.id.drawer) LinearLayout drawer;
     @InjectView(R.id.debugSettings) TextView debugSettings;
@@ -85,7 +85,10 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         fm = getSupportFragmentManager();
+
+        addDummyFragment();
 
         setSupportActionBar(toolbar);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -99,7 +102,7 @@ public class MainActivity extends BaseActivity {
             public void onBackStackChanged() {
                 FragmentManager fm = getSupportFragmentManager();
                 int stackHeight = fm.getBackStackEntryCount();
-                if (stackHeight > 0) {
+                if (stackHeight > 1) {
                     drawerToggle.setDrawerIndicatorEnabled(false);
                     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
                 } else {
@@ -109,13 +112,16 @@ public class MainActivity extends BaseActivity {
                 }
                 // http://stackoverflow.com/a/18752763/283607
                 Fragment fragment = fm.getFragments().get(stackHeight);
-                if (fragment != null) fragment.onResume();
                 // To remember the visibility of the toolbar and reset it on return if necessary.
                 if (fragment instanceof UiFragment && prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) {
                     UiFragment f = (UiFragment) fragment;
-                    // TODO: Animate
-                    ViewHelper.setTranslationY(toolbar, f.toolbarPosition);
-                    ViewHelper.setTranslationY(toolbarShadow, f.toolbarPosition);
+                    if (Build.VERSION.SDK_INT >= 14) {
+                        toolbar.animate().y(f.toolbarPosition).setDuration(dur);
+                        toolbarShadow.animate().y(f.toolbarPosition).setDuration(dur);
+                    } else {
+                        ViewHelper.setTranslationY(toolbar, f.toolbarPosition);
+                        ViewHelper.setTranslationY(toolbarShadow, f.toolbarPosition);
+                    }
                 }
             }
         };
@@ -168,6 +174,15 @@ public class MainActivity extends BaseActivity {
                     .replace(R.id.container, f, null)
                     .commit();
         }
+    }
+
+    private void addDummyFragment() {
+        // Workaround to fragment transition bug, see: https://code.google.com/p/android/issues/detail?id=82832#c4
+        fm.beginTransaction()
+                .add(R.id.container, new Fragment())
+                .addToBackStack("dummy")
+                .commit();
+        fm.executePendingTransactions();
     }
 
     @OnClick(R.id.allBoards) void onAllBoards() {
@@ -239,7 +254,7 @@ public class MainActivity extends BaseActivity {
     public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(drawer)) {
             drawerLayout.closeDrawers();
-        } else if (fm.getBackStackEntryCount() == 0) {
+        } else if (fm.getBackStackEntryCount() <= 1) {
             new AlertDialog.Builder(this)
                     .setMessage(R.string.exit_sure)
                     .setCancelable(false)
@@ -251,6 +266,10 @@ public class MainActivity extends BaseActivity {
                     .setNegativeButton(android.R.string.cancel, null)
                     .show();
         } else {
+            Fragment top = fm.getFragments().get(fm.getBackStackEntryCount());
+            if (top instanceof UiFragment) {
+                if(((UiFragment) top).onBackPressed()) return;
+            }
             super.onBackPressed();
         }
     }
@@ -293,8 +312,12 @@ public class MainActivity extends BaseActivity {
 
     // As per the design guidelines
     private void clearBackStackOnDrawerClick() {
-        fm.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        fm.popBackStackImmediate("dummy", 0);
         drawerLayout.closeDrawers();
+    }
+
+    public boolean transitionsAllowed() {
+        return Build.VERSION.SDK_INT >= 21 && prefs.getBoolean(Settings.TRANSITIONS, true);
     }
 
 
