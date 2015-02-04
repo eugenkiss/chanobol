@@ -47,6 +47,8 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.boards.BoardsFragment;
 import anabolicandroids.chanobol.ui.boards.FavoritesFragment;
+import anabolicandroids.chanobol.ui.posts.PostsDialog;
+import anabolicandroids.chanobol.ui.posts.PostsFragment;
 import anabolicandroids.chanobol.ui.threads.ThreadsFragment;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
@@ -59,6 +61,7 @@ public class MainActivity extends BaseActivity {
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
 
+    boolean wasPreviousFragmentPostsDialog;
     // Make the up button work as a back button
     // http://stackoverflow.com/a/24878407/283607
     private FragmentManager.OnBackStackChangedListener backStackChangedListener =
@@ -80,6 +83,17 @@ public class MainActivity extends BaseActivity {
                     ViewHelper.setTranslationY(toolbarShadow, f.toolbarPosition);
                 }
             }
+            // Horrible fix to force onResume on PostsFragment when last PostsDialog was popped off
+            // These problems are a result of this peculiar constraint:
+            // wanting transitions, working with fragments and having a bug in Android...
+            if (fragment instanceof PostsFragment && wasPreviousFragmentPostsDialog) {
+                fragment.onResume();
+            }
+            // Horrible fix to force onResume on PostsDialog when e.g. coming from ImageFragment
+            if (fragment instanceof PostsDialog && !wasPreviousFragmentPostsDialog) {
+                fragment.onResume();
+            }
+            wasPreviousFragmentPostsDialog = fragment instanceof PostsDialog;
         }
     };
 
