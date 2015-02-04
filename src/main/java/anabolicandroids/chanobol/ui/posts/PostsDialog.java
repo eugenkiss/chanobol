@@ -15,8 +15,6 @@ import anabolicandroids.chanobol.ui.UiFragment;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
-// TODO: This is bad design, PostsDialog should get a Parcelable list of posts and have it's
-// own adapter. Otherwise on recreation adapter is not initialized and will create NPE
 public class PostsDialog extends UiFragment {
     // Why not RecyclerView? It _used to be_ RecyclerView but as the by default provided
     // Layoutmanagers do not support wrap_content and thus no easy ability to center the
@@ -40,8 +38,10 @@ public class PostsDialog extends UiFragment {
     @Override
     public void onActivityCreated2(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated2(savedInstanceState);
-        postsView.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
+        if (adapter != null) {
+            postsView.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+        }
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PostsDialog extends UiFragment {
         postsView.requestLayout();
         if (repliedTo != null)
             activity.setTitle(resources.getString(R.string.replies_to) + " " + repliedTo.number);
-        else
+        else if (quotedBy != null)
             activity.setTitle(resources.getString(R.string.quoted_by) + " " + quotedBy.number);
     }
 
