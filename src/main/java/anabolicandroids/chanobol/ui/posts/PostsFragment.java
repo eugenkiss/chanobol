@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
@@ -84,7 +85,7 @@ public class PostsFragment extends SwipeRefreshFragment {
             ImageFragment f = ImageFragment.create(boardName, threadNumber,
                                                    0, Util.arrayListOf(imageIdAndExt));
             f.preview = preview;
-            if (transitionsAllowed()) {
+            if (transitionsAllowed() && !isTopFragmentPostsDialog()) {
                 if (Build.VERSION.SDK_INT >= 21) { // To make inspection shut up
                     f.setEnterTransition(inflateTransition(android.R.transition.fade));
                     f.setReturnTransition(inflateTransition(android.R.transition.fade));
@@ -100,6 +101,8 @@ public class PostsFragment extends SwipeRefreshFragment {
                             .addSharedElement(iv, uuid)
                             .commit();
                 }
+            } else if (transitionsAllowed()) {
+                startAddTransaction(f, null).commit();
             } else {
                 startTransaction(f).commit();
             }
@@ -332,6 +335,14 @@ public class PostsFragment extends SwipeRefreshFragment {
         dialog.quotedBy = quotedBy;
         dialog.adapter = new PostsDialogAdapter(Arrays.asList(post));
         startAddTransaction(dialog, PostsDialog.STACK_ID).commit();
+    }
+
+    // Crude, but gets the job done
+    private boolean isTopFragmentPostsDialog() {
+        FragmentManager fm = getFragmentManager();
+        int stackHeight = fm.getBackStackEntryCount();
+        Fragment fragment = fm.getFragments().get(stackHeight);
+        return fragment instanceof PostsDialog;
     }
 
     public static Pattern postReferencePattern = Pattern.compile("#p(\\d+)");

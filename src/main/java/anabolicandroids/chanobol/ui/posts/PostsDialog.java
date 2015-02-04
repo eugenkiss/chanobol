@@ -15,6 +15,8 @@ import anabolicandroids.chanobol.ui.UiFragment;
 import butterknife.InjectView;
 import butterknife.OnClick;
 
+// TODO: This is bad design, PostsDialog should get a Parcelable list of posts and have it's
+// own adapter. Otherwise on recreation adapter is not initialized and will create NPE
 public class PostsDialog extends UiFragment {
     // Why not RecyclerView? It _used to be_ RecyclerView but as the by default provided
     // Layoutmanagers do not support wrap_content and thus no easy ability to center the
