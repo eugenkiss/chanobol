@@ -2,7 +2,6 @@ package anabolicandroids.chanobol.ui.images;
 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -56,6 +55,7 @@ public class GalleryFragment extends SwipeRefreshFragment {
         Bundle b = getArguments();
         boardName = b.getString("boardName");
         threadNumber = b.getString("threadNumber");
+        if (imagePointers == null) imagePointers = new ArrayList<>(); // Prevent NPE
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override public void onClick(View v) {
