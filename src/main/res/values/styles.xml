@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="NewApi">
 
     <style name="AppTheme" parent="Theme.AppCompat" >
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
         <item name="actionButtonStyle">@style/ActionButtonStyle</item>
         <item name="android:actionOverflowButtonStyle">@style/ActionButtonOverflowStyle</item>
