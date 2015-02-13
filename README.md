@@ -40,6 +40,8 @@ Mockmode currently is not really working, see issues
 [#34](https://github.com/eugenkiss/chanobol/issues/34) and
 [#47](https://github.com/eugenkiss/chanobol/issues/34).
 
+Note: I'm currently rewriting Chanobol to have an activity-based drawer layout (like iosched) which allows me to finally use Lollipop transitions without (many) problems and get rid of many fragment related workarounds. I'm probably finished around 15.02.2015.
+
 
 Motivation
 ----------
