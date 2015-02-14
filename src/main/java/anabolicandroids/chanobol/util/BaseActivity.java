@@ -1,4 +1,4 @@
-package anabolicandroids.chanobol;
+package anabolicandroids.chanobol.util;
 
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -6,13 +6,13 @@ import android.support.v7.app.ActionBarActivity;
 import java.util.Arrays;
 import java.util.List;
 
-import butterknife.ButterKnife;
+import anabolicandroids.chanobol.App;
 import dagger.ObjectGraph;
 
 public abstract class BaseActivity extends ActionBarActivity {
     private ObjectGraph activityGraph;
 
-    protected abstract int getLayoutResource();
+    //protected abstract int getLayoutResource();
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,8 +22,8 @@ public abstract class BaseActivity extends ActionBarActivity {
         // Inject ourselves so subclasses will have dependencies fulfilled when this method returns.
         activityGraph.inject(this);
 
-        setContentView(getLayoutResource());
-        ButterKnife.inject(this);
+        //setContentView(getLayoutResource());
+        //ButterKnife.inject(this);
     }
 
     @Override protected void onDestroy() {

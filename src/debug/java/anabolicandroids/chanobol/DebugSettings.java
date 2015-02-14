@@ -6,7 +6,8 @@ import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
 
-import anabolicandroids.chanobol.ui.MainActivity;
+import anabolicandroids.chanobol.ui.boards.FavoritesActivity;
+import anabolicandroids.chanobol.util.BaseSettings;
 
 import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
 import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
@@ -29,7 +30,7 @@ public class DebugSettings extends BaseSettings {
     public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
         if (key.equals(MOCK)) {
             // From U2020 DebugAppContainer.setEndpointAndRelaunch
-            Intent newApp = new Intent(this, MainActivity.class);
+            Intent newApp = new Intent(this, FavoritesActivity.class);
             newApp.setFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
             getApplication().startActivity(newApp);
             App.get(getApplicationContext()).buildAppGraphAndInject();

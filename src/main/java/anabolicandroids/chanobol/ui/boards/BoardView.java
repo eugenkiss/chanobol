@@ -1,8 +1,8 @@
 package anabolicandroids.chanobol.ui.boards;
 
 import android.content.Context;
-import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,7 +13,7 @@ import anabolicandroids.chanobol.api.data.Board;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class BoardView extends CardView {
+public class BoardView extends FrameLayout {
     @InjectView(R.id.name) TextView name;
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.title) TextView title;

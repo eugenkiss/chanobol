@@ -7,9 +7,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
-    app:maxWidth="@dimen/max_post_width"
-    card_view:cardCornerRadius="0dp"
+    card_view:cardCornerRadius="2dp"
     app:cardBackgroundColor="@color/fg"
+    android:transitionGroup="false"
     >
 
     <LinearLayout
@@ -18,72 +18,80 @@
         android:orientation="vertical"
         >
 
-        <LinearLayout
+        <FrameLayout
             android:id="@+id/header"
-            android:layout_width="fill_parent"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/fg2"
-            android:paddingBottom="6dp"
-            android:paddingLeft="12dp"
-            android:paddingRight="12dp"
-            android:paddingTop="6dp"
+            android:foreground="?attr/selectableItemBackgroundBorderless"
             >
 
-            <TextView
-                android:id="@+id/number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textColor="?android:textColorPrimary"
-                android:textSize="16sp"
-                android:textStyle="bold"
-                tools:text="29832752"
-                />
-
-            <TextView
-                android:id="@+id/date"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:paddingLeft="10dp"
-                android:textSize="16sp"
-                tools:text="~ Nov 15"
-                />
-
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1"
-                />
-
             <LinearLayout
-                android:id="@+id/repliesContainer"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:orientation="horizontal"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/fg2"
+                android:paddingBottom="6dp"
+                android:paddingLeft="12dp"
+                android:paddingRight="12dp"
+                android:paddingTop="6dp"
                 >
 
-                <ImageView
-                    android:layout_width="24dp"
-                    android:layout_height="match_parent"
-                    android:paddingRight="8dp"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_replies"
+                <TextView
+                    android:id="@+id/number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="?android:textColorPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold"
+                    tools:text="29832752"
                     />
 
                 <TextView
-                    android:id="@+id/replies"
+                    android:id="@+id/date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="10dp"
+                    android:textSize="16sp"
+                    tools:text="~ Nov 15"
+                    />
+
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:layout_weight="1"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/repliesContainer"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:textSize="16sp"
-                    tools:text="3r"
-                    />
+                    android:layout_gravity="center"
+                    android:orientation="horizontal"
+                    >
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="match_parent"
+                        android:paddingRight="8dp"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_replies"
+                        />
+
+                    <TextView
+                        android:id="@+id/replies"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:textSize="16sp"
+                        tools:text="3r"
+                        />
+                </LinearLayout>
             </LinearLayout>
-        </LinearLayout>
+        </FrameLayout>
 
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="#292929"
+            android:transitionGroup="false"
             >
 
             <ImageView
@@ -109,6 +117,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:visibility="gone"
+                />
+
+            <View
+                android:id="@+id/imageTouchOverlay"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
                 />
         </FrameLayout>
 

@@ -12,6 +12,8 @@
   [Ion]: https://github.com/koush/ion/
   [Support]: http://developer.android.com/tools/support-library/index.html
   [RecyclerView]: https://developer.android.com/reference/android/support/v7/widget/RecyclerView.html
+  [RecyclerView]: https://developer.android.com/reference/android/support/v7/widget/RecyclerView.html
+  [iosched]: https://github.com/google/iosched
 
 Chanobol is a 4Chan reader app on steroids\* inspired by [Chanu][].
 Get in on the [Play Store](https://play.google.com/store/apps/details?id=anabolicandroids.chanobol.sfw).
@@ -39,8 +41,6 @@ features. It only means that I probably will not implement them myself.
 Mockmode currently is not really working, see issues
 [#34](https://github.com/eugenkiss/chanobol/issues/34) and
 [#47](https://github.com/eugenkiss/chanobol/issues/34).
-
-Note: I'm currently rewriting Chanobol to have an activity-based drawer layout (like iosched) which allows me to finally use Lollipop transitions without (many) problems and get rid of many fragment related workarounds. I'm probably finished around 15.02.2015.
 
 
 Motivation
@@ -90,39 +90,31 @@ Code Architecture
 This section gives a broad overview of the code, some (non-obvious) code design
 decisions and the reasons for the application of some libraries. There are many
 more decisions, of course, which can be found by studying the code or the [FAQ
-in the wiki](https://github.com/eugenkiss/chanobol/wiki#faq).  I tried to follow
+in the wiki](https://github.com/eugenkiss/chanobol/wiki#faq). I tried to follow
 good practices to the best of my knowledge. As pure Android development without
 the help of libraries is often relatively tedious I employ useful libraries
 where possible.
 
+The high-level code structure is very much inspired by [U+2020][]. There is a
+debug and a release [build type][Build Types]. The debug build type has a mock
+mode just like [U+2020][] where server requests are mocked to return data from
+the debug build type's assets folder. Instead of a debug drawer like in
+[U+2020][] Chanobol employs a debug preference activity which can be openend
+from the drawer. Dependencies are injected with [Dagger][]. Chanobol has an
+`AppModule` which contains application-level or rather global dependenices and
+an `ApiModule` for server-related dependencies. The debug build type overwrites
+some module definitions in `DebugAppModule`. Where it makes sense
+[`RecyclerView`][RecyclerView] is used in place of `ListView` or `GridView`
+which has several advantages like better scrolling performance and more precise
+scrolling information. In the vein of [The Google I/O 2014 Android App][iosched]
+Chanobol employs an activity-based drawer layout. With [Ion][] 4Chan's [API][]
+is mapped to the interface `ChanService` in the `api` package. On top of that,
+Ion takes care of loading and caching images.
+
+<sub>
 A constraint I set is that Chanobol must be runnable on API Level 9 to see what
 kind of workarounds are needed and what pitfalls there are for developing an
 Android application that is backwards compatible. That is the reason for the
 [`com.android.support:`*X*][Support]-dependencies as well as the dependency on
 [Nine Old Androids][].
-
-There is only one build file `build.gradle`. The project structure is not the
-default one created by Android Studio where the real application code is in the
-subfolder `app` because that extra indirection is not needed for Chanobol.
-
-The high-level code structure is very much inspired by [U+2020][]. There is a
-debug and a release [build type][Build Types]. The debug build type has a mock
-mode just like [U+2020][] where server requests are mocked to return data from
-the debug build type's assets folder. Instead of a debug drawer like in [U+2020][]
-Chanobol employs a debug preference activity which can be openend from the drawer.
-Dependencies are injected with [Dagger][]. Chanobol has an `AppModule` which contains
-application-level or rather global dependenices, an `ApiModule` for server-related
-dependencies and a scoped `UiModule` for fragment- and activity-related
-dependencies. The package structure roughly follows the module structure. The debug
-build type overwrites some module definitions in `DebugAppModule`. The top-level
-package contains a couple of `Base`*X* classes which mainly hide some Dagger-related
-injection boilerplate. Where it makes sense the new [`RecyclerView`][RecyclerView]
-is used in place of `ListView` or `GridView` which has several advantages like
-better scrolling performance and more precise scrolling information.
-The classes `UiFragment` and `SwipeRefreshFragment` in the `ui` package contain
-code which is shared by most of the concrete fragments.
-
-Chanobol can be seen as a UI for the [4Chan API][API]. To this end, the great
-[Ion][] library is employed. With Ion 4Chan's API is mapped to the interface
-`ChanService` in the `api` package. On top of that, Ion takes care of loading
-and caching images.
+</sub>

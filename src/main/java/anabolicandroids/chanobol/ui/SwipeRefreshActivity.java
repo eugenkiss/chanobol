@@ -12,7 +12,7 @@ import android.view.ViewGroup;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.util.Util;
 
-public abstract class SwipeRefreshFragment extends UiFragment {
+public abstract class SwipeRefreshActivity extends UiActivity {
 
     private SwipeRefreshLayout swipe;
 

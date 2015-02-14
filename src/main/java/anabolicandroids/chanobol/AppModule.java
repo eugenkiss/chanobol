@@ -26,6 +26,13 @@ import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.PersistentData;
 import anabolicandroids.chanobol.ui.Settings;
+import anabolicandroids.chanobol.ui.boards.BoardsActivity;
+import anabolicandroids.chanobol.ui.boards.FavoritesActivity;
+import anabolicandroids.chanobol.ui.images.GalleryActivity;
+import anabolicandroids.chanobol.ui.images.ImageActivity;
+import anabolicandroids.chanobol.ui.posts.PostsActivity;
+import anabolicandroids.chanobol.ui.posts.PostsDialog;
+import anabolicandroids.chanobol.ui.threads.ThreadsActivity;
 import anabolicandroids.chanobol.util.Util;
 import dagger.Module;
 import dagger.Provides;
@@ -33,7 +40,14 @@ import dagger.Provides;
 @Module(
         injects = {
                 App.class,
-                Settings.class
+                Settings.class,
+                BoardsActivity.class,
+                FavoritesActivity.class,
+                ThreadsActivity.class,
+                PostsActivity.class,
+                PostsDialog.class,
+                ImageActivity.class,
+                GalleryActivity.class,
         },
         includes = {
                 ApiModule.class
@@ -45,6 +59,11 @@ public class AppModule {
 
     public AppModule(App app) {
         this.app = app;
+    }
+
+    @Provides @Singleton
+    App provideApp() {
+        return app;
     }
 
     @Provides @Singleton

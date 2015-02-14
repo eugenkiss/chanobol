@@ -1,4 +1,4 @@
-package anabolicandroids.chanobol;
+package anabolicandroids.chanobol.util;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -6,6 +6,8 @@ import android.preference.PreferenceActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 
+import anabolicandroids.chanobol.App;
+import anabolicandroids.chanobol.R;
 import dagger.ObjectGraph;
 
 // The following resources have been helpful:

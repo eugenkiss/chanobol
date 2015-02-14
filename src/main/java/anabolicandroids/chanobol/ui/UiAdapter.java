@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 
 import java.util.List;
 
+@SuppressWarnings("UnusedDeclaration")
 public abstract class UiAdapter<T> extends RecyclerView.Adapter<UiAdapter.ViewHolder> {
     protected final Context context;
     protected final LayoutInflater inflater;
@@ -34,37 +35,28 @@ public abstract class UiAdapter<T> extends RecyclerView.Adapter<UiAdapter.ViewHo
         this(context, null, null);
     }
 
+    public abstract View newView(ViewGroup container);
+
+    public abstract void bindView(T item, int position, View view);
+
     public void replaceWith(List<T> items) {
         this.items = items;
         notifyDataSetChanged();
     }
 
-    public abstract View newView(ViewGroup container);
-
-    public abstract void bindView(T item, int position, View view);
-
-    @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    @Override public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = newView(parent);
         v.setOnClickListener(clickListener);
         v.setOnLongClickListener(longClickListener);
         return new ViewHolder(v);
     }
 
-    @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    @Override public void onBindViewHolder(ViewHolder holder, int position) {
         bindView(items.get(position), position, holder.itemView);
     }
 
-    @Override
-    public int getItemCount() {
-        return items.size();
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+    @Override public int getItemCount() { return items.size(); }
+    @Override public long getItemId(int position) { return position; }
 
     static class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View itemView) { super(itemView); }

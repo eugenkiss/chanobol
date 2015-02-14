@@ -2,10 +2,11 @@ package anabolicandroids.chanobol.ui.posts;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.CardView;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.format.DateUtils;
@@ -30,18 +31,19 @@ import com.koushikdutta.ion.builder.Builders;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
-import anabolicandroids.chanobol.ui.images.ImgIdExt;
-import anabolicandroids.chanobol.util.MaxWidthCardView;
+import anabolicandroids.chanobol.ui.UiActivity;
+import anabolicandroids.chanobol.ui.images.ImagePointer;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
-public class PostView extends MaxWidthCardView {
+public class PostView extends CardView {
     @InjectView(R.id.header) ViewGroup header;
     @InjectView(R.id.number) TextView number;
     @InjectView(R.id.date) TextView date;
     @InjectView(R.id.repliesContainer) ViewGroup repliesContainer;
     @InjectView(R.id.replies) TextView replies;
+    @InjectView(R.id.imageTouchOverlay) View imageTouchOverlay; // I couldn't get the FrameLayout clickable...
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.play) ImageView play;
     @InjectView(R.id.progressbar) ProgressBar progress;
@@ -110,23 +112,27 @@ public class PostView extends MaxWidthCardView {
         size[H] = (int) h;
     }
 
-    private void initImageCallback(final ImgIdExt imgIdExt, final Bitmap b, final boolean thumbnail,
-                                   final PostsFragment.ImageCallback cb) {
-        image.setOnClickListener(new OnClickListener() {
-            Drawable cached;
+    private void initImageCallback(final ImagePointer imagePointer, final boolean thumbnail,
+                                   final PostsActivity.ImageCallback cb) {
+        OnClickListener l = new OnClickListener() {
             @Override public void onClick(View v) {
-                if (cached == null && b != null) {
-                    cached = new BitmapDrawable(getResources(), b.copy(b.getConfig(), true));
-                }
-                cb.onClick(imgIdExt, cached, image, thumbnail);
+                imageTouchOverlay.postDelayed(new Runnable() {
+                    @Override public void run() {
+                        cb.onClick(imagePointer, image, thumbnail);
+                    }
+                }, UiActivity.RIPPLE_DELAY);
             }
-        });
+        };
+        imageTouchOverlay.setOnClickListener(l);
+        // Without this touches are not registered on 2.3.7 for some reason. I tried other
+        // solutions but this is the best I came up with.
+        image.setOnClickListener(l);
     }
 
     private void initText(final Ion ion,
                           final Post post,
-                          final PostsFragment.RepliesCallback repliesCallback,
-                          final PostsFragment.ReferencedPostCallback referencedPostCallback) {
+                          final PostsActivity.RepliesCallback repliesCallback,
+                          final PostsActivity.ReferencedPostCallback referencedPostCallback) {
         number.setText(post.number);
         date.setText(DateUtils.getRelativeTimeSpanString(
                 post.time * 1000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS));
@@ -180,7 +186,7 @@ public class PostView extends MaxWidthCardView {
 
     // http://stackoverflow.com/a/19989677/283607
     protected void setTextViewHTML(final String quoterId, TextView text, String html,
-                                   final PostsFragment.ReferencedPostCallback referencedPostCallback) {
+                                   final PostsActivity.ReferencedPostCallback referencedPostCallback) {
         CharSequence sequence = Html.fromHtml(html);
         SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
         URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
@@ -207,7 +213,7 @@ public class PostView extends MaxWidthCardView {
     // when viewing a single thread without first waiting for the 4Chan API request to finish
     // that gets all the posts in order to give the impression (illusion) of promptness
     // (compare with the iOS splash screen concept).
-    public void bindToOp(final Drawable opImage,
+    public void bindToOp(final Drawable opImage, final String transitionName,
                          final Post post, final String boardName,
                          final Ion ion) {
         this.post = post;
@@ -215,6 +221,7 @@ public class PostView extends MaxWidthCardView {
         initText(ion, post, null, null);
 
         final int[] size = new int[2]; calcSize(size, post);
+        ViewCompat.setTransitionName(image, transitionName);
         image.setVisibility(View.VISIBLE);
         image.setImageDrawable(opImage);
         image.getLayoutParams().height = size[H];
@@ -223,10 +230,10 @@ public class PostView extends MaxWidthCardView {
     }
 
     public void bindTo(final Post post, final String boardName,
-                       final String threadId, final Ion ion,
-                       final PostsFragment.RepliesCallback repliesCallback,
-                       final PostsFragment.ReferencedPostCallback referencedPostCallback,
-                       final PostsFragment.ImageCallback imageCallback) {
+                       @SuppressWarnings("UnusedParameters") final String threadId, final Ion ion,
+                       final PostsActivity.RepliesCallback repliesCallback,
+                       final PostsActivity.ReferencedPostCallback referencedPostCallback,
+                       final PostsActivity.ImageCallback imageCallback) {
         this.post = post;
         reset();
         initText(ion, post, repliesCallback, referencedPostCallback);
@@ -267,27 +274,21 @@ public class PostView extends MaxWidthCardView {
                                 });
                                 break;
                             default:
-                                initImageCallback(ImgIdExt.from(post), bitmapInfo.bitmap, true, imageCallback);
-                                // Resized Gifs don't animate apparently, that's the reason for the case analysis
+                                initImageCallback(ImagePointer.from(post), true, imageCallback);
                                 Builders.IV.F<?> placeholder = ion.build(image);
-                                if (result.getBitmapInfo() != null) {
-                                    BitmapDrawable bd = new BitmapDrawable(getResources(), result.getBitmapInfo().bitmap);
-                                    placeholder = placeholder.placeholder(bd);
-                                }
-                                if (".gif".equals(ext))
-                                    placeholder.animateGif(AnimateGifMode.ANIMATE).smartSize(true);
-                                else
-                                    placeholder.resize(size[W], size[H]);
-                                placeholder.load(url).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+                                // I'd love to have something like Picasso's noplaceholder s.t.
+                                // Ion doesn't clear the thumbnail preview...
+                                BitmapDrawable bd = new BitmapDrawable(getResources(), result.getBitmapInfo().bitmap);
+                                placeholder = placeholder.placeholder(bd);
+                                // Resized Gifs don't animate apparently, that's the reason for the case analysis
+                                if (".gif".equals(ext)) placeholder.animateGif(AnimateGifMode.ANIMATE).smartSize(true);
+                                else placeholder.resize(size[W], size[H]);
+                                placeholder.load(url).setCallback(new FutureCallback<ImageView>() {
                                     @Override
-                                    public void onCompleted(Exception e, final ImageViewBitmapInfo result) {
-                                        BitmapInfo bitmapInfo = result.getBitmapInfo();
-                                        if (e != null || bitmapInfo == null) {
-                                            progress.setVisibility(View.GONE);
-                                            return;
-                                        }
+                                    public void onCompleted(Exception e, final ImageView result) {
                                         progress.setVisibility(View.GONE);
-                                        initImageCallback(ImgIdExt.from(post), bitmapInfo.bitmap, false, imageCallback);
+                                        if (e != null) { return; }
+                                        initImageCallback(ImagePointer.from(post), false, imageCallback);
                                     }
                                 });
                                 break;

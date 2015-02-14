@@ -1,4 +1,4 @@
-package anabolicandroids.chanobol;
+package anabolicandroids.chanobol.util;
 
 import android.content.Context;
 import android.view.LayoutInflater;
