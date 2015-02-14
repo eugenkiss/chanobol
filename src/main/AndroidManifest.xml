@@ -8,6 +8,7 @@
 
     <application
         android:name=".App"
+        android:largeHeap="true"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -16,7 +17,7 @@
         tools:ignore="UnusedAttribute"
         >
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.boards.FavoritesActivity"
             android:label="@string/app_name"
             android:configChanges="keyboardHidden|orientation|screenSize"
             >
@@ -26,9 +27,28 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".ui.boards.BoardsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".ui.threads.ThreadsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".ui.posts.PostsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".ui.images.ImageActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".ui.images.GalleryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
             android:name="anabolicandroids.chanobol.ui.Settings"
-            >
-        </activity>
+            />
     </application>
 
 </manifest>

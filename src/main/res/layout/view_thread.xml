@@ -1,79 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <anabolicandroids.chanobol.ui.threads.ThreadView
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/column_width"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
-    android:layout_margin="4dp"
-    app:cardBackgroundColor="@color/fg"
+    android:layout_margin="3dp"
+    android:background="@color/fg"
+    android:foreground="?attr/selectableItemBackground"
     >
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/fg"
-        >
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/fg2"
-                >
-
-                <TextView
-                    android:id="@+id/numReplies"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:textSize="14sp"
-                    tools:text="17r" />
-
-                <View
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
-
-                <TextView
-                    android:id="@+id/numImages"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="5dp"
-                    android:textSize="14sp"
-                    tools:text="6i" />
-            </LinearLayout>
-
-            <ImageView
-                android:id="@+id/image"
-                android:layout_width="match_parent"
-                android:layout_height="120dp"
-                android:scaleType="centerCrop" />
+            android:background="@color/fg2"
+            >
 
             <TextView
-                android:id="@+id/text"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:maxLines="5"
-                android:minLines="5"
+                android:id="@+id/numReplies"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:padding="5dp"
-                android:textColor="?android:textColorPrimary"
                 android:textSize="14sp"
-                tools:text="Hello Bla blsdf asdkf sfj sdif aj dfiasfj  sdfjasidfj sdif jasdf jsdfijdsf" />
+                tools:text="17r" />
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/numImages"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="5dp"
+                android:textSize="14sp"
+                tools:text="6i" />
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/blackness"
+        <ImageView
+            android:id="@+id/image"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/catalogthumbnail"
+            />
+
+        <TextView
+            android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="#99000000"
-            android:orientation="horizontal"
-            android:visibility="gone" />
-    </FrameLayout>
+            android:maxLines="4"
+            android:minLines="4"
+            android:padding="5dp"
+            android:textColor="?android:textColorPrimary"
+            android:textSize="14sp"
+            tools:text="Hello Bla blsdf asdkf sfj sdif aj dfiasfj  sdfjasidfj sdif jasdf jsdfijdsf" />
+    </LinearLayout>
+
+    <View
+        android:id="@+id/blackness"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#99000000"
+        android:visibility="gone" />
 
 </anabolicandroids.chanobol.ui.threads.ThreadView>

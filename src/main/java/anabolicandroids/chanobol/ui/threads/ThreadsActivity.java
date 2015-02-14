@@ -1,30 +1,30 @@
 package anabolicandroids.chanobol.ui.threads;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
 import android.transition.TransitionManager;
 import android.view.Gravity;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.koushikdutta.async.future.FutureCallback;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.WeakHashMap;
+import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -32,96 +32,98 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.api.data.Thread;
 import anabolicandroids.chanobol.ui.Settings;
-import anabolicandroids.chanobol.ui.SwipeRefreshFragment;
+import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.UiAdapter;
-import anabolicandroids.chanobol.ui.boards.BoardsFragment;
-import anabolicandroids.chanobol.ui.posts.PostsFragment;
+import anabolicandroids.chanobol.ui.boards.BoardsActivity;
+import anabolicandroids.chanobol.ui.posts.PostsActivity;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
-public class ThreadsFragment extends SwipeRefreshFragment {
+public class ThreadsActivity extends SwipeRefreshActivity {
+
+    // Construction ////////////////////////////////////////////////////////////////////////////////
+
+    // To load the respective threads from 4Chan
+    private static String EXTRA_BOARD = "board";
+    private Board board;
+
+    // Internal state
+    private static String THREADS = "threads";
+    private static String THREADMAP = "threadMap";
+    private ArrayList<Thread> threads;
+    private HashMap<String, Integer> threadMap;
+    private ThreadsAdapter threadsAdapter;
+
+    // This whole bitMap stuff is only needed to prevent the thumbnails from blinking after
+    // update is finished. I tried many other approaches but this is the only one that worked.
+    private HashMap<String, Bitmap> bitMap;
+
+    public static void launch(Activity activity, Board board) {
+        Intent intent = new Intent(activity, ThreadsActivity.class);
+        intent.putExtra(EXTRA_BOARD, Parcels.wrap(board));
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
+        activity.finish();
+    }
+
+    @InjectView(R.id.threads) RecyclerView threadsView;
+
+    @Override protected int getLayoutResource() { return R.layout.activity_threads; }
+    @Override protected RecyclerView getRootRecyclerView() { return threadsView; }
+
+    @Override protected void onCreate(Bundle savedInstanceState) {
+        taskRoot = true;
+        super.onCreate(savedInstanceState);
+
+        Bundle b = getIntent().getExtras();
+        board = Parcels.unwrap(b.getParcelable(EXTRA_BOARD));
+
+        setTitle(board.name);
+
+        if (savedInstanceState == null) {
+            threads = new ArrayList<>();
+            threadMap = new HashMap<>();
+        } else {
+            threads = Parcels.unwrap(savedInstanceState.getParcelable(THREADS));
+            threadMap = Parcels.unwrap(savedInstanceState.getParcelable(THREADMAP));
+        }
+
+        bitMap = new HashMap<>();
+
+        threadsAdapter = new ThreadsAdapter(clickCallback, null);
+        threadsView.setAdapter(threadsAdapter);
+        threadsView.setHasFixedSize(true);
+        GridLayoutManager glm = new GridLayoutManager(ThreadsActivity.this, 2);
+        threadsView.setLayoutManager(glm);
+        Util.calcDynamicSpanCountById(ThreadsActivity.this, threadsView, glm, R.dimen.column_width);
+
+        if (savedInstanceState == null) load();
+    }
+
+    @Override protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(THREADS, Parcels.wrap(threads));
+        outState.putParcelable(THREADMAP, Parcels.wrap(threadMap));
+    }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
 
     View.OnClickListener clickCallback = new View.OnClickListener() {
         @Override public void onClick(View v) {
-            ThreadView tv = (ThreadView) v;
+            final ThreadView tv = (ThreadView) v;
             Thread thread = tv.thread;
             if (thread.dead) {
                 showToast(R.string.no_thread);
                 return;
             }
             pauseUpdating = true;
-            Drawable d = null;
-            // Why not just `b = ((BitmapDrawable) tv.image.getDrawable()).getBitmap();`
-            // You see, tv.image.getDrawable is not of type BitmapDrawable but IonDrawable and
-            // IonDrawable is not public so bad luck. That's the whole reason for bitMap.
-            Bitmap b = bitMap.get(thread.number);
-            if (b != null) {
-                b = b.copy(b.getConfig(), true);
-                d = new BitmapDrawable(getResources(), b);
-            }
-            final PostsFragment f = PostsFragment.create(board.name, thread.number);
-            f.opPost = thread.toOpPost();
-            f.opImage = d;
-            if (transitionsAllowed()) {
-                if (Build.VERSION.SDK_INT >= 21) { // To make inspection shut up
-                    ThreadsFragment.this.setExitTransition(null);
-                    f.setEnterTransition(inflateTransition(android.R.transition.slide_bottom));
-                    f.setReturnTransition(inflateTransition(android.R.transition.fade));
-                    f.setSharedElementEnterTransition(inflateTransition(android.R.transition.move));
-                    f.setSharedElementReturnTransition(null);
-                    f.transitionDuration = 450;
-                    tv.image.setTransitionName("op");
-                    startTransaction(f)
-                            .addSharedElement(tv.image, "op")
-                            .commit();
-                }
-            } else {
-                startTransaction(f).commit();
-            }
+            String uuid = UUID.randomUUID().toString();
+            PostsActivity.launch(
+                    ThreadsActivity.this, tv.image, uuid,
+                    thread.toOpPost(), board.name, thread.number
+            );
         }
     };
-
-    // Construction ////////////////////////////////////////////////////////////////////////////////
-
-    @InjectView(R.id.threads) RecyclerView threadsView;
-
-    private Board board;
-    private ArrayList<Thread> threads;
-    private HashMap<String, Integer> threadMap;
-    private WeakHashMap<String, Bitmap> bitMap; // To work around IonDrawable not being public
-    private ThreadsAdapter threadsAdapter;
-
-    public static ThreadsFragment create(Board board) {
-        ThreadsFragment f = new ThreadsFragment();
-        Bundle b = new Bundle();
-        b.putParcelable("board", board);
-        f.setArguments(b);
-        return f;
-    }
-
-    @Override protected int getLayoutResource() { return R.layout.fragment_threads; }
-
-    @Override
-    public void onActivityCreated2(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated2(savedInstanceState);
-
-        board = getArguments().getParcelable("board");
-        threads = new ArrayList<>();
-        threadMap = new HashMap<>();
-        bitMap = new WeakHashMap<>();
-
-        threadsAdapter = new ThreadsAdapter(clickCallback, null);
-        threadsView.setAdapter(threadsAdapter);
-        threadsView.setHasFixedSize(true);
-        GridLayoutManager glm = new GridLayoutManager(context, 2);
-        threadsView.setLayoutManager(glm);
-        Util.calcDynamicSpanCountById(context, threadsView, glm, R.dimen.column_width);
-
-        load();
-        initBackgroundUpdater();
-    }
 
     // Data Loading ////////////////////////////////////////////////////////////////////////////////
 
@@ -138,12 +140,13 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 boolean empty = threads.isEmpty();
                 threads.clear();
                 threadMap.clear();
+                bitMap.clear(); // prevent strong references to possibly stale bitmaps
                 for (int i = 0; i < result.size(); i++) {
                     Thread thread = result.get(i);
                     threads.add(thread);
                     threadMap.put(thread.number, i);
                 }
-                if (empty && transitionsAllowed()) {
+                if (empty) {
                     animateThreadsArrival();
                 } else {
                     threadsAdapter.notifyDataSetChanged();
@@ -174,29 +177,24 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 }
                 for (int i = 0; i < positions.length; i++)
                     if (!positions[i]) threads.get(i).dead = true;
-                threadsAdapter.notifyDataSetChanged();
+                threadsAdapter.notifyDataSetChangedWithoutBlinking();
                 lastUpdate = System.currentTimeMillis();
             }
         });
     }
 
-    @Override
-    protected void cancelPending() {
+    @Override protected void cancelPending() {
         super.cancelPending();
         ion.cancelAll(this);
     }
 
     // Lifecycle ///////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void onResume() {
+    @Override public void onResume() {
         super.onResume();
-        activity.setTitle(board.name);
         update();
-        threadsAdapter.notifyDataSetChanged();
         initBackgroundUpdater();
         pauseUpdating = false;
-        setupTransitions();
     }
 
     @Override public void onConfigurationChanged(Configuration newConfig) {
@@ -204,22 +202,19 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         Util.updateRecyclerViewGridOnConfigChange(threadsView, R.dimen.column_width);
     }
 
-    @Override
-    public void onStop() {
+    @Override public void onStop() {
         super.onStop();
         pauseUpdating = true;
     }
 
     // Toolbar Menu ////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.threads, menu);
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.threads, menu);
+        return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.refresh:
                 load();
@@ -228,7 +223,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                 threadsView.scrollToPosition(0);
                 break;
             case R.id.favorize:
-                BoardsFragment.showAddFavoriteDialog(context, persistentData, board);
+                BoardsActivity.showAddFavoriteDialog(this, persistentData, board);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -251,7 +246,7 @@ public class ThreadsFragment extends SwipeRefreshFragment {
                     if (!prefs.getBoolean(Settings.REFRESH, true)) return;
                     if (pauseUpdating) return;
                     if (System.currentTimeMillis() - lastUpdate > updateInterval) {
-                        activity.runOnUiThread(new Runnable() {
+                        runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 update();
@@ -263,38 +258,50 @@ public class ThreadsFragment extends SwipeRefreshFragment {
         }
     }
 
-    // Transitions /////////////////////////////////////////////////////////////////////////////////
+    // Animations //////////////////////////////////////////////////////////////////////////////////
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void animateThreadsArrival() {
-        if (transitionsAllowed()) {
-            threadsAdapter.hide = true;
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
             threadsAdapter.notifyDataSetChanged();
-            TransitionManager.beginDelayedTransition(threadsView, new Slide(Gravity.BOTTOM));
-            threadsAdapter.hide = false;
-            threadsAdapter.notifyDataSetChanged();
+            return;
         }
+        // Add slight delay because thumbnails must be retrieved, too,
+        // and it looks bad when the thumbnails are loaded afterwards.
+        threadsView.postDelayed(new Runnable() {
+            @Override public void run() {
+                threadsAdapter.hide = true;
+                threadsAdapter.notifyDataSetChanged();
+                TransitionManager.beginDelayedTransition(threadsView, new Slide(Gravity.BOTTOM));
+                threadsAdapter.hide = false;
+                threadsAdapter.notifyDataSetChanged();
+            }
+        }, 300);
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void setupTransitions() {
-        if (transitionsAllowed()) {
-            setExitTransition(new Slide(Gravity.BOTTOM));
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    @Override public void onDestroy() {
         if (executor != null) executor.shutdown();
+        super.onDestroy();
     }
 
     // Adapters ////////////////////////////////////////////////////////////////////////////////////
 
     class ThreadsAdapter extends UiAdapter<Thread> {
-        boolean hide;
+        boolean onlyUpdateText;
+        boolean hide = false;
 
         public ThreadsAdapter(View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
-            super(ThreadsFragment.this.context, clickListener, longClickListener);
+            super(ThreadsActivity.this, clickListener, longClickListener);
             this.items = threads;
+        }
+
+        public void notifyDataSetChangedWithoutBlinking() {
+            onlyUpdateText = true;
+            notifyDataSetChanged();
+            threadsView.postDelayed(new Runnable() {
+                @Override public void run() {
+                    onlyUpdateText = false;
+                }
+            }, 1000);
         }
 
         @Override public View newView(ViewGroup container) {
@@ -303,13 +310,9 @@ public class ThreadsFragment extends SwipeRefreshFragment {
 
         @Override public void bindView(Thread item, int position, View view) {
             ThreadView tv = (ThreadView) view;
-            tv.bindTo(item, board.name, ion, bitMap);
+            tv.bindTo(item, board.name, ion, onlyUpdateText, bitMap);
             if (hide) tv.setVisibility(View.GONE);
             else tv.setVisibility(View.VISIBLE);
-            if (Build.VERSION.SDK_INT >= 21) {
-                tv.image.setTransitionName(null);
-            }
         }
     }
 }
-

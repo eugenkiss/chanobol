@@ -3,7 +3,15 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="@dimen/column_width_gallery"
     android:layout_height="@dimen/row_height_gallery"
-    android:layout_margin="4dp"
-    android:scaleType="fitXY"
-    />
+    android:layout_margin="3dp"
+    android:foreground="?attr/selectableItemBackground"
+    >
 
+    <ImageView
+        android:id="@+id/image"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        />
+
+</anabolicandroids.chanobol.ui.images.GalleryThumbView>

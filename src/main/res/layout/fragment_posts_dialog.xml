@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="#99000000"
     android:clickable="true"
+    android:paddingTop="?attr/actionBarSize"
     >
 
     <ListView

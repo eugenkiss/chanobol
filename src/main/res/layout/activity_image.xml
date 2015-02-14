@@ -5,17 +5,26 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     >
-
     <View
+        android:id="@+id/revealbg"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@color/bg"
+        android:visibility="invisible"
         />
 
-    <uk.co.senab.photoview.PhotoView
-        android:id="@+id/image"
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        />
+
+    <ProgressBar
+        android:id="@+id/progressbar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="gone"
         />
 
 </FrameLayout>
