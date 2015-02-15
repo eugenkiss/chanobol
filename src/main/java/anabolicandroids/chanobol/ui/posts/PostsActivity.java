@@ -30,7 +30,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.google.common.collect.Lists;
 import com.koushikdutta.async.future.FutureCallback;
 import com.nineoldandroids.view.ViewHelper;
 
@@ -481,7 +480,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     private void setupUpLongClickCloseAll() {
         if (Build.VERSION.SDK_INT >= 14) {
             toolbar.setNavigationContentDescription("up");
-            final ArrayList<View> outViews = Lists.newArrayList();
+            final ArrayList<View> outViews = new ArrayList<>();
             toolbar.findViewsWithText(outViews, "up", View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
             if (outViews.size() == 0 || outViews.get(0) == null) return;
             outViews.get(0).setOnLongClickListener(new View.OnLongClickListener() {

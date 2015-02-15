@@ -42,6 +42,10 @@ Mockmode currently is not really working, see issues
 [#34](https://github.com/eugenkiss/chanobol/issues/34) and
 [#47](https://github.com/eugenkiss/chanobol/issues/34).
 
+If you clone this project and want to build/run it you will need to comment
+some lines in `build.gradle`. `build.gradle` contains information about
+the offending lines. Sadly, I could not find a better way.
+
 
 Motivation
 ----------
