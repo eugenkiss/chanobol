@@ -141,7 +141,7 @@ public class Util {
                         rv.getViewTreeObserver().removeGlobalOnLayoutListener(this);
                         int viewWidth = rv.getMeasuredWidth();
                         int newSpanCount = (int) Math.floor(viewWidth / cardWidth);
-                        glm.setSpanCount(newSpanCount);
+                        glm.setSpanCount(Math.max(1, newSpanCount));
                         glm.requestLayout();
                     }
                 });
