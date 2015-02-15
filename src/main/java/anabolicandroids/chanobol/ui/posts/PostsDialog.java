@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.FragmentManager;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
@@ -48,7 +49,8 @@ public class PostsDialog extends BaseFragment {
         animatePostsRemoval();
         postsView.postDelayed(new Runnable() {
             @Override public void run() {
-                getFragmentManager().popBackStack();
+                FragmentManager fm = getFragmentManager();
+                if (fm != null) fm.popBackStack();
             }
         }, ANIM_DURATION);
     }
