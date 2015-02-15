@@ -129,6 +129,20 @@ public class PostView extends CardView {
         image.setOnClickListener(l);
     }
 
+    private void initWebmCallback(final String url) {
+        OnClickListener l = new OnClickListener() {
+            @Override public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(url), "video/webm");
+                if(intent.resolveActivity(getContext().getPackageManager()) != null)
+                    getContext().startActivity(intent);
+                else
+                    Util.showToast(getContext(), R.string.no_app);
+            }
+        };
+        imageTouchOverlay.setOnClickListener(l);
+        image.setOnClickListener(l);
+    }
+
     private void initText(final Ion ion,
                           final Post post,
                           final PostsActivity.RepliesCallback repliesCallback,
@@ -239,7 +253,6 @@ public class PostView extends CardView {
         initText(ion, post, repliesCallback, referencedPostCallback);
 
         if (post.imageId != null && !"null".equals(post.imageId)) {
-
             final int[] size = new int[2]; calcSize(size, post);
             progress.setVisibility(View.VISIBLE);
             image.setVisibility(View.VISIBLE);
@@ -262,16 +275,7 @@ public class PostView extends CardView {
                             case ".webm":
                                 progress.setVisibility(View.GONE);
                                 play.setVisibility(View.VISIBLE);
-                                image.setOnClickListener(new OnClickListener() {
-                                    @Override public void onClick(View v) {
-                                    Intent intent = new Intent(Intent.ACTION_VIEW)
-                                            .setDataAndType(Uri.parse(url), "video/webm");
-                                    if(intent.resolveActivity(getContext().getPackageManager()) != null)
-                                        getContext().startActivity(intent);
-                                    else
-                                        Util.showToast(getContext(), R.string.no_app);
-                                    }
-                                });
+                                initWebmCallback(url);
                                 break;
                             default:
                                 initImageCallback(ImagePointer.from(post), true, imageCallback);
