@@ -22,6 +22,7 @@ import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import com.google.common.collect.Lists;
 import com.koushikdutta.async.future.FutureCallback;
 import com.nineoldandroids.view.ViewHelper;
 
@@ -155,6 +157,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         postsView.addItemDecoration(new SpacesItemDecoration((int) resources.getDimension(R.dimen.post_spacing)));
 
         getSupportFragmentManager().addOnBackStackChangedListener(backStackChangedListener);
+        setupUpLongClickCloseAll();
 
         if (firstLoad) {
             posts.add(opPost);
@@ -391,7 +394,7 @@ public class PostsActivity extends SwipeRefreshActivity {
                 GalleryActivity.launch(this, boardName, threadNumber, imagePointers);
                 break;
             case R.id.close:
-                getSupportFragmentManager().popBackStack(PostsDialog.STACK_ID, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+                dismissAllPostsDialogs();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -464,6 +467,37 @@ public class PostsActivity extends SwipeRefreshActivity {
         }
     }
 
+    @Override public boolean onKeyLongPress(int keyCode, KeyEvent event) {
+        FragmentManager fm = getSupportFragmentManager();
+        int stackHeight = fm.getBackStackEntryCount();
+        if (stackHeight > 0 && keyCode == KeyEvent.KEYCODE_BACK) {
+            dismissAllPostsDialogs();
+            return true;
+        }
+        return super.onKeyLongPress(keyCode, event);
+    }
+
+    // http://stackoverflow.com/a/27180584/283607
+    private void setupUpLongClickCloseAll() {
+        if (Build.VERSION.SDK_INT >= 14) {
+            toolbar.setNavigationContentDescription("up");
+            final ArrayList<View> outViews = Lists.newArrayList();
+            toolbar.findViewsWithText(outViews, "up", View.FIND_VIEWS_WITH_CONTENT_DESCRIPTION);
+            if (outViews.size() == 0 || outViews.get(0) == null) return;
+            outViews.get(0).setOnLongClickListener(new View.OnLongClickListener() {
+                @Override public boolean onLongClick(View v) {
+                    FragmentManager fm = getSupportFragmentManager();
+                    int stackHeight = fm.getBackStackEntryCount();
+                    if (stackHeight > 0 && !drawerLayout.isDrawerOpen(drawer)) {
+                        dismissAllPostsDialogs();
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
+    }
+
     private void showPostsDialog(Post repliedTo, List<Post> posts) {
         PostsDialog dialog = new PostsDialog();
         dialog.repliedTo = repliedTo;
@@ -476,6 +510,22 @@ public class PostsActivity extends SwipeRefreshActivity {
         dialog.quotedBy = quotedBy;
         dialog.adapter = new PostsDialogAdapter(Arrays.asList(post));
         addPostsDialog(dialog);
+    }
+
+    boolean removingAll = false;
+    private void dismissAllPostsDialogs() {
+        if (removingAll) return;
+        removingAll = true;
+        FragmentManager fm = getSupportFragmentManager();
+        for (Fragment f : fm.getFragments()) { if (f instanceof PostsDialog) { PostsDialog d = (PostsDialog) f;
+            d.animatePostsRemoval();
+        }}
+        postsView.postDelayed(new Runnable() {
+            @Override public void run() {
+                removingAll = false;
+                getSupportFragmentManager().popBackStack(PostsDialog.STACK_ID, FragmentManager.POP_BACK_STACK_INCLUSIVE);
+            }
+        }, PostsDialog.ANIM_DURATION);
     }
 
     public static Pattern postReferencePattern = Pattern.compile("#p(\\d+)");
