@@ -320,12 +320,12 @@ public class ImageActivity extends UiActivity {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void hideBackground() {
         int cx = revealPoint.x;
         int cy = revealPoint.y;
-        int initialRadius = background.getWidth();
+        int initialRadius = Math.max(background.getWidth(), background.getHeight());
         Animator anim = ViewAnimationUtils.createCircularReveal(
                 background, cx, cy, initialRadius, revealRadius
         );
-        anim.setDuration(350);
-        anim.setStartDelay(250);
+        anim.setDuration(300);
+        anim.setStartDelay(100);
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {

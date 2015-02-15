@@ -311,8 +311,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         @Override public void bindView(Thread item, int position, View view) {
             ThreadView tv = (ThreadView) view;
             tv.bindTo(item, board.name, ion, onlyUpdateText, bitMap);
-            if (hide) tv.setVisibility(View.GONE);
-            else tv.setVisibility(View.VISIBLE);
+            setVisibility(tv, !hide);
         }
     }
 }

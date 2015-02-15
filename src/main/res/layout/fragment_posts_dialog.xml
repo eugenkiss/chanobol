@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:id="@+id/blackness"
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#99000000"
-    android:clickable="true"
     android:paddingTop="?attr/actionBarSize"
+    android:transitionGroup="false"
     >
+
+    <View
+        android:id="@+id/blackness"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:background="#99000000"
+        android:visibility="invisible"
+        />
 
     <ListView
         android:id="@+id/posts"
@@ -15,4 +22,4 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         />
-</LinearLayout>
+</FrameLayout>

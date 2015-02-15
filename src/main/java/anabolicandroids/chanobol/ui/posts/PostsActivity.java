@@ -444,6 +444,26 @@ public class PostsActivity extends SwipeRefreshActivity {
         }
     };
 
+    boolean removing = false;
+    @Override public void onBackPressed() {
+        if (removing) return;
+        FragmentManager fm = getSupportFragmentManager();
+        int stackHeight = fm.getBackStackEntryCount();
+        if (stackHeight > 0) {
+            removing = true;
+            PostsDialog dialog = (PostsDialog) fm.getFragments().get(stackHeight-1);
+            dialog.animatePostsRemoval();
+            postsView.postDelayed(new Runnable() {
+                @Override public void run() {
+                    removing = false;
+                    PostsActivity.super.onBackPressed();
+                }
+            }, PostsDialog.ANIM_DURATION);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
     private void showPostsDialog(Post repliedTo, List<Post> posts) {
         PostsDialog dialog = new PostsDialog();
         dialog.repliedTo = repliedTo;
@@ -537,9 +557,7 @@ public class PostsActivity extends SwipeRefreshActivity {
 
         @Override public void bindView(final Post item, int position, View view) {
             bindViewDRY(item, position, view);
-            //if (hide && Util.implies(firstLoad, position != 0)) view.setVisibility(View.GONE);
-            if (hide && position != 0) view.setVisibility(View.GONE);
-            else view.setVisibility(View.VISIBLE);
+            setVisibility(view, !hide || position == 0);
         }
     }
 
@@ -563,6 +581,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     class PostsDialogAdapter extends BindableAdapter<Post> {
+        boolean hide = false;
         List<Post> items;
 
         public PostsDialogAdapter(List<Post> posts) {
@@ -576,6 +595,7 @@ public class PostsActivity extends SwipeRefreshActivity {
 
         @Override public void bindView(final Post item, int position, View view) {
             bindViewDRY(item, position, view);
+            setVisibility(view, !hide);
         }
 
         @Override public int getCount() { return items.size(); }
