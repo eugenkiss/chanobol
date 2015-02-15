@@ -301,7 +301,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
                 @Override public void run() {
                     onlyUpdateText = false;
                 }
-            }, 1000);
+            }, 500);
         }
 
         @Override public View newView(ViewGroup container) {

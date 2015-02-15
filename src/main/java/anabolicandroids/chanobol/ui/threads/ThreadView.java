@@ -43,7 +43,8 @@ public class ThreadView extends FrameLayout {
         this.thread = thread;
         numReplies.setText(thread.replies+"r");
         numImages.setText(thread.images+"i");
-        if (!onlyUpdateText) {
+        Bitmap b = bitMap.get(thread.number);
+        if (!onlyUpdateText || b == null) {
             ion.build(image)
                     .load(ApiModule.thumbUrl(boardName, thread.imageId))
                     .withBitmapInfo()
@@ -55,7 +56,7 @@ public class ThreadView extends FrameLayout {
                         }
                     });
         } else {
-            image.setImageDrawable(new BitmapDrawable(getResources(), bitMap.get(thread.number)));
+            image.setImageDrawable(new BitmapDrawable(getResources(), b));
         }
         String s = thread.subject;
         if (s == null) s = "";
