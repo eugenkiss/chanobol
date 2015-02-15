@@ -11,6 +11,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.DrawerLayout;
@@ -22,6 +23,7 @@ import android.text.SpannableString;
 import android.text.method.LinkMovementMethod;
 import android.text.util.Linkify;
 import android.util.AttributeSet;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -408,5 +410,22 @@ public abstract class UiActivity extends BaseActivity {
             shortName.setText(board.name);
             longName.setText(board.title);
         }
+    }
+
+    // Workarounds /////////////////////////////////////////////////////////////////////////////////
+
+    // See http://stackoverflow.com/a/27024610/283607
+    @Override public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_MENU && "LGE".equalsIgnoreCase(Build.BRAND)) {
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+    @Override public boolean onKeyUp(int keyCode, @NonNull KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_MENU && "LGE".equalsIgnoreCase(Build.BRAND)) {
+            openOptionsMenu();
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
     }
 }
