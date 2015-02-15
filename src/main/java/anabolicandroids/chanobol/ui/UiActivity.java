@@ -67,7 +67,8 @@ import butterknife.OnClick;
 // http://stackoverflow.com/a/26526858/283607
 public abstract class UiActivity extends BaseActivity {
 
-    public static int RIPPLE_DELAY = 250;
+    public static int RIPPLE_DELAY = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ?
+            250 : 50;
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 

@@ -16,6 +16,7 @@ import android.widget.ListView;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Post;
+import anabolicandroids.chanobol.ui.UiActivity;
 import anabolicandroids.chanobol.util.BaseFragment;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
@@ -25,7 +26,8 @@ import butterknife.OnClick;
 public class PostsDialog extends BaseFragment {
 
     public static final String STACK_ID = "postsdialog";
-    public static final int ANIM_DURATION = 500;
+    public static final int ANIM_DURATION = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ?
+            500 : UiActivity.RIPPLE_DELAY;
 
     @InjectView(R.id.blackness) View background;
     // Why not RecyclerView? It _used to be_ RecyclerView but as the by default provided
