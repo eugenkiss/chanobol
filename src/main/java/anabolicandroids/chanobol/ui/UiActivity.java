@@ -350,16 +350,30 @@ public abstract class UiActivity extends BaseActivity {
 
     // In order to not repeat shared status-, navigation- and toolbar.
     // http://stackoverflow.com/a/26748694/283607
-    @SafeVarargs
+    @SuppressWarnings("ConstantConditions") @SafeVarargs
     public static ActivityOptionsCompat makeSceneTransitionAnimation(Activity activity, Pair<View, String>... shared)  {
         List<Pair<View, String>> pairs = new ArrayList<>();
+        // Because of the following crash on some devices I need to be extra careful:
+        // "java.lang.IllegalArgumentException: Shared element must not be null"
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            pairs.add(Pair.create(activity.findViewById(android.R.id.navigationBarBackground), Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME));
-            pairs.add(Pair.create(activity.findViewById(android.R.id.statusBarBackground), Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME));
+            View v; String s;
+            v = activity.findViewById(android.R.id.navigationBarBackground);
+            s = Window.NAVIGATION_BAR_BACKGROUND_TRANSITION_NAME;
+            if (v != null && s != null) pairs.add(Pair.create(v, s));
+            v = activity.findViewById(android.R.id.statusBarBackground);
+            s = Window.STATUS_BAR_BACKGROUND_TRANSITION_NAME;
+            if (v != null && s != null) pairs.add(Pair.create(v, s));
             // Assumed that toolbar in layout has transitionname 'toolbar'
-            pairs.add(Pair.create(activity.findViewById(R.id.toolbar), "toolbar"));
+            v = activity.findViewById(R.id.toolbar);
+            s = "toolbar";
+            if (v != null && s != null) pairs.add(Pair.create(v, s));
+            // The custom elements
+            for (Pair<View, String> p : shared) {
+                v = p.first;
+                s = p.second;
+                if (v != null && s != null) pairs.add(Pair.create(v, s));
+            }
         }
-        Collections.addAll(pairs, shared);
         //noinspection unchecked
         return ActivityOptionsCompat.makeSceneTransitionAnimation(activity, pairs.toArray(new Pair[pairs.size()]));
     }
