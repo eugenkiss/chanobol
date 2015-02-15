@@ -262,10 +262,15 @@ public class ImageActivity extends UiActivity {
     }
 
     private void updateToolbarShadow() {
+        if (Build.VERSION.SDK_INT < 11) return;
         try {
             toolbar.setDrawingCacheEnabled(true);
             toolbar.buildDrawingCache();
             Bitmap bm = toolbar.getDrawingCache();
+            if (bm == null) {
+                toolbar.setDrawingCacheEnabled(false);
+                return;
+            }
             if (Build.VERSION.SDK_INT < 12) bm = Util.setHasAlphaCompat(bm);
             else bm.setHasAlpha(true);
             toolbarShadow.setImageBitmap(Util.blur(this, bm, 1f));
