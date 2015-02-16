@@ -68,8 +68,6 @@ public class PostsDialog extends BaseFragment {
 
     @Override public void onResume() {
         super.onResume();
-        adapter.notifyDataSetChanged();
-        postsView.requestLayout();
         if (repliedTo != null)
             getActivity().setTitle(resources.getString(R.string.replies_to) + " " + repliedTo.number);
         else if (quotedBy != null)
