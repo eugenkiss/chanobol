@@ -321,7 +321,7 @@ public class PostsActivity extends SwipeRefreshActivity {
                     if (p.imageId != null) {
                         if (prefs.getBoolean(Settings.PRELOAD_THUMBNAILS, true))
                             ion.build(PostsActivity.this).load(ApiModule.thumbUrl(boardName, p.imageId)).asBitmap().tryGet();
-                        imagePointers.add(new ImagePointer(p.imageId, p.imageExtension));
+                        imagePointers.add(new ImagePointer(p.imageId, p.imageExtension, p.imageWidth, p.imageHeight));
                     }
                 }
                 lastUpdate = System.currentTimeMillis();

@@ -145,9 +145,9 @@ public class GalleryActivity extends SwipeRefreshActivity {
                     return;
                 }
                 imagePointers.clear();
-                for (Post p : result) {
-                    if (p.imageId != null) imagePointers.add(new ImagePointer(p.imageId, p.imageExtension));
-                }
+                for (Post p : result) { if (p.imageId != null) {
+                    imagePointers.add(new ImagePointer(p.imageId, p.imageExtension, p.imageWidth, p.imageHeight));
+                }}
                 galleryAdapter.notifyDataSetChanged();
                 loaded();
             }

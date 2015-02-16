@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.builder.Builders;
 
 import org.parceler.Parcels;
 
@@ -50,6 +51,8 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 // https://plus.google.com/app/basic/photos/108918686796284921012/album/6082900202909178977/6082900205521388114
 public class ImageActivity extends UiActivity {
 
+    private static int THRESHOLD_IMG_SIZE = 3000;
+
     // Construction ////////////////////////////////////////////////////////////////////////////////
 
     private static String EXTRA_TRANSITIONNAME = "transitionName";
@@ -64,6 +67,7 @@ public class ImageActivity extends UiActivity {
     private static String EXTRA_INDEX = "index";
     private static String EXTRA_IMAGEPOINTERS = "imagePointers";
 
+    private ImagePointer current;
     private String url;
     private Bitmap bm;
     private boolean loaded;
@@ -122,9 +126,9 @@ public class ImageActivity extends UiActivity {
         List<ImagePointer> imagePointers = Parcels.unwrap(b.getParcelable(EXTRA_IMAGEPOINTERS));
         fromThumbnail = b.getBoolean(EXTRA_FROM_THUMBNAIL);
 
-        ImagePointer imagePointer = imagePointers.get(index);
-        url = ApiModule.imgUrl(boardName, imagePointer.id, imagePointer.ext);
-        String thumbUrl = ApiModule.thumbUrl(boardName, imagePointer.id);
+        current = imagePointers.get(index);
+        url = ApiModule.imgUrl(boardName, current.id, current.ext);
+        String thumbUrl = ApiModule.thumbUrl(boardName, current.id);
         // Blocking load s.t. imageView is initialized before transition begins to avoid glitches.
         // This is not a big problem because Ion has loaded the image previously.
         // Note: Somehow Ion's future callback wasn't called when postponeEnterTransaition was
@@ -132,7 +136,11 @@ public class ImageActivity extends UiActivity {
         // Curiosly, it did work once with a  gifs... see https://github.com/koush/ion/issues/486
         ViewCompat.setTransitionName(imageView, transitionName);
         try {
-            bm = ion.build(this).load(fromThumbnail ? thumbUrl : url).asBitmap().get();
+            // This is actually problematic for big images -> can lead to out of memory error because
+            // bm is not resized. But if I resize it the following call apparently takes too long
+            // and the activity crashes because of this... So use a compromise.
+            boolean useThumbnail = fromThumbnail || current.w > THRESHOLD_IMG_SIZE || current.h > THRESHOLD_IMG_SIZE;
+            bm = ion.build(this).load(useThumbnail ? thumbUrl : url).asBitmap().get();
             imageView.setImageBitmap(bm);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
@@ -191,11 +199,11 @@ public class ImageActivity extends UiActivity {
     }
 
     private void setup() {
-        ion.build(imageView)
+        Builders.IV.F<?> b = ion.build(imageView)
                 // Placeholder _and_ crossfade to prevent blinking
                 .crossfade(true)
-                .placeholder(new BitmapDrawable(resources, bm))
-                .deepZoom()
+                .placeholder(new BitmapDrawable(resources, bm));
+                if (current.h > THRESHOLD_IMG_SIZE || current.h > THRESHOLD_IMG_SIZE) b = b.deepZoom(); b
                 .load(url)
                 .setCallback(new FutureCallback<ImageView>() {
                     @Override public void onCompleted(Exception e, ImageView result) {
@@ -203,7 +211,7 @@ public class ImageActivity extends UiActivity {
                         progressbar.setVisibility(View.GONE);
                         attacher = new PhotoViewAttacher(imageView);
                         // TODO: Makes application break after a while of zooming in and out
-                        //imageView.setMaximumScale(25); // Default value is too small for some images
+                        attacher.setMaximumScale(25); // Default value is too small for some images
                     }
                 });
         if (fromThumbnail) {
