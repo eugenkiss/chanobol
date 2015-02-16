@@ -156,7 +156,8 @@ public class GalleryActivity extends SwipeRefreshActivity {
 
     @Override protected void cancelPending() {
         super.cancelPending();
-        ion.cancelAll(this);
+        // TODO: Reenable once https://github.com/koush/ion/issues/422 is fixed
+        //ion.cancelAll(this);
     }
 
     // Lifecycle ///////////////////////////////////////////////////////////////////////////////////
