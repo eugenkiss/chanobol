@@ -207,6 +207,7 @@ public class ImageActivity extends UiActivity {
                 .load(url)
                 .setCallback(new FutureCallback<ImageView>() {
                     @Override public void onCompleted(Exception e, ImageView result) {
+                        if (e != null) return;
                         loaded = true;
                         progressbar.setVisibility(View.GONE);
                         attacher = new PhotoViewAttacher(imageView);
