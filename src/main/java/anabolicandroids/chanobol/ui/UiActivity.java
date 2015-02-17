@@ -40,7 +40,6 @@ import com.koushikdutta.ion.Ion;
 import com.nineoldandroids.view.ViewHelper;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -51,6 +50,7 @@ import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.BuildConfig;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.annotations.ForApplication;
+import anabolicandroids.chanobol.annotations.SfwMode;
 import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
@@ -72,6 +72,7 @@ public abstract class UiActivity extends BaseActivity {
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 
+    @Inject @SfwMode boolean sfw;
     @Inject @Named("DebugSettings") Class debugSettingsClass;
     @Inject @ForApplication public Context appContext;
     @Inject public App app;
@@ -86,6 +87,7 @@ public abstract class UiActivity extends BaseActivity {
     @InjectView(R.id.loadingBar) public ProgressBar loadingBar;
     @InjectView(R.id.drawerLayout) public DrawerLayout drawerLayout;
     @InjectView(R.id.drawer) public LinearLayout drawer;
+    @InjectView(R.id.allBoards) public TextView allBoards;
     @InjectView(R.id.debugSettings) public TextView debugSettings;
     @InjectView(R.id.favoriteBoardsHeader) public CompatTextView favoriteBoardsHeader;
     @InjectView(R.id.favoriteBoards) public ListView favoriteBoardsView;
@@ -112,6 +114,7 @@ public abstract class UiActivity extends BaseActivity {
         ButterKnife.inject(this);
 
         if (BuildConfig.DEBUG) debugSettings.setVisibility(View.VISIBLE);
+        if (sfw) allBoards.setVisibility(View.GONE);
 
         setSupportActionBar(toolbar);
         setupDrawer();

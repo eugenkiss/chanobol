@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.annotations.Nsfw;
+import anabolicandroids.chanobol.annotations.SfwMode;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.PersistentData;
 import anabolicandroids.chanobol.ui.UiActivity;
@@ -42,6 +43,7 @@ public class FavoritesActivity extends UiActivity {
 
     @InjectView(R.id.boards) RecyclerView favoritesView;
 
+    @Inject @SfwMode boolean sfw;
     @Inject @Nsfw List<Board> allBoards;
     BoardsAdapter boardsAdapter;
 
@@ -53,10 +55,11 @@ public class FavoritesActivity extends UiActivity {
         super.onCreate(savedInstanceState);
         setTitle(R.string.favorite_boards);
 
-        if (App.firstStart && persistentData.getFavorites().size() == 0) {
+        if (!sfw && App.firstStart && persistentData.getFavorites().size() == 0) {
             App.firstStart = false;
             BoardsActivity.launch(this);
         }
+        App.firstStart = false;
 
         boardsAdapter = new BoardsAdapter(this, ion,
                 new ArrayList<>(persistentData.getFavorites()),
