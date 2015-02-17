@@ -422,7 +422,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         fm.beginTransaction()
                 .add(R.id.container, d)
                 .addToBackStack(PostsDialog.STACK_ID)
-                .commit();
+                .commitAllowingStateLoss();
     }
 
     FragmentManager.OnBackStackChangedListener backStackChangedListener = new FragmentManager.OnBackStackChangedListener() {
