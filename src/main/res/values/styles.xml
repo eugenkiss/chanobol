@@ -3,14 +3,11 @@
     <style name="AppTheme" parent="Theme.AppCompat" >
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="android:actionButtonStyle">@style/ActionButtonStyle</item>
-        <item name="actionButtonStyle">@style/ActionButtonStyle</item>
-        <item name="android:actionOverflowButtonStyle">@style/ActionButtonOverflowStyle</item>
-        <item name="actionOverflowButtonStyle">@style/ActionButtonOverflowStyle</item>
-        <item name="drawerArrowStyle">@style/DrawerArrowStyle</item>
+
         <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBarOverlay">true</item>
         <item name="windowActionBar">false</item>
+
         <item name="android:windowNoTitle">true</item>
         <item name="android:windowActivityTransitions">true</item>
         <item name="android:windowContentTransitions">true</item>
@@ -18,22 +15,6 @@
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
         <item name="android:windowSharedElementEnterTransition">@transition/move</item>
         <item name="android:windowSharedElementReenterTransition">@transition/move</item>
-    </style>
-
-    <!-- TODO: I want to prevent the hamburger to arrow animation because the drawer is on top, but this does not work -->
-    <style name="DrawerArrowStyle" parent="Widget.AppCompat.DrawerArrowToggle">
-        <item name="spinBars">false</item>
-    </style>
-
-    <style name="ActionButtonOverflowStyle" parent="Widget.AppCompat.ActionButton.Overflow">
-        <!--<item name="android:minWidth">60dp</item>-->
-    </style>
-
-    <style name="ActionButtonStyle" parent="Widget.AppCompat.ActionButton">
-        <!--<item name="android:minWidth">60dp</item>-->
-        <!-- Why doesn't the following work! -->
-        <!--<item name="android:layout_marginRight">60dp</item>-->
-        <!--<item name="android:paddingRight">600dp</item>-->
     </style>
 
     <style name="Widget.Chanobol.Drawer.Header" parent="">
