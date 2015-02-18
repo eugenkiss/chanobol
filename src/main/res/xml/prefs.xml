@@ -15,9 +15,4 @@
         android:key="pref_refresh"
         android:title="Background Refresh"
         />
-    <CheckBoxPreference
-        android:defaultValue="true"
-        android:key="pref_transitions"
-        android:title="Transitions"
-        />
 </PreferenceScreen>
