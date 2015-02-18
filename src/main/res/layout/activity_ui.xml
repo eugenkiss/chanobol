@@ -3,9 +3,9 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:ignore="UnusedAttribute"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    tools:ignore="UnusedAttribute"
     >
 
     <FrameLayout
@@ -34,9 +34,9 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/toolbar"
-            android:transitionName="toolbar"
+            android:background="?attr/colorPrimary"
             android:elevation="4dp"
+            android:transitionName="toolbar"
             app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
             />
 

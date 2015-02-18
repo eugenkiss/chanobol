@@ -6,11 +6,12 @@
     <color name="colorSecondary">@color/material_deep_teal_200</color>
     <color name="colorSecondaryDark">@color/material_deep_teal_500</color>
 
-    <color name="windowBackgroundColor">#333333</color>
+    <color name="colorAccent">#CE93D8</color>
+    <color name="colorAccentTranslucent">#80CE93D8</color>
+
+    <color name="windowBackgroundColor">#212121</color>
     <color name="black_translucent">#80000000</color>
 
-    <item name="toolbar" type="color">@color/material_blue_grey_900</item>
-    <item name="drawer" type="color">@color/material_blue_grey_900</item>
     <item name="bg" type="color">#212121</item>
     <item name="fg" type="color">@color/background_floating_material_dark</item>
     <item name="fg2" type="color">#393939</item>
