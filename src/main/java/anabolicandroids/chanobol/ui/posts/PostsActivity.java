@@ -81,7 +81,8 @@ public class PostsActivity extends SwipeRefreshActivity {
     private static String POSTS = "posts";
     private static String POSTMAP = "postMap";
     private static String REPLIES = "replies";
-    private static String IMAGEPOINTERS = "imagepointers";
+    private static String IMAGEPOINTERS = "imagePointers";
+    private static String BITMAPCACHEKEYS = "bitmapCacheKeys";
     private ArrayList<Post> posts;
     private PostsAdapter postsAdapter;
     // Map from a post number to its post POJO
@@ -91,6 +92,8 @@ public class PostsActivity extends SwipeRefreshActivity {
     // This is provided to the gallery fragment so that it can immediately load its images without
     // waiting for the result of requesting the thread json and extracting its image references once more
     private ArrayList<ImagePointer> imagePointers;
+    // To remove all the bitmaps from Ion's cache once the activity's been destroyed
+    private ArrayList<String> bitmapCacheKeys;
 
     public static void launch(
             Activity activity, View transitionView, String transitionName,
@@ -138,12 +141,14 @@ public class PostsActivity extends SwipeRefreshActivity {
             postMap = new HashMap<>();
             replies = new HashMap<>();
             imagePointers = new ArrayList<>();
+            bitmapCacheKeys = new ArrayList<>();
         } else {
             firstLoad = false;
             posts = Parcels.unwrap(savedInstanceState.getParcelable(POSTS));
             postMap = Parcels.unwrap(savedInstanceState.getParcelable(POSTMAP));
             replies = Parcels.unwrap(savedInstanceState.getParcelable(REPLIES));
             imagePointers = Parcels.unwrap(savedInstanceState.getParcelable(IMAGEPOINTERS));
+            bitmapCacheKeys = Parcels.unwrap(savedInstanceState.getParcelable(BITMAPCACHEKEYS));
 
             previousToolbarPosition = savedInstanceState.getFloat(PREVIOUS_TOOLBAR_POSITION);
             previousStackHeight = savedInstanceState.getInt(PREVIOUS_STACK_HEIGHT);
@@ -191,6 +196,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         outState.putParcelable(POSTMAP, Parcels.wrap(postMap));
         outState.putParcelable(REPLIES, Parcels.wrap(replies));
         outState.putParcelable(IMAGEPOINTERS, Parcels.wrap(imagePointers));
+        outState.putParcelable(BITMAPCACHEKEYS, Parcels.wrap(bitmapCacheKeys));
 
         outState.putString(PREVIOUS_TITLE, previousTitle);
         outState.putFloat(PREVIOUS_TOOLBAR_POSITION, previousToolbarPosition);
@@ -368,6 +374,10 @@ public class PostsActivity extends SwipeRefreshActivity {
     @Override public void onDestroy() {
         if (executor != null) executor.shutdown();
         getSupportFragmentManager().removeOnBackStackChangedListener(backStackChangedListener);
+        for (String key : bitmapCacheKeys) {
+            ion.getBitmapCache().remove(key);
+        }
+        System.gc();
         super.onDestroy();
     }
 
@@ -623,7 +633,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         if (position == 0 && firstLoad) {
             v.bindToOp(opImage, transitionName, item, boardName, ion);
         } else {
-            v.bindTo(item, boardName, threadNumber, ion,
+            v.bindTo(item, boardName, threadNumber, ion, bitmapCacheKeys,
                      repliesCallback, referencedPostCallback, imageCallback);
         }
         if (position == 0)  ViewCompat.setTransitionName(v.image, transitionName);

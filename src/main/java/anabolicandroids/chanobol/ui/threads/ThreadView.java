@@ -40,10 +40,14 @@ public class ThreadView extends FrameLayout {
 
     public void bindTo(final Thread thread, String boardName, Ion ion,
                        boolean onlyUpdateText, final HashMap<String, Bitmap> bitMap) {
+        // Remove reference to bitmap which is out of view
+        if (this.thread != null) {
+            bitMap.remove(thread.number);
+        }
         this.thread = thread;
+        Bitmap b = bitMap.get(thread.number);
         numReplies.setText(thread.replies+"r");
         numImages.setText(thread.images+"i");
-        Bitmap b = bitMap.get(thread.number);
         if (!onlyUpdateText || b == null) {
             ion.build(image)
                     .load(ApiModule.thumbUrl(boardName, thread.imageId))

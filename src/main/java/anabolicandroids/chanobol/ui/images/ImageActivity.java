@@ -216,7 +216,9 @@ public class ImageActivity extends UiActivity {
                         attacher = new PhotoViewAttacher(imageView);
                         // TODO: Makes application break after a while of zooming in and out
                         attacher.setMaximumScale(25); // Default value is too small for some images
-                        bitmapCacheKey = result.getBitmapInfo().key;
+                        if (result.getBitmapInfo() != null) {
+                            bitmapCacheKey = result.getBitmapInfo().key;
+                        }
                     }
                 });
         if (fromThumbnail) {

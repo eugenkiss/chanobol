@@ -28,6 +28,8 @@ import com.koushikdutta.ion.bitmap.BitmapInfo;
 import com.koushikdutta.ion.builder.AnimateGifMode;
 import com.koushikdutta.ion.builder.Builders;
 
+import java.util.ArrayList;
+
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
@@ -245,6 +247,7 @@ public class PostView extends CardView {
 
     public void bindTo(final Post post, final String boardName,
                        @SuppressWarnings("UnusedParameters") final String threadId, final Ion ion,
+                       final ArrayList<String> bitmapCacheKeys,
                        final PostsActivity.RepliesCallback repliesCallback,
                        final PostsActivity.ReferencedPostCallback referencedPostCallback,
                        final PostsActivity.ImageCallback imageCallback) {
@@ -269,6 +272,7 @@ public class PostView extends CardView {
                             progress.setVisibility(View.GONE);
                             return;
                         }
+                        bitmapCacheKeys.add(result.getBitmapInfo().key);
                         final String ext = post.imageExtension;
                         final String url = ApiModule.imgUrl(boardName, post.imageId, post.imageExtension);
                         switch (ext) {
@@ -287,12 +291,15 @@ public class PostView extends CardView {
                                 // Resized Gifs don't animate apparently, that's the reason for the case analysis
                                 if (".gif".equals(ext)) placeholder.animateGif(AnimateGifMode.ANIMATE).smartSize(true);
                                 else placeholder.resize(size[W], size[H]);
-                                placeholder.load(url).setCallback(new FutureCallback<ImageView>() {
+                                placeholder.load(url).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                                     @Override
-                                    public void onCompleted(Exception e, final ImageView result) {
+                                    public void onCompleted(Exception e, final ImageViewBitmapInfo result) {
                                         progress.setVisibility(View.GONE);
                                         if (e != null) { return; }
                                         initImageCallback(ImagePointer.from(post), false, imageCallback);
+                                        if (result.getBitmapInfo() != null) {
+                                            bitmapCacheKeys.add(result.getBitmapInfo().key);
+                                        }
                                     }
                                 });
                                 break;
