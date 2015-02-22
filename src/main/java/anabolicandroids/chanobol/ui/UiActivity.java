@@ -134,18 +134,7 @@ public abstract class UiActivity extends BaseActivity {
         favoriteBoardsAdapter = new FavoritesAdapter(this, new ArrayList<>(persistentData.getFavorites()));
         favoriteBoardsView.setAdapter(favoriteBoardsAdapter);
         favoriteBoardsAdapter.notifyDataSetChanged();
-        // TODO: I think here we have a memory leak. persistentData is a singleton and on the first
-        // start a callback is added which closes over favoriteBoardsAdapter which itself has a
-        // necessary reference to the activity. If the activity is recreated then that callback
-        // keeps a reference to the old activity and it won't be collected. One solution is to
-        // keep a weak reference in favoriteBoardsAdapter to the activity. But test it with the
-        // Memory Monitor.
-        persistentData.addFavoritesChangedCallback(new PersistentData.FavoritesCallback() {
-            @Override public void onChanged(Set<Board> newFavorites) {
-                favoriteBoardsAdapter.updateItems(new ArrayList<>(newFavorites));
-                setVisibility(favoriteBoardsHeader, !newFavorites.isEmpty());
-            }
-        });
+        persistentData.addFavoritesChangedCallback(favoritesChangedCallback);
         favoriteBoardsView.setOnItemClickListener(favoriteCallback);
         setVisibility(favoriteBoardsHeader, persistentData.getFavorites().size() != 0);
     }
@@ -209,6 +198,13 @@ public abstract class UiActivity extends BaseActivity {
         @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final Board board = favoriteBoardsAdapter.getItem(position);
             ThreadsActivity.launch(UiActivity.this, board);
+        }
+    };
+
+    private PersistentData.FavoritesCallback favoritesChangedCallback = new PersistentData.FavoritesCallback() {
+        @Override public void onChanged(Set<Board> newFavorites) {
+            favoriteBoardsAdapter.updateItems(new ArrayList<>(newFavorites));
+            setVisibility(favoriteBoardsHeader, !newFavorites.isEmpty());
         }
     };
 
@@ -305,6 +301,12 @@ public abstract class UiActivity extends BaseActivity {
 
     @Override public void onDestroy() {
         cancelPending();
+        // The object `persistentData` is a singleton and on the first start a callback is added
+        // which closes over favoriteBoardsAdapter which itself has a necessary reference to the
+        // activity. If the activity is recreated then that callback keeps a reference to the old
+        // activity and it won't be collected. To prevent this memory leak remove the callback
+        // when the respective activity is destroyed.
+        persistentData.removeFavoritesChangedCallback(favoritesChangedCallback);
         super.onDestroy();
     }
 
@@ -341,6 +343,12 @@ public abstract class UiActivity extends BaseActivity {
     }
 
     // Utility /////////////////////////////////////////////////////////////////////////////////////
+
+    public void freeMemory() {
+        ion.configure().getResponseCache().clear();
+        ion.getBitmapCache().clear();
+        System.gc();
+    }
 
     public void setVisibility(View view, boolean show) {
         if (show) view.setVisibility(View.VISIBLE);

@@ -61,6 +61,10 @@ import anabolicandroids.chanobol.api.data.Board;
         favoritesCallbacks.add(callback);
     }
 
+    public void removeFavoritesChangedCallback(FavoritesCallback callback) {
+        favoritesCallbacks.remove(callback);
+    }
+
     public static interface FavoritesCallback {
         public void onChanged(Set<Board> newFavorites);
     }

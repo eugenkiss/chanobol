@@ -31,6 +31,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.koushikdutta.ion.builder.Builders;
 
 import org.parceler.Parcels;
@@ -74,6 +75,7 @@ public class ImageActivity extends UiActivity {
     private Point revealPoint;
     private int revealRadius;
     private boolean fromThumbnail;
+    private String bitmapCacheKey;
 
     public static void launch(
             Activity activity, View transitionView, String transitionName,
@@ -205,14 +207,16 @@ public class ImageActivity extends UiActivity {
                 .placeholder(new BitmapDrawable(resources, bm));
                 if (current.h > THRESHOLD_IMG_SIZE || current.h > THRESHOLD_IMG_SIZE) b = b.deepZoom(); b
                 .load(url)
-                .setCallback(new FutureCallback<ImageView>() {
-                    @Override public void onCompleted(Exception e, ImageView result) {
+                .withBitmapInfo()
+                .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+                    @Override public void onCompleted(Exception e, ImageViewBitmapInfo result) {
                         if (e != null) return;
                         loaded = true;
                         progressbar.setVisibility(View.GONE);
                         attacher = new PhotoViewAttacher(imageView);
                         // TODO: Makes application break after a while of zooming in and out
                         attacher.setMaximumScale(25); // Default value is too small for some images
+                        bitmapCacheKey = result.getBitmapInfo().key;
                     }
                 });
         if (fromThumbnail) {
@@ -266,8 +270,10 @@ public class ImageActivity extends UiActivity {
     }
 
     @Override public void onDestroy() {
-        super.onDestroy();
         toolbarShadow.setImageBitmap(null);
+        ion.getBitmapCache().remove(bitmapCacheKey);
+        System.gc();
+        super.onDestroy();
     }
 
     private void updateToolbarShadow() {

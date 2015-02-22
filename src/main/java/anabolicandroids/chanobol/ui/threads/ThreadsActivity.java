@@ -81,6 +81,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         setTitle(board.name);
 
         if (savedInstanceState == null) {
+            freeMemory();
             threads = new ArrayList<>();
             threadMap = new HashMap<>();
         } else {
@@ -208,6 +209,12 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         pauseUpdating = true;
     }
 
+    @Override public void onDestroy() {
+        if (executor != null) executor.shutdown();
+        bitMap.clear();
+        super.onDestroy();
+    }
+
     // Toolbar Menu ////////////////////////////////////////////////////////////////////////////////
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
@@ -277,11 +284,6 @@ public class ThreadsActivity extends SwipeRefreshActivity {
                 threadsAdapter.notifyDataSetChanged();
             }
         }, 300);
-    }
-
-    @Override public void onDestroy() {
-        if (executor != null) executor.shutdown();
-        super.onDestroy();
     }
 
     // Adapters ////////////////////////////////////////////////////////////////////////////////////
