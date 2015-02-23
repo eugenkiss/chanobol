@@ -375,7 +375,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         if (executor != null) executor.shutdown();
         getSupportFragmentManager().removeOnBackStackChangedListener(backStackChangedListener);
         for (String key : bitmapCacheKeys) {
-            ion.getBitmapCache().remove(key);
+            if (key != null) ion.getBitmapCache().remove(key);
         }
         System.gc();
         super.onDestroy();

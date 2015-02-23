@@ -273,7 +273,7 @@ public class ImageActivity extends UiActivity {
 
     @Override public void onDestroy() {
         toolbarShadow.setImageBitmap(null);
-        ion.getBitmapCache().remove(bitmapCacheKey);
+        if (bitmapCacheKey != null) ion.getBitmapCache().remove(bitmapCacheKey);
         System.gc();
         super.onDestroy();
     }
