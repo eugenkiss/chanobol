@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
@@ -70,7 +71,8 @@ public class ImageActivity extends UiActivity {
 
     private ImagePointer current;
     private String url;
-    private Bitmap bm;
+    private Bitmap bm; // Workaround for preventing transition glitches
+    private Bitmap bitmap; // For sharing
     private boolean loaded;
     private Point revealPoint;
     private int revealRadius;
@@ -111,7 +113,6 @@ public class ImageActivity extends UiActivity {
 
     @Override protected int getLayoutResource() { return R.layout.activity_image; }
 
-    // TODO: May be refactored
     @Override protected void onCreate(Bundle savedInstanceState) {
         supportPostponeEnterTransition();
         super.onCreate(savedInstanceState);
@@ -214,9 +215,9 @@ public class ImageActivity extends UiActivity {
                         loaded = true;
                         progressbar.setVisibility(View.GONE);
                         attacher = new PhotoViewAttacher(imageView);
-                        // TODO: Makes application break after a while of zooming in and out
                         attacher.setMaximumScale(25); // Default value is too small for some images
                         if (result.getBitmapInfo() != null) {
+                            bitmap = result.getBitmapInfo().bitmap;
                             bitmapCacheKey = result.getBitmapInfo().key;
                         }
                     }
@@ -307,19 +308,33 @@ public class ImageActivity extends UiActivity {
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         Intent intent;
+        String path;
+        // https://github.com/codepath/android_guides/wiki/Sharing-Content-with-Intents#sharing-remote-images-without-explicit-file-io
         switch(item.getItemId()) {
             case R.id.openExternal:
+                if (bitmap == null) break;
                 intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.parse(url), "image/*");
-                if(intent.resolveActivity(getPackageManager()) != null) startActivity(intent);
-                else showToast("No suitable app");
+                // I actually want to share the remote URL and have the resulting application
+                // download the image itself especially because the image here might have been
+                // resized or because of deep zoom. Alas, it does not seem to be easy to solve...
+                // ...unless I would try to download the image into the media store (if it
+                // takes too much time simply share the current bitmap) if it has been resized or
+                // deep zoom is used and then share that downloaded bitmap (but do _not_ load it
+                // into RAM!).
+                path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null, null);
+                intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+                intent.setType("image/*");
+                startActivity(Intent.createChooser(intent, getResources().getText(R.string.view_image)));
                 break;
-            case R.id.chooseExternal:
+            case R.id.share:
+                if (bitmap == null) break;
                 intent = new Intent();
-                intent.setAction(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.parse(url), "image/*");
-                startActivity(Intent.createChooser(intent, "Open image with"));
+                intent.setAction(Intent.ACTION_SEND);
+                path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null, null);
+                intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+                intent.setType("image/*");
+                startActivity(Intent.createChooser(intent, getResources().getText(R.string.share_image)));
                 break;
         }
         return super.onOptionsItemSelected(item);

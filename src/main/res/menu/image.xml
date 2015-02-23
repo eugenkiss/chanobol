@@ -2,12 +2,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto"
     >
-    <item android:id="@+id/openExternal"
-          android:title="@string/open_external"
+    <item android:id="@+id/share"
+          android:title="@string/share"
           app:showAsAction="never"
         />
-    <item android:id="@+id/chooseExternal"
-          android:title="@string/choose_external"
+    <item android:id="@+id/openExternal"
+          android:title="@string/view_external"
           app:showAsAction="never"
         />
 </menu>

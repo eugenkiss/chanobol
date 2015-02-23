@@ -3,13 +3,15 @@
     <string name="app_name">Chanobol</string>
     <string name="settings">Settings</string>
     <string name="debug_settings">Debug Settings</string>
+    <string name="view_image">View Image with</string>
+    <string name="share_image">Share Image</string>
     <!-- Screens -->
     <string name="replies_to">Replies to</string>
     <string name="quoted_by">Quoted by</string>
     <!-- Menu -->
+    <string name="share">Share</string>
     <string name="add_favorite">Add Favorite</string>
-    <string name="open_external">Open External</string>
-    <string name="choose_external">Choose External</string>
+    <string name="view_external">View</string>
     <string name="close_all">Close All</string>
     <string name="show_gallery">Show Gallery</string>
     <string name="go_to_bottom">Go to Bottom</string>
