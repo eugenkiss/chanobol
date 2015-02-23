@@ -35,6 +35,8 @@ import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
+import anabolicandroids.chanobol.ui.images.GalleryActivity;
+import anabolicandroids.chanobol.ui.images.ImagePointer;
 import anabolicandroids.chanobol.ui.posts.PostsActivity;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
@@ -91,7 +93,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
 
         bitMap = new HashMap<>();
 
-        threadsAdapter = new ThreadsAdapter(clickCallback, null);
+        threadsAdapter = new ThreadsAdapter(clickCallback, longClickCallback);
         threadsView.setAdapter(threadsAdapter);
         threadsView.setHasFixedSize(true);
         GridLayoutManager glm = new GridLayoutManager(ThreadsActivity.this, 2);
@@ -123,6 +125,23 @@ public class ThreadsActivity extends SwipeRefreshActivity {
                     ThreadsActivity.this, tv.image, uuid,
                     thread.toOpPost(), board.name, thread.number
             );
+        }
+    };
+
+    View.OnLongClickListener longClickCallback = new View.OnLongClickListener() {
+        @Override public boolean onLongClick(View v) {
+            final ThreadView tv = (ThreadView) v;
+            Thread thread = tv.thread;
+            if (thread.dead) {
+                showToast(R.string.no_thread);
+                return true;
+            }
+            pauseUpdating = true;
+            // TODO: Shared element animation
+            GalleryActivity.launch(
+                    ThreadsActivity.this, board.name, thread.number, new ArrayList<ImagePointer>()
+            );
+            return true;
         }
     };
 
