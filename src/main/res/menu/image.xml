@@ -10,4 +10,8 @@
           android:title="@string/view_external"
           app:showAsAction="never"
         />
+    <item android:id="@+id/gallery"
+          android:title="@string/show_gallery"
+          app:showAsAction="never"
+        />
 </menu>

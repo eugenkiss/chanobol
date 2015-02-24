@@ -55,7 +55,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
     public static void launch(
             Activity activity,
             String boardName, String threadNumber,
-            ArrayList<ImagePointer> imagePointers
+            List<ImagePointer> imagePointers
     ) {
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity);
         Intent intent = new Intent(activity, GalleryActivity.class);
@@ -124,7 +124,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
             iv.postDelayed(new Runnable() {
                 @Override public void run() {
                     ImageActivity.launch(
-                            GalleryActivity.this, iv.image, uuid, new Point(cx, cy), r, true,
+                            GalleryActivity.this, iv.image, uuid, new Point(cx, cy), r, true, true,
                             boardName, threadNumber, 0, Util.arrayListOf(iv.imagePointer)
                     );
                 }

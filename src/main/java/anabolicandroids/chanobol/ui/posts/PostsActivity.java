@@ -253,7 +253,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             int cy = xy[1] + h/2;
             String uuid = UUID.randomUUID().toString();
             ImageActivity.launch(
-                    PostsActivity.this, iv, uuid, new Point(cx, cy), r, fromThumbnail,
+                    PostsActivity.this, iv, uuid, new Point(cx, cy), r, fromThumbnail, false,
                     boardName, threadNumber, 0, Util.arrayListOf(imageIdAndExt)
             );
         }

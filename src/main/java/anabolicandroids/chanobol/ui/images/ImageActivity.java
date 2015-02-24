@@ -57,32 +57,43 @@ public class ImageActivity extends UiActivity {
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 
+    // Transition related
     private static String EXTRA_TRANSITIONNAME = "transitionName";
     private static String EXTRA_REVEALPOINT = "revealPoint";
     private static String EXTRA_REVEALRADIUS = "revealRadius";
     private static String EXTRA_FROM_THUMBNAIL = "fromThumbnail";
+    private static String EXTRA_FROM_GALLERY = "fromGallery";
+    private Point revealPoint;
+    private int revealRadius;
+    private boolean fromThumbnail;
+    private boolean fromGallery;
+
     // Needed to form a valid request to 4Chan
     private static String EXTRA_BOARDNAME = "boardName";
     private static String EXTRA_THREADNUMBER = "threadNumber";
+    private String boardName;
+    private String threadNumber;
+
     // Currently not really used (has always length 1), but the idea is to have swipes to
     // the left/right reveal the next/previous image, see issue #85
     private static String EXTRA_INDEX = "index";
     private static String EXTRA_IMAGEPOINTERS = "imagePointers";
+    @SuppressWarnings("FieldCanBeLocal") private int index;
+    private List<ImagePointer> imagePointers;
 
+    // Non-local lifetime
     private ImagePointer current;
     private String url;
     private Bitmap bm; // Workaround for preventing transition glitches
     private Bitmap bitmap; // For sharing
     private boolean loaded;
-    private Point revealPoint;
-    private int revealRadius;
-    private boolean fromThumbnail;
     private String bitmapCacheKey;
 
     public static void launch(
             Activity activity, View transitionView, String transitionName,
             Point revealPoint, int revealStartRadius,
-            boolean fromThumbnail, String boardName, String threadNumber,
+            boolean fromThumbnail, boolean fromGallery,
+            String boardName, String threadNumber,
             int index, ArrayList<ImagePointer> imagePointers
     ) {
         ViewCompat.setTransitionName(transitionView, transitionName);
@@ -99,6 +110,7 @@ public class ImageActivity extends UiActivity {
         }
         intent.putExtra(EXTRA_REVEALRADIUS, revealStartRadius);
         intent.putExtra(EXTRA_FROM_THUMBNAIL, fromThumbnail);
+        intent.putExtra(EXTRA_FROM_GALLERY, fromGallery);
         intent.putExtra(EXTRA_BOARDNAME, boardName);
         intent.putExtra(EXTRA_THREADNUMBER, threadNumber);
         intent.putExtra(EXTRA_INDEX, index);
@@ -120,14 +132,14 @@ public class ImageActivity extends UiActivity {
 
         Bundle b = getIntent().getExtras();
         String transitionName = b.getString(EXTRA_TRANSITIONNAME);
-        revealPoint = b.getParcelable(EXTRA_REVEALPOINT);
-        revealRadius = b.getInt(EXTRA_REVEALRADIUS) / 2;
-        String boardName = b.getString(EXTRA_BOARDNAME);
-        //noinspection UnusedDeclaration
-        String threadNumber = b.getString(EXTRA_THREADNUMBER);
-        int index = b.getInt(EXTRA_INDEX);
-        List<ImagePointer> imagePointers = Parcels.unwrap(b.getParcelable(EXTRA_IMAGEPOINTERS));
+        revealPoint   = b.getParcelable(EXTRA_REVEALPOINT);
+        revealRadius  = b.getInt(EXTRA_REVEALRADIUS) / 2;
+        boardName     = b.getString(EXTRA_BOARDNAME);
+        threadNumber  = b.getString(EXTRA_THREADNUMBER);
+        index         = b.getInt(EXTRA_INDEX);
+        imagePointers = Parcels.unwrap(b.getParcelable(EXTRA_IMAGEPOINTERS));
         fromThumbnail = b.getBoolean(EXTRA_FROM_THUMBNAIL);
+        fromGallery   = b.getBoolean(EXTRA_FROM_THUMBNAIL);
 
         current = imagePointers.get(index);
         url = ApiModule.imgUrl(boardName, current.id, current.ext);
@@ -335,6 +347,19 @@ public class ImageActivity extends UiActivity {
                 intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
                 intent.setType("image/*");
                 startActivity(Intent.createChooser(intent, getResources().getText(R.string.share_image)));
+                break;
+            case R.id.gallery:
+                if (fromGallery) {
+                    onBackPressed();
+                } else {
+                    // TODO: Shared element transition
+                    // I find it weird that the background drawable of the toolbar is for some
+                    // reason shared between activities in Lollipop... (if I don't set it to 255 it
+                    // remains translucent in the next activity)
+                    toolbar.getBackground().setAlpha(255);
+                    GalleryActivity.launch(this, boardName, threadNumber, imagePointers);
+                    ActivityCompat.finishAfterTransition(this);
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
