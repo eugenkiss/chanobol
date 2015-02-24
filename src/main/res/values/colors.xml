@@ -11,6 +11,8 @@
 
     <color name="windowBackgroundColor">#212121</color>
     <color name="black_translucent">#80000000</color>
+    <color name="transparent">#00000000</color>
+    <color name="releaseIndicator">#20f0b3fa</color>
 
     <item name="bg" type="color">#212121</item>
     <item name="fg" type="color">@color/background_floating_material_dark</item>

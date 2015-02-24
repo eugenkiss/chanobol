@@ -9,13 +9,16 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
@@ -25,6 +28,7 @@ import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
@@ -119,6 +123,7 @@ public class ImageActivity extends UiActivity {
     }
 
     @InjectView(R.id.revealbg) View background;
+    @InjectView(R.id.releaseIndicator) View releaseIndicator;
     @InjectView(R.id.imageView) ImageView imageView;
     @InjectView(R.id.progressbar) ProgressBar progressbar;
     @SuppressWarnings("UnusedDeclaration") private PhotoViewAttacher attacher;
@@ -128,6 +133,7 @@ public class ImageActivity extends UiActivity {
     @Override protected void onCreate(Bundle savedInstanceState) {
         supportPostponeEnterTransition();
         super.onCreate(savedInstanceState);
+        background.getBackground().setAlpha(255);
         setTitle("");
 
         Bundle b = getIntent().getExtras();
@@ -226,8 +232,7 @@ public class ImageActivity extends UiActivity {
                         if (e != null) return;
                         loaded = true;
                         progressbar.setVisibility(View.GONE);
-                        attacher = new PhotoViewAttacher(imageView);
-                        attacher.setMaximumScale(25); // Default value is too small for some images
+                        setupPhotoAttacher();
                         if (result.getBitmapInfo() != null) {
                             bitmap = result.getBitmapInfo().bitmap;
                             bitmapCacheKey = result.getBitmapInfo().key;
@@ -248,6 +253,38 @@ public class ImageActivity extends UiActivity {
                 updateToolbarShadow();
             }
         }, 50);
+    }
+
+    private float releaseScaleThresholdBuffer = 0.005f;
+    private float releaseScaleThreshold = 0.515f;
+    private Matrix previousMatrix;
+    private void setupPhotoAttacher() {
+        attacher = new PhotoViewAttacher(imageView);
+        attacher.setMaximumScale(25);
+        attacher.setOnMatrixChangeListener(new PhotoViewAttacher.OnMatrixChangedListener() {
+            @Override public void onMatrixChanged(RectF rect) {
+                double s = attacher.getScale();
+                if (s < releaseScaleThreshold) {
+                    attacher.setOnMatrixChangeListener(null);
+                    previousMatrix.setScale(releaseScaleThreshold, releaseScaleThreshold);
+                    attacher.setDisplayMatrix(previousMatrix);
+                    attacher.setOnMatrixChangeListener(this);
+                }
+                background.getBackground().setAlpha(Util.clamp(50, 255*s*Math.sqrt(s)*1.3, 255));
+                setVisibility(releaseIndicator, s <= releaseScaleThreshold + releaseScaleThresholdBuffer);
+                previousMatrix = attacher.getDisplayMatrix();
+            }
+        });
+    }
+
+    @Override public boolean dispatchTouchEvent(@NonNull MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_UP) {
+            if (attacher != null && attacher.getScale() <= releaseScaleThreshold + releaseScaleThresholdBuffer) {
+                onBackPressed();
+                return true;
+            }
+        }
+        return super.dispatchTouchEvent(event);
     }
 
     @Override public void onBackPressed() {
