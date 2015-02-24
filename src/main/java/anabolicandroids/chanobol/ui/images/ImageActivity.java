@@ -218,7 +218,7 @@ public class ImageActivity extends UiActivity {
                 // Placeholder _and_ crossfade to prevent blinking
                 .crossfade(true)
                 .placeholder(new BitmapDrawable(resources, bm));
-                if (current.h > THRESHOLD_IMG_SIZE || current.h > THRESHOLD_IMG_SIZE) b = b.deepZoom(); b
+                if (current.w > THRESHOLD_IMG_SIZE || current.h > THRESHOLD_IMG_SIZE) b = b.deepZoom(); b
                 .load(url)
                 .withBitmapInfo()
                 .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
