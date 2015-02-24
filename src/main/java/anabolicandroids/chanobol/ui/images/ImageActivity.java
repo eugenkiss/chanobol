@@ -139,7 +139,7 @@ public class ImageActivity extends UiActivity {
         index         = b.getInt(EXTRA_INDEX);
         imagePointers = Parcels.unwrap(b.getParcelable(EXTRA_IMAGEPOINTERS));
         fromThumbnail = b.getBoolean(EXTRA_FROM_THUMBNAIL);
-        fromGallery   = b.getBoolean(EXTRA_FROM_THUMBNAIL);
+        fromGallery   = b.getBoolean(EXTRA_FROM_GALLERY);
 
         current = imagePointers.get(index);
         url = ApiModule.imgUrl(boardName, current.id, current.ext);
