@@ -1,8 +1,10 @@
 package anabolicandroids.chanobol.util;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -206,5 +208,13 @@ public class Util {
         bit.getPixels(allpixels, 0, myBitmap.getWidth(), 0, 0, myBitmap.getWidth(),myBitmap.getHeight());
         myBitmap.setPixels(allpixels, 0, width, 0, 0, width, height);
         return myBitmap;
+    }
+
+    public static void startWebmActivity(Context context, String url) {
+        Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(url), "video/webm");
+        if(intent.resolveActivity(context.getPackageManager()) != null)
+            context.startActivity(intent);
+        else
+            Util.showToast(context, R.string.no_app);
     }
 }

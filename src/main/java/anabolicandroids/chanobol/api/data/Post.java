@@ -10,9 +10,10 @@ public class Post extends Common {
     public String replyTo;
 
     @SuppressWarnings("UnusedDeclaration")
-    public boolean isOp() {
-        return "0".equals(replyTo);
-    }
+    public boolean isOp() { return "0".equals(replyTo); }
+
+    @SuppressWarnings("UnusedDeclaration")
+    public boolean isWebm() { return ".webm".equals(imageExtension); }
 
     // Only used internally, no counterpart in 4Chan API
     public int replyCount;

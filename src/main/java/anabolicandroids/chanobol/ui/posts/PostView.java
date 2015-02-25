@@ -1,10 +1,8 @@
 package anabolicandroids.chanobol.ui.posts;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
 import android.text.Html;
@@ -134,11 +132,7 @@ public class PostView extends CardView {
     private void initWebmCallback(final String url) {
         OnClickListener l = new OnClickListener() {
             @Override public void onClick(View v) {
-                Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(url), "video/webm");
-                if(intent.resolveActivity(getContext().getPackageManager()) != null)
-                    getContext().startActivity(intent);
-                else
-                    Util.showToast(getContext(), R.string.no_app);
+                Util.startWebmActivity(getContext(), url);
             }
         };
         imageTouchOverlay.setOnClickListener(l);

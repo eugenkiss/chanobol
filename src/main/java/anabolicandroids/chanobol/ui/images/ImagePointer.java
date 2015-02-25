@@ -24,4 +24,8 @@ public class ImagePointer {
     public static ImagePointer from(Post post) {
         return new ImagePointer(post.imageId, post.imageExtension, post.imageWidth, post.imageHeight);
     }
+
+    public boolean isWebm() {
+        return ".webm".equals(ext);
+    }
 }

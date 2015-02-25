@@ -4,7 +4,9 @@
     <string name="settings">Settings</string>
     <string name="debug_settings">Debug Settings</string>
     <string name="view_image">View Image with</string>
+    <string name="view_video">View Video with</string>
     <string name="share_image">Share Image</string>
+    <string name="share_video">Share Video</string>
     <!-- Screens -->
     <string name="replies_to">Replies to</string>
     <string name="quoted_by">Quoted by</string>

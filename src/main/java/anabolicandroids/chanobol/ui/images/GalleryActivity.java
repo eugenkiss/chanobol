@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.UUID;
 
 import anabolicandroids.chanobol.R;
-import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.UiAdapter;
@@ -103,15 +101,6 @@ public class GalleryActivity extends SwipeRefreshActivity {
     View.OnClickListener clickListener = new View.OnClickListener() {
         @Override public void onClick(View v) {
             final GalleryThumbView iv = (GalleryThumbView) v;
-            if (".webm".equals(iv.imagePointer.ext)) {
-                String url = ApiModule.imgUrl(boardName, iv.imagePointer.id, iv.imagePointer.ext);
-                Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(url), "video/webm");
-                if(intent.resolveActivity(getPackageManager()) != null)
-                    startActivity(intent);
-                else
-                    showToast(R.string.no_app);
-                return;
-            }
             int w = iv.getWidth();
             int h = iv.getHeight();
             final Drawable d = iv.image.getDrawable();

@@ -69,6 +69,7 @@ public class ImageActivity extends UiActivity {
     private static String EXTRA_FROM_GALLERY = "fromGallery";
     private Point revealPoint;
     private int revealRadius;
+    @SuppressWarnings("FieldCanBeLocal")
     private boolean fromThumbnail;
     private boolean fromGallery;
 
@@ -82,7 +83,8 @@ public class ImageActivity extends UiActivity {
     // the left/right reveal the next/previous image, see issue #85
     private static String EXTRA_INDEX = "index";
     private static String EXTRA_IMAGEPOINTERS = "imagePointers";
-    @SuppressWarnings("FieldCanBeLocal") private int index;
+    @SuppressWarnings("FieldCanBeLocal")
+    private int index;
     private List<ImagePointer> imagePointers;
 
     // Non-local lifetime
@@ -125,6 +127,7 @@ public class ImageActivity extends UiActivity {
     @InjectView(R.id.revealbg) View background;
     @InjectView(R.id.releaseIndicator) View releaseIndicator;
     @InjectView(R.id.imageView) ImageView imageView;
+    @InjectView(R.id.play) ImageView play;
     @InjectView(R.id.progressbar) ProgressBar progressbar;
     @SuppressWarnings("UnusedDeclaration") private PhotoViewAttacher attacher;
 
@@ -160,21 +163,40 @@ public class ImageActivity extends UiActivity {
             // This is actually problematic for big images -> can lead to out of memory error because
             // bm is not resized. But if I resize it the following call apparently takes too long
             // and the activity crashes because of this... So use a compromise.
-            boolean useThumbnail = fromThumbnail || current.w > THRESHOLD_IMG_SIZE || current.h > THRESHOLD_IMG_SIZE;
+            boolean useThumbnail = fromThumbnail || current.isWebm() ||
+                    current.w > THRESHOLD_IMG_SIZE || current.h > THRESHOLD_IMG_SIZE;
             bm = ion.build(this).load(useThumbnail ? thumbUrl : url).asBitmap().get();
             imageView.setImageBitmap(bm);
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
 
+        // Only show progressbar if loading takes a bit more time
+        if (fromThumbnail) {
+            progressbar.postDelayed(new Runnable() {
+                @Override public void run() {
+                    if (!loaded) progressbar.setVisibility(View.VISIBLE);
+                }
+            }, 200);
+        }
+        // Delay as otherwise there is no shadow under overflow options icon
+        toolbar.postDelayed(new Runnable() {
+            @Override public void run() {
+                updateToolbarShadow();
+            }
+        }, 50);
+
+        // Setup ImageView
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
                 @Override public void onTransitionEnd(Transition transition) {
-                    setup();
+                    if (current.isWebm()) setupWebm();
+                    else setupImage();
                 }
             });
         } else {
-            setup();
+            if (current.isWebm()) setupWebm();
+            else setupImage();
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -219,7 +241,19 @@ public class ImageActivity extends UiActivity {
         });
     }
 
-    private void setup() {
+    private void setupWebm() {
+        loaded = true;
+        progressbar.setVisibility(View.GONE);
+        play.setVisibility(View.VISIBLE);
+        setupPhotoAttacher();
+        attacher.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
+            @Override public void onViewTap(View view, float x, float y) {
+                Util.startWebmActivity(ImageActivity.this, url);
+            }
+        });
+    }
+
+    private void setupImage() {
         Builders.IV.F<?> b = ion.build(imageView)
                 // Placeholder _and_ crossfade to prevent blinking
                 .crossfade(true)
@@ -239,20 +273,6 @@ public class ImageActivity extends UiActivity {
                         }
                     }
                 });
-        if (fromThumbnail) {
-            // Only show progressbar if loading takes a bit more time
-            progressbar.postDelayed(new Runnable() {
-                @Override public void run() {
-                    if (!loaded) progressbar.setVisibility(View.VISIBLE);
-                }
-            }, 200);
-        }
-        // Delay as otherwise there is no shadow under overflow options icon
-        toolbar.postDelayed(new Runnable() {
-            @Override public void run() {
-                updateToolbarShadow();
-            }
-        }, 50);
     }
 
     private float releaseScaleThresholdBuffer = 0.005f;
@@ -364,26 +384,36 @@ public class ImageActivity extends UiActivity {
                 if (bitmap == null) break;
                 intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
-                // I actually want to share the remote URL and have the resulting application
-                // download the image itself especially because the image here might have been
-                // resized or because of deep zoom. Alas, it does not seem to be easy to solve...
-                // ...unless I would try to download the image into the media store (if it
-                // takes too much time simply share the current bitmap) if it has been resized or
-                // deep zoom is used and then share that downloaded bitmap (but do _not_ load it
-                // into RAM!).
-                path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null, null);
-                intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
-                intent.setType("image/*");
-                startActivity(Intent.createChooser(intent, getResources().getText(R.string.view_image)));
+                if (current.isWebm()) {
+                    Util.startWebmActivity(this, url);
+                } else {
+                    // I actually want to share the remote URL and have the resulting application
+                    // download the image itself especially because the image here might have been
+                    // resized or because of deep zoom. Alas, it does not seem to be easy to solve...
+                    // ...unless I would try to download the image into the media store (if it
+                    // takes too much time simply share the current bitmap) if it has been resized or
+                    // deep zoom is used and then share that downloaded bitmap (but do _not_ load it
+                    // into RAM!).
+                    path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null, null);
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+                    intent.setType("image/*");
+                    startActivity(Intent.createChooser(intent, getResources().getText(R.string.view_image)));
+                }
                 break;
             case R.id.share:
                 if (bitmap == null) break;
                 intent = new Intent();
                 intent.setAction(Intent.ACTION_SEND);
-                path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null, null);
-                intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
-                intent.setType("image/*");
-                startActivity(Intent.createChooser(intent, getResources().getText(R.string.share_image)));
+                if (current.isWebm()) {
+                    // TODO: Webm must be downloaded
+                    intent.setDataAndType(Uri.parse(url), "video/webm");
+                    startActivity(Intent.createChooser(intent, getResources().getText(R.string.share_video)));
+                } else {
+                    path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null, null);
+                    intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
+                    intent.setType("image/*");
+                    startActivity(Intent.createChooser(intent, getResources().getText(R.string.share_image)));
+                }
                 break;
             case R.id.gallery:
                 if (fromGallery) {
