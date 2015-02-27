@@ -171,33 +171,22 @@ public class ImageActivity extends UiActivity {
             e.printStackTrace();
         }
 
-        // Only show progressbar if loading takes a bit more time
-        if (fromThumbnail) {
-            progressbar.postDelayed(new Runnable() {
-                @Override public void run() {
-                    if (!loaded) progressbar.setVisibility(View.VISIBLE);
-                }
-            }, 200);
-        }
-        // Delay as otherwise there is no shadow under overflow options icon
-        toolbar.postDelayed(new Runnable() {
-            @Override public void run() {
-                updateToolbarShadow();
-            }
-        }, 50);
-
-        // Setup ImageView
+        // Setup main view
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
                 @Override public void onTransitionEnd(Transition transition) {
                     if (current.isWebm()) setupWebm();
                     else setupImage();
+                    postSetup();
                 }
             });
         } else {
             if (current.isWebm()) setupWebm();
             else setupImage();
+            postSetup();
         }
+
+        // Workarounds
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             getWindow().getSharedElementReturnTransition().addListener(new TransitionListenerAdapter() {
@@ -273,6 +262,23 @@ public class ImageActivity extends UiActivity {
                         }
                     }
                 });
+    }
+
+    private void postSetup() {
+        // Only show progressbar if loading takes a bit more time
+        if (fromThumbnail) {
+            progressbar.postDelayed(new Runnable() {
+                @Override public void run() {
+                    if (!loaded) progressbar.setVisibility(View.VISIBLE);
+                }
+            }, 200);
+        }
+        // Delay as otherwise there is no shadow under overflow options icon
+        toolbar.postDelayed(new Runnable() {
+            @Override public void run() {
+                updateToolbarShadow();
+            }
+        }, 50);
     }
 
     private float releaseScaleThresholdBuffer = 0.005f;
