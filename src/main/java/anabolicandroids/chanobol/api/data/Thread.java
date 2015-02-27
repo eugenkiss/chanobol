@@ -13,6 +13,10 @@ public class Thread extends Common {
     // Only used internally, no counterpart in 4Chan API
     public boolean dead;
 
+    // Used internally to speed up rendering
+    public String strippedSubject;
+    public String excerpt;
+
     public Post toOpPost() {
         Gson gson = new Gson();
         Type type = new TypeToken<Post>() {}.getType();

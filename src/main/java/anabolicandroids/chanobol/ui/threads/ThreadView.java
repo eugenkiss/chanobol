@@ -2,8 +2,10 @@ package anabolicandroids.chanobol.ui.threads;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
-import android.text.Html;
+import android.text.Spannable;
+import android.text.style.StyleSpan;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -31,15 +33,19 @@ public class ThreadView extends FrameLayout {
 
     public Thread thread;
 
+    StyleSpan boldSpan;
+
     public ThreadView(Context context, AttributeSet attrs) { super(context, attrs); }
 
     @Override protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.inject(this);
+        boldSpan = new StyleSpan(Typeface.BOLD);
     }
 
     public void bindTo(final Thread thread, String boardName, Ion ion,
                        boolean onlyUpdateText, final HashMap<String, Bitmap> bitMap) {
+
         // Remove reference to bitmap which is out of view
         if (this.thread != null) {
             bitMap.remove(thread.number);
@@ -62,16 +68,12 @@ public class ThreadView extends FrameLayout {
         } else {
             image.setImageDrawable(new BitmapDrawable(getResources(), b));
         }
-        String s = thread.subject;
-        if (s == null) s = "";
-        else s = "<b>" + s + "</b><br/>";
-        String t = thread.text;
-        if (t == null) t = "";
-        text.setText(Html.fromHtml(s + t));
-        if (thread.dead) {
-            blackness.setVisibility(View.VISIBLE);
-        } else {
-            blackness.setVisibility(View.GONE);
-        }
+
+        text.setText(thread.excerpt);
+        Spannable spannable = (Spannable) text.getText();
+        spannable.setSpan(boldSpan, 0, thread.strippedSubject.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+
+        if (thread.dead) blackness.setVisibility(View.VISIBLE);
+        else blackness.setVisibility(View.GONE);
     }
 }

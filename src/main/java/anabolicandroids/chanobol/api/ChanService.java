@@ -44,6 +44,16 @@ public class ChanService {
                         for (JsonElement x : result) {
                             for (JsonElement y : x.getAsJsonObject().get("threads").getAsJsonArray()) {
                                 Thread t = gson.fromJson(y, Thread.class);
+
+                                // Generate excerpt here instead of ThreadView for efficiency reasons
+                                if (t.subject == null) t.subject = "";
+                                if (t.text == null) t.text = "";
+                                t.strippedSubject = android.text.Html.fromHtml(t.subject).toString();
+                                String strippedText = android.text.Html.fromHtml(t.text).toString();
+                                t.excerpt = t.strippedSubject
+                                        + (t.strippedSubject.isEmpty() ? "" : "\n")
+                                        + strippedText.substring(0, Math.min(160, strippedText.length()));
+
                                 threads.add(t);
                             }
                         }

@@ -54,6 +54,7 @@
             android:id="@+id/text"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:bufferType="spannable"
             android:maxLines="4"
             android:minLines="4"
             android:padding="5dp"
