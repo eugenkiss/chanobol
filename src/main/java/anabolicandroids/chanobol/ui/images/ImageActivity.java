@@ -32,6 +32,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewTreeObserver;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
@@ -94,6 +96,11 @@ public class ImageActivity extends UiActivity {
     private Bitmap bitmap; // For sharing
     private boolean loaded;
     private String bitmapCacheKey;
+    // To prevent transition glitches
+    private int initialStatusBarColor;
+    private int targetStatusBarColor;
+    private int initialNavBarColor;
+    private int targetNavBarColor;
 
     public static void launch(
             Activity activity, View transitionView, String transitionName,
@@ -186,6 +193,26 @@ public class ImageActivity extends UiActivity {
             postSetup();
         }
 
+        // Make activity full screen with fully transparent navigation and status bars
+        // http://developer.android.com/reference/android/view/Window.html#setNavigationBarColor(int)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            Window window = getWindow();
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+            window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+            window.getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION);
+            initialStatusBarColor = window.getStatusBarColor();
+            targetStatusBarColor = getResources().getColor(R.color.transparent);
+            window.setStatusBarColor(targetStatusBarColor);
+            initialNavBarColor = window.getNavigationBarColor();
+            targetNavBarColor = getResources().getColor(R.color.transparent);
+            window.setNavigationBarColor(targetNavBarColor);
+            setTopPadding(drawer, getStatusBarHeight());
+        }
+
         // Workarounds
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -194,6 +221,10 @@ public class ImageActivity extends UiActivity {
                     toolbarShadow.setImageDrawable(null);
                 }
             });
+            // Workaround for glitchy toolbar shared return transition
+            int statusBarHeight = getStatusBarHeight();
+            toolbar.setTranslationY(statusBarHeight);
+            toolbarShadow.setTranslationY(statusBarHeight);
         }
 
         // http://stackoverflow.com/a/26748694/283607
@@ -324,6 +355,34 @@ public class ImageActivity extends UiActivity {
                     toolbarShadow.setImageBitmap(null);
                 }
             });
+
+            // Workaround for glitchy nav bar shared return transition
+            final Window window = getWindow();
+            ValueAnimator colorAnimation = ValueAnimator.ofArgb(targetNavBarColor, initialNavBarColor);
+            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override public void onAnimationUpdate(ValueAnimator animation) {
+                    window.setNavigationBarColor((int) animation.getAnimatedValue());
+                }
+            });
+            colorAnimation.setDuration(400);
+            colorAnimation.start();
+            // It's funny. If I place this statement before colorAnimation.start()
+            // or omit it entirely then the transition keeps being glitchy.
+            window.setNavigationBarColor(initialNavBarColor);
+
+            // Workaround for glitchy status bar shared return transition
+            colorAnimation = ValueAnimator.ofArgb(targetStatusBarColor, initialStatusBarColor);
+            colorAnimation.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override public void onAnimationUpdate(ValueAnimator animation) {
+                    window.setStatusBarColor((int) animation.getAnimatedValue());
+                }
+            });
+            colorAnimation.setDuration(400);
+            colorAnimation.start();
+            window.setStatusBarColor(initialStatusBarColor);
+
             // Otherwise background is removed too early and the return reveal animation glitches
             getWindow().setTransitionBackgroundFadeDuration(500);
             hideBackground();
@@ -508,4 +567,20 @@ public class ImageActivity extends UiActivity {
         v.setDuration(400);
         v.start();
     }
+
+    // Utility /////////////////////////////////////////////////////////////////////////////////////
+
+    public int getStatusBarHeight() {
+        int result = 0;
+        int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            result = getResources().getDimensionPixelSize(resourceId);
+        }
+        return result;
+    }
+
+    public void setTopPadding(View v, int padding) {
+        v.setPadding(v.getPaddingLeft(), padding, v.getPaddingRight(), v.getPaddingBottom());
+    }
+
 }
