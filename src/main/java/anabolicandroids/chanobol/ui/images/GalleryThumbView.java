@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.koushikdutta.ion.Ion;
 
@@ -14,6 +15,7 @@ import butterknife.InjectView;
 
 public class GalleryThumbView extends FrameLayout {
     @InjectView(R.id.image) ImageView image;
+    @InjectView(R.id.info) TextView info;
 
     public ImagePointer imagePointer;
 
@@ -29,6 +31,12 @@ public class GalleryThumbView extends FrameLayout {
     public void bindTo(Ion ion, String board, ImagePointer imagePointer) {
         this.imagePointer = imagePointer;
         ion.build(image).load(ApiModule.thumbUrl(board, imagePointer.id));
+
+        switch (imagePointer.ext) {
+            case ".webm": info.setText("webm"); break;
+            case ".gif": info.setText("gif"); break;
+            default: info.setText("");
+        }
     }
 
 }

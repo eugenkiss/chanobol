@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <anabolicandroids.chanobol.ui.images.GalleryThumbView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/column_width_gallery"
     android:layout_height="@dimen/row_height_gallery"
     android:layout_margin="3dp"
@@ -12,6 +13,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"
+        />
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|right"
+        android:paddingRight="3dp"
+        android:paddingBottom="1dp"
+        android:textSize="11sp"
+        android:textStyle="bold"
+        android:shadowColor="#000"
+        android:shadowDx="1"
+        android:shadowDy="1"
+        android:shadowRadius="6"
+        tools:text="webm"
+        tools:ignore="SmallSp"
         />
 
 </anabolicandroids.chanobol.ui.images.GalleryThumbView>
