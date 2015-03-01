@@ -1,4 +1,4 @@
-package anabolicandroids.chanobol.ui.posts;
+package anabolicandroids.chanobol.util;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;

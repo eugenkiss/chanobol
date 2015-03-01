@@ -57,6 +57,7 @@ import anabolicandroids.chanobol.ui.images.GalleryActivity;
 import anabolicandroids.chanobol.ui.images.ImageActivity;
 import anabolicandroids.chanobol.ui.images.ImagePointer;
 import anabolicandroids.chanobol.util.BindableAdapter;
+import anabolicandroids.chanobol.util.SpacesItemDecoration;
 import anabolicandroids.chanobol.util.TransitionListenerAdapter;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
