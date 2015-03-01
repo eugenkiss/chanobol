@@ -406,7 +406,7 @@ public abstract class UiActivity extends BaseActivity {
 
         @Override
         public View newView(LayoutInflater inflater, int position, ViewGroup container) {
-            return inflater.inflate(R.layout.view_favorite2, container, false);
+            return inflater.inflate(R.layout.view_favorite, container, false);
         }
 
         @Override
