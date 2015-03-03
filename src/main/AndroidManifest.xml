@@ -40,12 +40,12 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             />
         <activity
-            android:name=".ui.images.ImageActivity"
+            android:name=".ui.media.MediaActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@style/ImageActivity"
+            android:theme="@style/MediaActivity"
             />
         <activity
-            android:name=".ui.images.GalleryActivity"
+            android:name=".ui.media.GalleryActivity"
             android:configChanges="keyboardHidden|orientation|screenSize"
             />
         <activity

@@ -32,7 +32,7 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.UiActivity;
-import anabolicandroids.chanobol.ui.images.ImagePointer;
+import anabolicandroids.chanobol.ui.media.MediaPointer;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -91,7 +91,7 @@ public class PostView extends CardView {
         footerImage.setVisibility(View.GONE);
     }
 
-    // If needed reduce the image size such that it is only as big as needed and is
+    // If needed reduce the media size such that it is only as big as needed and is
     // never bigger than approx. the screen size. For example, an image with a height
     // of one billion pixels should fit on the screen. Therefore, the width and height
     // have to be reduced proportionally such that the new height is smaller equal the
@@ -112,13 +112,13 @@ public class PostView extends CardView {
         size[H] = (int) h;
     }
 
-    private void initImageCallback(final ImagePointer imagePointer, final boolean thumbnail,
+    private void initImageCallback(final Post post,
                                    final PostsActivity.ImageCallback cb) {
         OnClickListener l = new OnClickListener() {
             @Override public void onClick(View v) {
                 imageTouchOverlay.postDelayed(new Runnable() {
                     @Override public void run() {
-                        cb.onClick(imagePointer, image, thumbnail);
+                        cb.onClick(post, image);
                     }
                 }, UiActivity.RIPPLE_DELAY);
             }
@@ -239,6 +239,7 @@ public class PostView extends CardView {
         ion.build(getContext()).load(ApiModule.imgUrl(boardName, post.imageId, post.imageExtension)).asBitmap().tryGet();
     }
 
+    private boolean loaded;
     public void bindTo(final Post post, final String boardName,
                        @SuppressWarnings("UnusedParameters") final String threadId, final Ion ion,
                        final ArrayList<String> bitmapCacheKeys,
@@ -251,7 +252,13 @@ public class PostView extends CardView {
 
         if (post.imageId != null && !"null".equals(post.imageId)) {
             final int[] size = new int[2]; calcSize(size, post);
-            progress.setVisibility(View.VISIBLE);
+            // Only show progress bar if loading takes especially long
+            loaded = false;
+            postDelayed(new Runnable() {
+                @Override public void run() {
+                    if (!loaded) progress.setVisibility(View.VISIBLE);
+                }
+            }, 500);
             image.setVisibility(View.VISIBLE);
             image.getLayoutParams().height = size[H];
             String thumbUrl = ApiModule.thumbUrl(boardName, post.imageId);
@@ -263,6 +270,7 @@ public class PostView extends CardView {
                     public void onCompleted(Exception e, ImageViewBitmapInfo result) {
                         BitmapInfo bitmapInfo = result.getBitmapInfo();
                         if (e != null || bitmapInfo == null) {
+                            loaded = true;
                             progress.setVisibility(View.GONE);
                             return;
                         }
@@ -271,12 +279,13 @@ public class PostView extends CardView {
                         final String url = ApiModule.imgUrl(boardName, post.imageId, post.imageExtension);
                         switch (ext) {
                             case ".webm":
+                                loaded = true;
                                 progress.setVisibility(View.GONE);
                                 play.setVisibility(View.VISIBLE);
                                 initWebmCallback(url);
                                 break;
                             default:
-                                initImageCallback(ImagePointer.from(post), true, imageCallback);
+                                initImageCallback(post, imageCallback);
                                 Builders.IV.F<?> placeholder = ion.build(image);
                                 // I'd love to have something like Picasso's noplaceholder s.t.
                                 // Ion doesn't clear the thumbnail preview...
@@ -286,11 +295,11 @@ public class PostView extends CardView {
                                 if (".gif".equals(ext)) placeholder.animateGif(AnimateGifMode.ANIMATE).smartSize(true);
                                 else placeholder.resize(size[W], size[H]);
                                 placeholder.load(url).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
-                                    @Override
-                                    public void onCompleted(Exception e, final ImageViewBitmapInfo result) {
+                                    @Override public void onCompleted(Exception e, final ImageViewBitmapInfo result) {
+                                        loaded = true;
                                         progress.setVisibility(View.GONE);
                                         if (e != null) { return; }
-                                        initImageCallback(ImagePointer.from(post), false, imageCallback);
+                                        initImageCallback(post, imageCallback);
                                         if (result.getBitmapInfo() != null) {
                                             bitmapCacheKeys.add(result.getBitmapInfo().key);
                                         }

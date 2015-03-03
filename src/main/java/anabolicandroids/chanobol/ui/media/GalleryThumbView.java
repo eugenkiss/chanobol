@@ -1,4 +1,4 @@
-package anabolicandroids.chanobol.ui.images;
+package anabolicandroids.chanobol.ui.media;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -17,22 +17,20 @@ public class GalleryThumbView extends FrameLayout {
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.info) TextView info;
 
-    public ImagePointer imagePointer;
+    public int index;
 
-    public GalleryThumbView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-    }
+    public GalleryThumbView(Context context, AttributeSet attrs) { super(context, attrs); }
 
     @Override protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.inject(this);
     }
 
-    public void bindTo(Ion ion, String board, ImagePointer imagePointer) {
-        this.imagePointer = imagePointer;
-        ion.build(image).load(ApiModule.thumbUrl(board, imagePointer.id));
+    public void bindTo(Ion ion, String board, MediaPointer mediaPointer, int index) {
+        this.index = index;
+        ion.build(image).load(ApiModule.thumbUrl(board, mediaPointer.id));
 
-        switch (imagePointer.ext) {
+        switch (mediaPointer.ext) {
             case ".webm": info.setText("webm"); break;
             case ".gif": info.setText("gif"); break;
             default: info.setText("");

@@ -351,8 +351,7 @@ public abstract class UiActivity extends BaseActivity {
     }
 
     public void setVisibility(View view, boolean show) {
-        if (show) view.setVisibility(View.VISIBLE);
-        else view.setVisibility(View.GONE);
+        Util.setVisibility(view, show);
     }
 
     @SuppressWarnings("UnusedDeclaration")

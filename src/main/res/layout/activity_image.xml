@@ -22,28 +22,16 @@
         android:background="@color/releaseIndicator"
         />
 
+    <anabolicandroids.chanobol.util.HackyViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        />
+
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewForTransition"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
-
-    <ImageView
-        android:id="@+id/play"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
-        android:scaleType="centerInside"
-        android:src="@drawable/ic_play"
-        android:visibility="gone"
-        />
-
-    <ProgressBar
-        android:id="@+id/progressbar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:visibility="gone"
-        />
-
 </FrameLayout>

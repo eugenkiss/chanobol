@@ -19,7 +19,7 @@
         <item name="android:windowSharedElementReenterTransition">@transition/move</item>
     </style>
 
-    <style name="ImageActivity" parent="AppTheme">
+    <style name="MediaActivity" parent="AppTheme">
         <item name="android:windowIsTranslucent">true</item>
         <item name="android:windowBackground">@color/transparent</item>
         <item name="android:windowContentOverlay">@null</item>

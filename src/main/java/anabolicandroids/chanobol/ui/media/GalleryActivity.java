@@ -1,4 +1,4 @@
-package anabolicandroids.chanobol.ui.images;
+package anabolicandroids.chanobol.ui.media;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +9,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -24,7 +25,6 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Post;
@@ -45,7 +45,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
     @SuppressWarnings("FieldCanBeLocal")
     private static String EXTRA_THREADNUMBER = "threadNumber";
 
-    private ArrayList<ImagePointer> imagePointers;
+    private ArrayList<MediaPointer> mediaPointers;
     private String boardName;
     private String threadNumber;
     private GalleryAdapter galleryAdapter;
@@ -53,13 +53,13 @@ public class GalleryActivity extends SwipeRefreshActivity {
     public static void launch(
             Activity activity,
             String boardName, String threadNumber,
-            List<ImagePointer> imagePointers
+            List<MediaPointer> mediaPointers
     ) {
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity);
         Intent intent = new Intent(activity, GalleryActivity.class);
         intent.putExtra(EXTRA_BOARDNAME, boardName);
         intent.putExtra(EXTRA_THREADNUMBER, threadNumber);
-        intent.putExtra(EXTRA_IMAGEPOINTERS, Parcels.wrap(imagePointers));
+        intent.putExtra(EXTRA_IMAGEPOINTERS, Parcels.wrap(mediaPointers));
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
 
@@ -74,7 +74,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
         Bundle b = getIntent().getExtras();
         boardName = b.getString("boardName");
         threadNumber = b.getString("threadNumber");
-        imagePointers = Parcels.unwrap(b.getParcelable(EXTRA_IMAGEPOINTERS));
+        mediaPointers = Parcels.unwrap(b.getParcelable(EXTRA_IMAGEPOINTERS));
 
         setTitle(boardName + "/gal/" + threadNumber);
 
@@ -109,12 +109,12 @@ public class GalleryActivity extends SwipeRefreshActivity {
             iv.getLocationOnScreen(xy);
             final int cx = xy[0] + w/2;
             final int cy = xy[1] + h/2;
-            final String uuid = UUID.randomUUID().toString();
             iv.postDelayed(new Runnable() {
                 @Override public void run() {
-                    ImageActivity.launch(
-                            GalleryActivity.this, iv.image, uuid, new Point(cx, cy), r, true, true,
-                            boardName, threadNumber, 0, Util.arrayListOf(iv.imagePointer)
+                    MediaActivity.transitionBitmap = Util.drawableToBitmap(iv.image.getDrawable());
+                    MediaActivity.launch(
+                            GalleryActivity.this, iv.image, iv.index + "", new Point(cx, cy), r, true,
+                            boardName, threadNumber, iv.index, mediaPointers
                     );
                 }
             }, 200);
@@ -133,9 +133,9 @@ public class GalleryActivity extends SwipeRefreshActivity {
                     loaded();
                     return;
                 }
-                imagePointers.clear();
+                mediaPointers.clear();
                 for (Post p : result) { if (p.imageId != null) {
-                    imagePointers.add(new ImagePointer(p.imageId, p.imageExtension, p.imageWidth, p.imageHeight));
+                    mediaPointers.add(new MediaPointer(p, p.imageId, p.imageExtension, p.imageWidth, p.imageHeight));
                 }}
                 galleryAdapter.notifyDataSetChanged();
                 loaded();
@@ -170,19 +170,21 @@ public class GalleryActivity extends SwipeRefreshActivity {
 
     // Adapters ////////////////////////////////////////////////////////////////////////////////////
 
-    class GalleryAdapter extends UiAdapter<ImagePointer> {
+    class GalleryAdapter extends UiAdapter<MediaPointer> {
 
         public GalleryAdapter(View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
             super(GalleryActivity.this, clickListener, longClickListener);
-            this.items = imagePointers;
+            this.items = mediaPointers;
         }
 
         @Override public View newView(ViewGroup container) {
             return getLayoutInflater().inflate(R.layout.view_gallery_thumb, container, false);
         }
 
-        @Override public void bindView(ImagePointer imagePointer, int position, View view) {
-            ((GalleryThumbView) view).bindTo(ion, boardName, imagePointer);
+        @Override public void bindView(MediaPointer mediaPointer, int position, View view) {
+            GalleryThumbView g = (GalleryThumbView) view;
+            g.bindTo(ion, boardName, mediaPointer, position);
+            ViewCompat.setTransitionName(g.image, position+"");
         }
     }
 }

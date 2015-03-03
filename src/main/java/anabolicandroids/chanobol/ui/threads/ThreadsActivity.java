@@ -35,8 +35,8 @@ import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
-import anabolicandroids.chanobol.ui.images.GalleryActivity;
-import anabolicandroids.chanobol.ui.images.ImagePointer;
+import anabolicandroids.chanobol.ui.media.GalleryActivity;
+import anabolicandroids.chanobol.ui.media.MediaPointer;
 import anabolicandroids.chanobol.ui.posts.PostsActivity;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
@@ -139,7 +139,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             pauseUpdating = true;
             // TODO: Shared element animation
             GalleryActivity.launch(
-                    ThreadsActivity.this, board.name, thread.number, new ArrayList<ImagePointer>()
+                    ThreadsActivity.this, board.name, thread.number, new ArrayList<MediaPointer>()
             );
             return true;
         }

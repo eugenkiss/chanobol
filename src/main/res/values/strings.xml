@@ -14,6 +14,8 @@
     <string name="share">Share</string>
     <string name="add_favorite">Add Favorite</string>
     <string name="view_external">View</string>
+    <string name="show_post">Show Post</string>
+    <string name="goto_post">Goto Post</string>
     <string name="close_all">Close All</string>
     <string name="show_gallery">Gallery</string>
     <string name="go_to_bottom">Go to Bottom</string>

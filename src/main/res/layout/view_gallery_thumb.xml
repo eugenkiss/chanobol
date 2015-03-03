@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<anabolicandroids.chanobol.ui.images.GalleryThumbView
+<anabolicandroids.chanobol.ui.media.GalleryThumbView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="@dimen/column_width_gallery"
@@ -32,4 +32,4 @@
         tools:ignore="SmallSp"
         />
 
-</anabolicandroids.chanobol.ui.images.GalleryThumbView>
+</anabolicandroids.chanobol.ui.media.GalleryThumbView>

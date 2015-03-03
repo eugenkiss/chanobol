@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v7.widget.GridLayoutManager;
@@ -179,6 +182,11 @@ public class Util {
         anim.start();
     }
 
+    public static void setVisibility(View view, boolean show) {
+        if (show) view.setVisibility(View.VISIBLE);
+        else view.setVisibility(View.GONE);
+    }
+
     // http://stackoverflow.com/a/21051758/283607
     public static Bitmap blur(Context ctx, Bitmap image, float radius) {
         int width = Math.round(image.getWidth());
@@ -216,5 +224,24 @@ public class Util {
             context.startActivity(intent);
         else
             Util.showToast(context, R.string.no_app);
+    }
+
+    // http://stackoverflow.com/a/10600736/283607
+    public static Bitmap drawableToBitmap (Drawable drawable) {
+        if (drawable instanceof BitmapDrawable) {
+            return ((BitmapDrawable)drawable).getBitmap();
+        }
+
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+        drawable.draw(canvas);
+
+        return bitmap;
+    }
+
+    // http://stackoverflow.com/a/23683075/283607
+    public static Bitmap copy(Bitmap b) {
+        return b.copy(b.getConfig(), true);
     }
 }

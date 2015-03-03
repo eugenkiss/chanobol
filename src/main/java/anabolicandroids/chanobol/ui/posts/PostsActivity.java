@@ -40,6 +40,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -53,9 +54,9 @@ import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.UiAdapter;
-import anabolicandroids.chanobol.ui.images.GalleryActivity;
-import anabolicandroids.chanobol.ui.images.ImageActivity;
-import anabolicandroids.chanobol.ui.images.ImagePointer;
+import anabolicandroids.chanobol.ui.media.GalleryActivity;
+import anabolicandroids.chanobol.ui.media.MediaActivity;
+import anabolicandroids.chanobol.ui.media.MediaPointer;
 import anabolicandroids.chanobol.util.BindableAdapter;
 import anabolicandroids.chanobol.util.SpacesItemDecoration;
 import anabolicandroids.chanobol.util.TransitionListenerAdapter;
@@ -82,7 +83,8 @@ public class PostsActivity extends SwipeRefreshActivity {
     private static String POSTS = "posts";
     private static String POSTMAP = "postMap";
     private static String REPLIES = "replies";
-    private static String IMAGEPOINTERS = "imagePointers";
+    private static String MEDIAPOINTERS = "mediaPointers";
+    private static String MEDIAMAP = "mediaMap";
     private static String BITMAPCACHEKEYS = "bitmapCacheKeys";
     private ArrayList<Post> posts;
     private PostsAdapter postsAdapter;
@@ -91,8 +93,10 @@ public class PostsActivity extends SwipeRefreshActivity {
     // Map from a post number X to the post numbers of the posts that refer to X
     private HashMap<String, ArrayList<String>> replies;
     // This is provided to the gallery fragment so that it can immediately load its images without
-    // waiting for the result of requesting the thread json and extracting its image references once more
-    private ArrayList<ImagePointer> imagePointers;
+    // waiting for the result of requesting the thread json and extracting its media references once more
+    private ArrayList<MediaPointer> mediaPointers;
+    // Map from a post number to the index of its mediaPointer in mediaPointers (important for swiping)
+    public Map<String, Integer> mediaMap;
     // To remove all the bitmaps from Ion's cache once the activity's been destroyed
     private ArrayList<String> bitmapCacheKeys;
 
@@ -141,14 +145,16 @@ public class PostsActivity extends SwipeRefreshActivity {
             posts = new ArrayList<>();
             postMap = new HashMap<>();
             replies = new HashMap<>();
-            imagePointers = new ArrayList<>();
+            mediaPointers = new ArrayList<>();
+            mediaMap = new HashMap<>();
             bitmapCacheKeys = new ArrayList<>();
         } else {
             firstLoad = false;
             posts = Parcels.unwrap(savedInstanceState.getParcelable(POSTS));
             postMap = Parcels.unwrap(savedInstanceState.getParcelable(POSTMAP));
             replies = Parcels.unwrap(savedInstanceState.getParcelable(REPLIES));
-            imagePointers = Parcels.unwrap(savedInstanceState.getParcelable(IMAGEPOINTERS));
+            mediaPointers = Parcels.unwrap(savedInstanceState.getParcelable(MEDIAPOINTERS));
+            mediaMap = Parcels.unwrap(savedInstanceState.getParcelable(MEDIAMAP));
             bitmapCacheKeys = Parcels.unwrap(savedInstanceState.getParcelable(BITMAPCACHEKEYS));
 
             previousToolbarPosition = savedInstanceState.getFloat(PREVIOUS_TOOLBAR_POSITION);
@@ -196,7 +202,8 @@ public class PostsActivity extends SwipeRefreshActivity {
         outState.putParcelable(POSTS, Parcels.wrap(posts));
         outState.putParcelable(POSTMAP, Parcels.wrap(postMap));
         outState.putParcelable(REPLIES, Parcels.wrap(replies));
-        outState.putParcelable(IMAGEPOINTERS, Parcels.wrap(imagePointers));
+        outState.putParcelable(MEDIAPOINTERS, Parcels.wrap(mediaPointers));
+        outState.putParcelable(MEDIAMAP, Parcels.wrap(mediaMap));
         outState.putParcelable(BITMAPCACHEKEYS, Parcels.wrap(bitmapCacheKeys));
 
         outState.putString(PREVIOUS_TITLE, previousTitle);
@@ -240,10 +247,10 @@ public class PostsActivity extends SwipeRefreshActivity {
     };
 
     public static interface ImageCallback {
-        public void onClick(ImagePointer imageIdAndExt, ImageView iv, boolean fromThumbnail);
+        public void onClick(Post post, ImageView iv);
     }
     ImageCallback imageCallback = new ImageCallback() {
-        @Override public void onClick(ImagePointer imageIdAndExt, ImageView iv, boolean fromThumbnail) {
+        @Override public void onClick(Post post, ImageView iv) {
             int w = iv.getWidth();
             int h = iv.getHeight();
             Drawable d = iv.getDrawable();
@@ -253,9 +260,10 @@ public class PostsActivity extends SwipeRefreshActivity {
             int cx = xy[0] + w/2;
             int cy = xy[1] + h/2;
             String uuid = UUID.randomUUID().toString();
-            ImageActivity.launch(
-                    PostsActivity.this, iv, uuid, new Point(cx, cy), r, fromThumbnail, false,
-                    boardName, threadNumber, 0, Util.arrayListOf(imageIdAndExt)
+            MediaActivity.transitionBitmap = Util.drawableToBitmap(iv.getDrawable());
+            MediaActivity.launch(
+                    PostsActivity.this, iv, uuid, new Point(cx, cy), r, false,
+                    boardName, threadNumber, mediaMap.get(post.number), mediaPointers
             );
         }
     };
@@ -313,7 +321,9 @@ public class PostsActivity extends SwipeRefreshActivity {
                 posts.clear();
                 postMap.clear();
                 replies.clear();
-                imagePointers.clear();
+                mediaPointers.clear();
+                mediaMap.clear();
+                int mediaIndex = 0;
                 for (Post p : result) {
                     posts.add(p);
                     postMap.put(p.number, p);
@@ -328,7 +338,9 @@ public class PostsActivity extends SwipeRefreshActivity {
                     if (p.imageId != null) {
                         if (prefs.getBoolean(Settings.PRELOAD_THUMBNAILS, true))
                             ion.build(PostsActivity.this).load(ApiModule.thumbUrl(boardName, p.imageId)).asBitmap().tryGet();
-                        imagePointers.add(new ImagePointer(p.imageId, p.imageExtension, p.imageWidth, p.imageHeight));
+                        mediaPointers.add(new MediaPointer(p, p.imageId, p.imageExtension, p.imageWidth, p.imageHeight));
+                        mediaMap.put(p.number, mediaIndex);
+                        mediaIndex++;
                     }
                 }
                 lastUpdate = System.currentTimeMillis();
@@ -402,7 +414,7 @@ public class PostsActivity extends SwipeRefreshActivity {
                 load();
                 break;
             case R.id.gallery:
-                GalleryActivity.launch(this, boardName, threadNumber, imagePointers);
+                GalleryActivity.launch(this, boardName, threadNumber, mediaPointers);
                 break;
             case R.id.close:
                 dismissAllPostsDialogs();
