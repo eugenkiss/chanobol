@@ -86,6 +86,7 @@ public class MediaView extends FrameLayout {
 
     public void bindToPreview(Bitmap bitmap) {
         imageView.setImageBitmap(bitmap);
+        // Otherwise there will be glitches sometimes
         if (attacher != null) attacher.cleanup();
         attacher = new PhotoViewAttacher(imageView);
     }
@@ -99,7 +100,7 @@ public class MediaView extends FrameLayout {
 
         imageView.setImageBitmap(null);
         String thumbUrl = ApiModule.thumbUrl(boardName, mediaPointer.id);
-        ion.build(imageView).crossfade(true).load(thumbUrl).setCallback(new FutureCallback<ImageView>() {
+        ion.build(imageView).fadeIn(false).load(thumbUrl).setCallback(new FutureCallback<ImageView>() {
             @Override public void onCompleted(Exception e, ImageView result) {
                 if (attacher != null) attacher.cleanup();
                 attacher = new PhotoViewAttacher(imageView);
