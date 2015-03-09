@@ -32,7 +32,6 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.UiActivity;
-import anabolicandroids.chanobol.ui.media.MediaPointer;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -43,6 +42,7 @@ public class PostView extends CardView {
     @InjectView(R.id.date) TextView date;
     @InjectView(R.id.repliesContainer) ViewGroup repliesContainer;
     @InjectView(R.id.replies) TextView replies;
+    @InjectView(R.id.mediaContainer) ViewGroup mediaContainer;
     @InjectView(R.id.imageTouchOverlay) View imageTouchOverlay; // I couldn't get the FrameLayout clickable...
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.play) ImageView play;
@@ -78,6 +78,7 @@ public class PostView extends CardView {
     private void reset() {
         repliesContainer.setVisibility(View.GONE);
         header.setOnClickListener(null);
+        mediaContainer.setVisibility(View.GONE);
         image.setVisibility(View.GONE);
         image.setImageBitmap(null);
         image.setOnClickListener(null);
@@ -232,6 +233,7 @@ public class PostView extends CardView {
 
         final int[] size = new int[2]; calcSize(size, post);
         ViewCompat.setTransitionName(image, transitionName);
+        mediaContainer.setVisibility(View.VISIBLE);
         image.setVisibility(View.VISIBLE);
         image.setImageDrawable(opImage);
         image.getLayoutParams().height = size[H];
@@ -259,6 +261,7 @@ public class PostView extends CardView {
                     if (!loaded) progress.setVisibility(View.VISIBLE);
                 }
             }, 500);
+            mediaContainer.setVisibility(View.VISIBLE);
             image.setVisibility(View.VISIBLE);
             image.getLayoutParams().height = size[H];
             String thumbUrl = ApiModule.thumbUrl(boardName, post.imageId);
