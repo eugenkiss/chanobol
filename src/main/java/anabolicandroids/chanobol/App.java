@@ -5,6 +5,7 @@ import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
 
+import anabolicandroids.chanobol.util.Util;
 import dagger.ObjectGraph;
 import io.fabric.sdk.android.Fabric;
 import timber.log.Timber;
@@ -15,6 +16,9 @@ public class App extends Application {
     // in the Application class is safe with respect to stale references so it's all good.
     public static boolean needToProtractToolbar = false;
     public static boolean firstStart;
+    // As a fallback
+    public static int screenWidth;
+    public static int screenHeight;
 
     private ObjectGraph appGraph;
 
@@ -26,7 +30,10 @@ public class App extends Application {
             Timber.plant(new Timber.DebugTree());
         }
         buildAppGraphAndInject();
+
         firstStart = true;
+        screenWidth = Util.getScreenWidth(this);
+        screenHeight = Util.getScreenHeight(this);
     }
 
     public void buildAppGraphAndInject() {

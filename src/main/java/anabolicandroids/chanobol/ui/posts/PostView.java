@@ -1,6 +1,7 @@
 package anabolicandroids.chanobol.ui.posts;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.ViewCompat;
@@ -28,6 +29,7 @@ import com.koushikdutta.ion.builder.Builders;
 
 import java.util.ArrayList;
 
+import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
@@ -67,10 +69,26 @@ public class PostView extends CardView {
     @Override protected void onFinishInflate() {
         super.onFinishInflate();
         ButterKnife.inject(this);
-        // TODO: Is onFinishInflate called on a configuration change if the containing fragment's instance is retained?
-        // If not these values should be recalculated.
-        int screenWidth = Util.getScreenWidth(getContext());
-        int screenHeight = Util.getScreenHeight(getContext());
+        updateImageBounds();
+    }
+
+    @Override protected void onConfigurationChanged(Configuration newConfig) {
+        if (post == null || image == null || image.getLayoutParams() == null) return;
+        updateImageBounds();
+        final int[] size = new int[2]; calcSize(size, post);
+        image.getLayoutParams().height = size[H];
+        postInvalidate();
+    }
+
+    private void updateImageBounds() {
+        int screenWidth, screenHeight;
+        if (getContext() == null) { // Weird anomaly bug
+            screenWidth = App.screenWidth;
+            screenHeight = App.screenHeight;
+        } else {
+            screenWidth = Util.getScreenWidth(getContext());
+            screenHeight = Util.getScreenHeight(getContext());
+        }
         maxImgWidth = screenWidth;
         maxImgHeight = (int) (screenHeight * 0.85);
     }
