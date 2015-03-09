@@ -28,16 +28,16 @@ public abstract class Common {
     public String text;
 
     @SerializedName("tim")
-    public String imageId;
+    public String mediaId;
 
     @SerializedName("ext")
-    public String imageExtension;
+    public String mediaExtension;
 
     @SerializedName("w")
-    public int imageWidth;
+    public int mediaWidth;
 
     @SerializedName("h")
-    public int imageHeight;
+    public int mediaHeight;
 
     @SerializedName("tn_w")
     public int thumbnailWidth;

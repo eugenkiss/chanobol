@@ -13,7 +13,7 @@ public class Post extends Common {
     public boolean isOp() { return "0".equals(replyTo); }
 
     @SuppressWarnings("UnusedDeclaration")
-    public boolean isWebm() { return ".webm".equals(imageExtension); }
+    public boolean isWebm() { return ".webm".equals(mediaExtension); }
 
     // Only used internally, no counterpart in 4Chan API
     public int replyCount;

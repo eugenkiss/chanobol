@@ -56,7 +56,7 @@ public class ThreadView extends FrameLayout {
         numImages.setText(thread.images+"i");
         if (!onlyUpdateText || b == null) {
             ion.build(image)
-                    .load(ApiModule.thumbUrl(boardName, thread.imageId))
+                    .load(ApiModule.thumbUrl(boardName, thread.mediaId))
                     .withBitmapInfo()
                     .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                         @Override public void onCompleted(Exception e, ImageViewBitmapInfo result) {

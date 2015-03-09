@@ -116,7 +116,7 @@ public class PostView extends CardView {
     // have to be reduced proportionally such that the new height is smaller equal the
     // screen height.
     private void calcSize(int[] size, Post post) {
-        double w = post.imageWidth, h = post.imageHeight;
+        double w = post.mediaWidth, h = post.mediaHeight;
         if (w >= maxImgWidth) {
             double w_old = w;
             w = maxImgWidth;
@@ -191,11 +191,11 @@ public class PostView extends CardView {
                 .replaceAll("</span>", "</font>");
         setTextViewHTML(post.number, text, r, referencedPostCallback);
 
-        if (post.imageId != null && !"null".equals(post.imageId)) {
+        if (post.mediaId != null && !"null".equals(post.mediaId)) {
             footer.setVisibility(VISIBLE);
             footerImage.setVisibility(VISIBLE);
-            footerImage.setText(String.format("%dx%d ~ %s ~ %s%s", post.imageWidth, post.imageHeight,
-                    Util.readableFileSize(post.filesize), post.filename, post.imageExtension));
+            footerImage.setText(String.format("%dx%d ~ %s ~ %s%s", post.mediaWidth, post.mediaHeight,
+                    Util.readableFileSize(post.filesize), post.filename, post.mediaExtension));
         }
         if (post.tripCode != null) {
             footer.setVisibility(VISIBLE);
@@ -256,7 +256,7 @@ public class PostView extends CardView {
         image.setImageDrawable(opImage);
         image.getLayoutParams().height = size[H];
         image.requestLayout();
-        ion.build(getContext()).load(ApiModule.imgUrl(boardName, post.imageId, post.imageExtension)).asBitmap().tryGet();
+        ion.build(getContext()).load(ApiModule.imgUrl(boardName, post.mediaId, post.mediaExtension)).asBitmap().tryGet();
     }
 
     private boolean loaded;
@@ -270,7 +270,7 @@ public class PostView extends CardView {
         reset();
         initText(ion, post, repliesCallback, referencedPostCallback);
 
-        if (post.imageId != null && !"null".equals(post.imageId)) {
+        if (post.mediaId != null && !"null".equals(post.mediaId)) {
             final int[] size = new int[2]; calcSize(size, post);
             // Only show progress bar if loading takes especially long
             loaded = false;
@@ -282,7 +282,7 @@ public class PostView extends CardView {
             mediaContainer.setVisibility(View.VISIBLE);
             image.setVisibility(View.VISIBLE);
             image.getLayoutParams().height = size[H];
-            String thumbUrl = ApiModule.thumbUrl(boardName, post.imageId);
+            String thumbUrl = ApiModule.thumbUrl(boardName, post.mediaId);
             ion.build(image)
                 .load(thumbUrl)
                 .withBitmapInfo()
@@ -296,8 +296,8 @@ public class PostView extends CardView {
                             return;
                         }
                         bitmapCacheKeys.add(result.getBitmapInfo().key);
-                        final String ext = post.imageExtension;
-                        final String url = ApiModule.imgUrl(boardName, post.imageId, post.imageExtension);
+                        final String ext = post.mediaExtension;
+                        final String url = ApiModule.imgUrl(boardName, post.mediaId, post.mediaExtension);
                         switch (ext) {
                             case ".webm":
                                 loaded = true;

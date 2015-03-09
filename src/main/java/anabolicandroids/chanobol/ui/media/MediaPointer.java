@@ -24,7 +24,7 @@ public class MediaPointer {
     }
 
     public static MediaPointer from(Post post) {
-        return new MediaPointer(post, post.imageId, post.imageExtension, post.imageWidth, post.imageHeight);
+        return new MediaPointer(post, post.mediaId, post.mediaExtension, post.mediaWidth, post.mediaHeight);
     }
 
     public boolean isWebm() {

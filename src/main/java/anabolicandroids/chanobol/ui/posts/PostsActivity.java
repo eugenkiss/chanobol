@@ -133,7 +133,7 @@ public class PostsActivity extends SwipeRefreshActivity {
 
         setTitle(boardName + "/" + threadNumber);
 
-        String thumbUrl = ApiModule.thumbUrl(boardName, opPost.imageId);
+        String thumbUrl = ApiModule.thumbUrl(boardName, opPost.mediaId);
         try {
             opImage = new BitmapDrawable(getResources(), ion.build(this).load(thumbUrl).asBitmap().get());
         } catch (InterruptedException | ExecutionException e) {
@@ -335,10 +335,10 @@ public class PostsActivity extends SwipeRefreshActivity {
                             referenced.replyCount++;
                         }
                     }
-                    if (p.imageId != null) {
+                    if (p.mediaId != null) {
                         if (prefs.getBoolean(Settings.PRELOAD_THUMBNAILS, true))
-                            ion.build(PostsActivity.this).load(ApiModule.thumbUrl(boardName, p.imageId)).asBitmap().tryGet();
-                        mediaPointers.add(new MediaPointer(p, p.imageId, p.imageExtension, p.imageWidth, p.imageHeight));
+                            ion.build(PostsActivity.this).load(ApiModule.thumbUrl(boardName, p.mediaId)).asBitmap().tryGet();
+                        mediaPointers.add(new MediaPointer(p, p.mediaId, p.mediaExtension, p.mediaWidth, p.mediaHeight));
                         mediaMap.put(p.number, mediaIndex);
                         mediaIndex++;
                     }
