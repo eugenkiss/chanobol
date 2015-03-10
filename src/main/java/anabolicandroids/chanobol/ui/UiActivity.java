@@ -62,6 +62,7 @@ import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 import butterknife.OnClick;
+import butterknife.Optional;
 
 // http://stackoverflow.com/a/19451842/283607
 // http://stackoverflow.com/a/26526858/283607
@@ -221,7 +222,7 @@ public abstract class UiActivity extends BaseActivity {
         startActivity(intent);
     }
 
-    @OnClick(R.id.debugSettings) void onDebugSettings() {
+    @Optional @OnClick(R.id.debugSettings) void onDebugSettings() {
         Intent intent = new Intent(this, debugSettingsClass);
         startActivity(intent);
     }
