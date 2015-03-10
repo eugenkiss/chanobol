@@ -67,17 +67,32 @@ android {
         versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch * 100 + versionBuild
         versionName "${versionMajor}.${versionMinor}.${versionPatch}"
     }
-    // http://stackoverflow.com/a/21020469/283607
-    signingConfigs {
-        // FYI: Comment the following lines and the one under
-        // buildTypes.release to prevent Gradle from aborting the build
-        release {
-            storeFile file(RELEASE_STORE_FILE)
-            storePassword RELEASE_STORE_PASSWORD
-            keyAlias RELEASE_KEY_ALIAS
-            keyPassword RELEASE_KEY_PASSWORD
+
+    /*
+    If you want to sign releases, make a file in app/keys.properties with the following content:
+    keystoreFile=yourkey.store
+    keystorePass=pass
+    keyAlias=alias
+    keyPass=pass
+    */
+
+    File f = file('keys.properties')
+    boolean doSign = f.exists();
+
+    if (doSign) {
+        Properties props = new Properties()
+        props.load(new FileInputStream(f))
+
+        signingConfigs {
+            release {
+                storeFile file(props['keystoreFile'])
+                storePassword props['keystorePass']
+                keyAlias props['keyAlias']
+                keyPassword props['keyPass']
+            }
         }
     }
+
     buildTypes {
         debug {
             applicationIdSuffix '.dev'
@@ -86,7 +101,9 @@ android {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+            if (doSign) {
+                signingConfig signingConfigs.release
+            }
         }
         release_sfw {
             initWith buildTypes.release
