@@ -15,11 +15,9 @@ def versionPatch = 1
 def versionBuild = 0
 
 apply plugin: 'com.android.application'
-// TODO: This would be so nice but it doesn't work
-//if (project.hasProperty('apiKey') && project.hasProperty('apiSecret')) {
-// FYI: Comment the following line to prevent crashlytics errors from building the project
+if (project.file('crashlytics.properties').exists()) {
     apply plugin: 'io.fabric'
-//}
+}
 
 repositories {
     jcenter()
