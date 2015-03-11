@@ -15,6 +15,7 @@ def versionPatch = 1
 def versionBuild = 0
 
 apply plugin: 'com.android.application'
+
 if (project.file('crashlytics.properties').exists()) {
     apply plugin: 'io.fabric'
 }
@@ -67,7 +68,7 @@ android {
     }
 
     /*
-    If you want to sign releases, make a file in app/keys.properties with the following content:
+    If you want to sign releases, make a file keys.properties with the following content:
     keystoreFile=yourkey.store
     keystorePass=pass
     keyAlias=alias
