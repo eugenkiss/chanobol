@@ -223,6 +223,7 @@ public abstract class UiActivity extends BaseActivity {
     }
 
     @Optional @OnClick(R.id.debugSettings) void onDebugSettings() {
+        if (debugSettingsClass == null) return; // see https://github.com/eugenkiss/chanobol/issues/137
         Intent intent = new Intent(this, debugSettingsClass);
         startActivity(intent);
     }
