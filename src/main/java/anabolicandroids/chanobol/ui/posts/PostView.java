@@ -1,19 +1,22 @@
 package anabolicandroids.chanobol.ui.posts;
 
+import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.Configuration;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.CardView;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
+import android.text.Layout;
+import android.text.Spannable;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
-import android.text.style.URLSpan;
 import android.util.AttributeSet;
-import android.util.Patterns;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -34,6 +37,11 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.UiActivity;
+import anabolicandroids.chanobol.ui.posts.parsing.CommentParser;
+import anabolicandroids.chanobol.ui.posts.parsing.LinkSpan;
+import anabolicandroids.chanobol.ui.posts.parsing.QuoteSpan;
+import anabolicandroids.chanobol.ui.posts.parsing.ThreadLink;
+import anabolicandroids.chanobol.ui.posts.parsing.ThreadSpan;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -56,6 +64,7 @@ public class PostView extends CardView {
     @InjectView(R.id.footerCountryName) TextView footerCountryName;
     @InjectView(R.id.footerImage) TextView footerImage;
 
+    private PostViewMovementMethod postViewMovementMethod = new PostViewMovementMethod();
     private static final int W = 0, H = 1;
     private int maxImgWidth;
     private int maxImgHeight;
@@ -131,8 +140,7 @@ public class PostView extends CardView {
         size[H] = (int) h;
     }
 
-    private void initImageCallback(final Post post,
-                                   final PostsActivity.ImageCallback cb) {
+    private void initImageCallback(final Post post, final PostsActivity.ImageCallback cb) {
         OnClickListener l = new OnClickListener() {
             @Override public void onClick(View v) {
                 imageTouchOverlay.postDelayed(new Runnable() {
@@ -161,7 +169,7 @@ public class PostView extends CardView {
     private void initText(final Ion ion,
                           final Post post,
                           final PostsActivity.RepliesCallback repliesCallback,
-                          final PostsActivity.ReferencedPostCallback referencedPostCallback) {
+                          final PostsActivity.QuoteCallback quoteCallback) {
         number.setText(post.number);
         date.setText(DateUtils.getRelativeTimeSpanString(
                 post.time * 1000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS));
@@ -176,20 +184,11 @@ public class PostView extends CardView {
             });
         }
 
-        String s = post.subject;
-        if (s == null) s = "";
-        else s = "<h2>" + s + "</h2>";
-        String t = post.text;
-        if (t == null) t = "";
-
-        // TODO: I'd love to use a more principled approach
-        String r = (s + t)
-                .replaceAll("<wbr>", "")
-                // TODO: I simply want to turn all plain text urls into links without matching urls that are assigned to a href attribute
-                .replaceAll("(?!href=\")("+Patterns.WEB_URL.pattern()+")", "<a href=\"$1\">$1</a>")
-                .replaceAll("<span class=\"quote\">", "<font color=\"#23b423\">")
-                .replaceAll("</span>", "</font>");
-        setTextViewHTML(post.number, text, r, referencedPostCallback);
+        String s = post.subject; if (s == null) s = ""; else s = "<h2>" + s + "</h2>";
+        String t = post.text; if (t == null) t = "";
+        text.setText(CommentParser.getInstance().parseComment(post, s + t));
+        postViewMovementMethod.quoteCallback = quoteCallback;
+        text.setMovementMethod(postViewMovementMethod);
 
         if (post.mediaId != null && !"null".equals(post.mediaId)) {
             footer.setVisibility(VISIBLE);
@@ -211,31 +210,6 @@ public class PostView extends CardView {
                     .fitCenter()
                     .load("file:///android_asset/flags/"+post.country.toLowerCase()+".png");
         }
-    }
-
-    // http://stackoverflow.com/a/19989677/283607
-    protected void setTextViewHTML(final String quoterId, TextView text, String html,
-                                   final PostsActivity.ReferencedPostCallback referencedPostCallback) {
-        CharSequence sequence = Html.fromHtml(html);
-        SpannableStringBuilder strBuilder = new SpannableStringBuilder(sequence);
-        URLSpan[] urls = strBuilder.getSpans(0, sequence.length(), URLSpan.class);
-        for(final URLSpan span : urls) {
-            if (!span.getURL().startsWith("#p")) continue;
-            int start = strBuilder.getSpanStart(span);
-            int end = strBuilder.getSpanEnd(span);
-            int flags = strBuilder.getSpanFlags(span);
-            ClickableSpan clickable = new ClickableSpan() {
-                public void onClick(View view) {
-                    if (referencedPostCallback != null)
-                        referencedPostCallback.onClick(quoterId, span.getURL().substring(2));
-                }
-            };
-            strBuilder.setSpan(clickable, start, end, flags);
-            strBuilder.removeSpan(span);
-        }
-        text.setText(strBuilder);
-        text.setLinksClickable(true);
-        text.setMovementMethod(LinkMovementMethod.getInstance());
     }
 
     // The raison d'être for this method is to immediately populate the OP post cardview
@@ -264,11 +238,11 @@ public class PostView extends CardView {
                        @SuppressWarnings("UnusedParameters") final String threadId, final Ion ion,
                        final ArrayList<String> bitmapCacheKeys,
                        final PostsActivity.RepliesCallback repliesCallback,
-                       final PostsActivity.ReferencedPostCallback referencedPostCallback,
+                       final PostsActivity.QuoteCallback quoteCallback,
                        final PostsActivity.ImageCallback imageCallback) {
         this.post = post;
         reset();
-        initText(ion, post, repliesCallback, referencedPostCallback);
+        initText(ion, post, repliesCallback, quoteCallback);
 
         if (post.mediaId != null && !"null".equals(post.mediaId)) {
             final int[] size = new int[2]; calcSize(size, post);
@@ -330,6 +304,61 @@ public class PostView extends CardView {
                         }
                     }
                 });
+        }
+    }
+
+    // Adapted from Clover
+    private class PostViewMovementMethod extends LinkMovementMethod {
+        PostsActivity.QuoteCallback quoteCallback;
+        @Override public boolean onTouchEvent(@NonNull TextView widget, @NonNull Spannable buffer, @NonNull MotionEvent event) {
+            int action = event.getAction();
+            if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_DOWN) {
+                int x = (int) event.getX();
+                int y = (int) event.getY();
+                x -= widget.getTotalPaddingLeft();
+                y -= widget.getTotalPaddingTop();
+                x += widget.getScrollX();
+                y += widget.getScrollY();
+                Layout layout = widget.getLayout();
+                int line = layout.getLineForVertical(y);
+                int off = layout.getOffsetForHorizontal(line, x);
+                ClickableSpan[] spans = buffer.getSpans(off, off, ClickableSpan.class);
+                if (spans.length == 0) {
+                    PostView.this.onTouchEvent(event);
+                    return true;
+                }
+
+                if (action == MotionEvent.ACTION_UP) {
+                    ClickableSpan span = spans[0];
+                    if (span instanceof QuoteSpan) {
+                        QuoteSpan quoteSpan = (QuoteSpan) span;
+                        quoteCallback.onClick(quoteSpan.quoterId, quoteSpan.quotedId);
+                    } else if (span instanceof LinkSpan) {
+                        LinkSpan linkSpan = (LinkSpan) span;
+                        Util.openLink(getContext(), linkSpan.url);
+                    } else if (span instanceof ThreadSpan) {
+                        ThreadSpan threadSpan = (ThreadSpan) span;
+                        final ThreadLink threadLink = threadSpan.threadLink;
+                        new AlertDialog.Builder(getContext())
+                                .setNegativeButton(android.R.string.cancel, null)
+                                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                                    @Override public void onClick(final DialogInterface dialog, final int which) {
+                                        PostsActivity.launch((Activity) getContext(), null, null, null,
+                                                threadLink.board, String.valueOf(threadLink.threadNumber));
+                                    }
+                                })
+                                .setTitle(R.string.open_thread_confirmation)
+                                .setMessage("/" + threadLink.board + "/" + threadLink.threadNumber)
+                                .show();
+                    }
+                    span.onClick(widget);
+                }
+
+                text.invalidate();
+            } else {
+                PostView.this.onTouchEvent(event);
+            }
+            return true;
         }
     }
 }

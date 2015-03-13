@@ -104,7 +104,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             Activity activity, View transitionView, String transitionName,
             Post opPost, String boardName, String threadNumber
     ) {
-        ViewCompat.setTransitionName(transitionView, transitionName);
+        if (transitionView != null) ViewCompat.setTransitionName(transitionView, transitionName);
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity,
                 Pair.create(transitionView, transitionName)
         );
@@ -133,11 +133,13 @@ public class PostsActivity extends SwipeRefreshActivity {
 
         setTitle(boardName + "/" + threadNumber);
 
-        String thumbUrl = ApiModule.thumbUrl(boardName, opPost.mediaId);
-        try {
-            opImage = new BitmapDrawable(getResources(), ion.build(this).load(thumbUrl).asBitmap().get());
-        } catch (InterruptedException | ExecutionException e) {
-            e.printStackTrace();
+        if (opPost != null) {
+            String thumbUrl = ApiModule.thumbUrl(boardName, opPost.mediaId);
+            try {
+                opImage = new BitmapDrawable(getResources(), ion.build(this).load(thumbUrl).asBitmap().get());
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
         }
 
         if (savedInstanceState == null) {
@@ -170,7 +172,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         getSupportFragmentManager().addOnBackStackChangedListener(backStackChangedListener);
         setupUpLongClickCloseAll();
 
-        if (firstLoad) {
+        if (firstLoad && opPost != null) {
             posts.add(opPost);
             postsAdapter.notifyItemChanged(0);
         }
@@ -230,10 +232,10 @@ public class PostsActivity extends SwipeRefreshActivity {
         }
     };
 
-    public static interface ReferencedPostCallback {
+    public static interface QuoteCallback {
         public void onClick(String quoterId, String quotedId);
     }
-    ReferencedPostCallback referencedPostCallback = new ReferencedPostCallback() {
+    QuoteCallback quoteCallback = new QuoteCallback() {
         @Override public void onClick(final String quoterId, final String quotedId) {
             Post quoted = postMap.get(quotedId);
             if (quoted != null) {
@@ -647,7 +649,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             v.bindToOp(opImage, transitionName, item, boardName, ion);
         } else {
             v.bindTo(item, boardName, threadNumber, ion, bitmapCacheKeys,
-                     repliesCallback, referencedPostCallback, imageCallback);
+                     repliesCallback, quoteCallback, imageCallback);
         }
         if (position == 0)  ViewCompat.setTransitionName(v.image, transitionName);
         else  ViewCompat.setTransitionName(v.image, null);

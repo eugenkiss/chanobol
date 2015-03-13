@@ -17,6 +17,8 @@
         <item name="android:windowAllowReturnTransitionOverlap">true</item>
         <item name="android:windowSharedElementEnterTransition">@transition/move</item>
         <item name="android:windowSharedElementReenterTransition">@transition/move</item>
+
+        <item name="post_style">@style/PostView.Dark</item>
     </style>
 
     <style name="MediaActivity" parent="AppTheme">
@@ -101,6 +103,69 @@
         <item name="android:scrollbarStyle">outsideOverlay</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:background">@null</item>
+    </style>
+
+    <style name="PostView">
+        <item name="grid_width">90dp</item>
+        <item name="grid_height">300dp</item>
+        <item name="grid_spacing">0dp</item>
+
+        <item name="title_size">14sp</item>
+        <item name="detail_size">10sp</item>
+        <item name="icon_padding">6dp</item>
+        <item name="icon_width">24dp</item>
+        <item name="icon_height">14dp</item>
+        <item name="options_spacing">25dp</item>
+        <item name="options_left_padding">15dp</item>
+        <item name="options_top_padding">5dp</item>
+        <item name="options_right_padding">5dp</item>
+        <item name="options_bottom_padding">15dp</item>
+        <item name="last_seen_height">6dp</item>
+
+        <item name="grid_padding">5dp</item>
+        <item name="grid_image_size">120dp</item>
+        <item name="grid_comment_padding">8dp</item>
+        <item name="grid_replies_count_size">11sp</item>
+
+        <item name="list_padding">10dp</item>
+        <item name="list_image_size">70dp</item>
+        <item name="list_comment_padding">11dp</item>
+        <item name="list_replies_count_size">14sp</item>
+        <item name="list_comment_max_height">200dp</item>
+
+        <item name="thumbnail_background">#FFDDDDDD</item>
+        <item name="saved_reply_color">#FFBCBCBC</item>
+        <item name="highlighted_color">#FFD6BAD0</item>
+        <item name="reply_count_color">#FF646464</item>
+        <item name="name_color">#ff117743</item>
+        <item name="subject_color">#ff0F0C5D</item>
+        <item name="date_color">#ff646464</item>
+        <item name="quote_color">#ffDD0000</item>
+        <item name="highlight_quote_color">#ff950000</item>
+        <item name="link_color">#ff0000B4</item>
+        <item name="spoiler_color">#ff000000</item>
+        <item name="capcode_color">#ffff0000</item>
+        <item name="id_background_light">#ff636363</item>
+        <item name="id_background_dark">#00000000</item>
+        <item name="inline_quote_color">#ff789922</item>
+
+        <item name="code_tag_size">12sp</item>
+    </style>
+
+    <style name="PostView.Dark">
+        <item name="quote_color">#ffff7f72</item>
+        <item name="highlight_quote_color">#ffff7f72</item>
+        <item name="inline_quote_color">#ff52d74a</item>
+        <item name="thumbnail_background">#00000000</item>
+        <item name="saved_reply_color">#ff5C5C5C</item>
+        <item name="highlighted_color">#ff444444</item>
+        <item name="reply_count_color">#ff9f9f9f</item>
+        <item name="subject_color">#ff625cff</item>
+        <item name="date_color">#ff9f9f9f</item>
+        <item name="link_color">#80cbc4</item>
+        <item name="spoiler_color">#ff000000</item>
+        <item name="id_background_light">#00000000</item>
+        <item name="id_background_dark">#ffC6C6C6</item>
     </style>
 
 </resources>

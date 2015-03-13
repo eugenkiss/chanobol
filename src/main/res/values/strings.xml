@@ -40,6 +40,7 @@
     <string name="add_favorite_title">Add favorite board</string>
     <string name="favorize_title">Favorize?</string>
     <string name="favorite_added">added as favorite</string>
+    <string name="open_thread_confirmation">Open this thread?</string>
     <!-- Toasts -->
     <string name="no_app">No suitable app</string>
     <string name="no_board">Board doesn\'t exist</string>

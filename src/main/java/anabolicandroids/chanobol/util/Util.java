@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.util;
 
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -220,6 +221,14 @@ public class Util {
 
     public static void startWebmActivity(Context context, String url) {
         Intent intent = new Intent(Intent.ACTION_VIEW).setDataAndType(Uri.parse(url), "video/webm");
+        if(intent.resolveActivity(context.getPackageManager()) != null)
+            context.startActivity(intent);
+        else
+            Util.showToast(context, R.string.no_app);
+    }
+
+    public static void openLink(Context context, String link) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
         if(intent.resolveActivity(context.getPackageManager()) != null)
             context.startActivity(intent);
         else
