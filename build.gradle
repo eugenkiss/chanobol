@@ -43,7 +43,7 @@ dependencies {
 
     compile 'org.jsoup:jsoup:1.7.3'
 
-    compile  'com.koushikdutta.ion:ion:2.0.7'
+    compile  'com.koushikdutta.ion:ion:2.1.1'
 
     // TODO: Update to 1.2.4 once it's out (https://github.com/chrisbanes/PhotoView/issues/72)
     compile  'com.github.chrisbanes.photoview:library:1.2.2'
