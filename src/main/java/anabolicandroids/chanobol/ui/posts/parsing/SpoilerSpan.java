@@ -3,7 +3,7 @@ package anabolicandroids.chanobol.ui.posts.parsing;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
-import anabolicandroids.chanobol.ui.ThemeHelper;
+import anabolicandroids.chanobol.ui.ThemeContext;
 
 public class SpoilerSpan extends PostSpan {
 
@@ -11,8 +11,8 @@ public class SpoilerSpan extends PostSpan {
 
     @Override public void updateDrawState(@NonNull TextPaint ds) {
         if (!clicked) {
-            ds.setColor(ThemeHelper.getInstance().getSpoilerColor());
-            ds.bgColor = ThemeHelper.getInstance().getSpoilerColor();
+            ds.setColor(ThemeContext.getInstance().getSpoilerColor());
+            ds.bgColor = ThemeContext.getInstance().getSpoilerColor();
             ds.setUnderlineText(false);
         }
     }

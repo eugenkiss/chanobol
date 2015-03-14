@@ -6,7 +6,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Build;
@@ -78,7 +77,7 @@ public abstract class UiActivity extends BaseActivity {
     @Inject @ForApplication public Context appContext;
     @Inject public App app;
     @Inject public Resources resources;
-    @Inject public SharedPreferences prefs;
+    @Inject public Prefs prefs;
     @Inject public PersistentData persistentData;
     @Inject public ChanService service;
     @Inject public Ion ion;
@@ -109,8 +108,8 @@ public abstract class UiActivity extends BaseActivity {
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        ThemeHelper.setTheme(this);
-        ThemeHelper.getInstance().reloadPostViewColors(this);
+        setTheme(prefs.theme().resValue);
+        ThemeContext.getInstance().reloadPostViewColors(this);
 
         setContentView(R.layout.activity_ui);
         ViewGroup container = (ViewGroup) findViewById(R.id.container);
@@ -170,7 +169,7 @@ public abstract class UiActivity extends BaseActivity {
             rv.setOnScrollListener(new RecyclerView.OnScrollListener() {
                 @TargetApi(Build.VERSION_CODES.HONEYCOMB) @Override
                 public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
+                    if (!prefs.hidableToolbar()) return;
                     float y = Util.clamp(-toolbar.getHeight(), toolbar.getTranslationY() - dy, 0);
                     toolbar.setTranslationY(y);
                     toolbarShadow.setTranslationY(y);
@@ -179,7 +178,7 @@ public abstract class UiActivity extends BaseActivity {
         } else {
             rv.setOnScrollListener(new RecyclerView.OnScrollListener() {
                 @Override public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                    if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
+                    if (!prefs.hidableToolbar()) return;
                     float y = Util.clamp(-toolbar.getHeight(), ViewHelper.getTranslationY(toolbar) - dy, 0);
                     ViewHelper.setTranslationY(toolbar, y);
                     ViewHelper.setTranslationY(toolbarShadow, y);
@@ -340,7 +339,7 @@ public abstract class UiActivity extends BaseActivity {
 
     @SuppressWarnings("UnusedDeclaration")
     public void hideToolbar() {
-        if (!prefs.getBoolean(Settings.HIDABLE_TOOLBAR, true)) return;
+        if (!prefs.hidableToolbar()) return;
         if (Build.VERSION.SDK_INT >= 14)
             toolbar.animate().y(-toolbar.getHeight()).setDuration(dur);
         else

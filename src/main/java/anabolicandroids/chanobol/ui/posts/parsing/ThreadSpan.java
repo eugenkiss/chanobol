@@ -3,7 +3,7 @@ package anabolicandroids.chanobol.ui.posts.parsing;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
-import anabolicandroids.chanobol.ui.ThemeHelper;
+import anabolicandroids.chanobol.ui.ThemeContext;
 
 public class ThreadSpan extends PostSpan {
 
@@ -14,7 +14,7 @@ public class ThreadSpan extends PostSpan {
     }
 
     @Override public void updateDrawState(@NonNull TextPaint ds) {
-        ds.setColor(ThemeHelper.getInstance().getQuoteColor());
+        ds.setColor(ThemeContext.getInstance().getQuoteColor());
         ds.setUnderlineText(true);
     }
 }

@@ -31,7 +31,6 @@ import java.util.concurrent.TimeUnit;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.api.data.Thread;
-import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
@@ -270,7 +269,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             executor.scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
-                    if (!prefs.getBoolean(Settings.REFRESH, true)) return;
+                    if (!prefs.autoRefresh()) return;
                     if (pauseUpdating) return;
                     if (System.currentTimeMillis() - lastUpdate > updateInterval) {
                         runOnUiThread(new Runnable() {

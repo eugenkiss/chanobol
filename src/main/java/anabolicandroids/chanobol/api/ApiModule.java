@@ -12,6 +12,7 @@ import dagger.Module;
 import dagger.Provides;
 
 // https://github.com/4chan/4chan-API
+@SuppressWarnings("UnusedDeclaration")
 @Module(
         complete = false,
         library = true

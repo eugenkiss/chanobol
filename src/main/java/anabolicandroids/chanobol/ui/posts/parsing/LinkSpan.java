@@ -3,7 +3,7 @@ package anabolicandroids.chanobol.ui.posts.parsing;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
-import anabolicandroids.chanobol.ui.ThemeHelper;
+import anabolicandroids.chanobol.ui.ThemeContext;
 
 public class LinkSpan extends PostSpan {
 
@@ -14,7 +14,7 @@ public class LinkSpan extends PostSpan {
     }
 
     @Override public void updateDrawState(@NonNull TextPaint ds) {
-        ds.setColor(ThemeHelper.getInstance().getLinkColor());
+        ds.setColor(ThemeContext.getInstance().getLinkColor());
         ds.setUnderlineText(true);
     }
 }

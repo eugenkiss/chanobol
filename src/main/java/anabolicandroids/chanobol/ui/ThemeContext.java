@@ -17,83 +17,33 @@
  */
 package anabolicandroids.chanobol.ui;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 
 import anabolicandroids.chanobol.R;
 
-// From Clover
+// Adapted from Clover
 
-public class ThemeHelper {
-    public enum Theme {
-        LIGHT("light", R.style.AppTheme, true),
-        DARK("dark", R.style.AppTheme, false),
-        BLACK("black", R.style.AppTheme, false);
+// In order to have a global (dynamically bound would be better in an ideal world) way to
+// get the current theme's respective colors for the PostView (see e.g. QuoteSpan's updateDrawState).
+// A non-global solution would be much too inconvenient.
+public class ThemeContext {
 
-        public String name;
-        public int resValue;
-        public boolean isLightTheme;
-
-        private Theme(String name, int resValue, boolean isLightTheme) {
-            this.name = name;
-            this.resValue = resValue;
-            this.isLightTheme = isLightTheme;
-        }
-    }
-
-    private static ThemeHelper instance;
-    private Context context;
     private int quoteColor;
     private int highlightQuoteColor;
     private int linkColor;
     private int spoilerColor;
     private int inlineQuoteColor;
     private int codeTagSize;
-    private int fontSize;
 
-    public static ThemeHelper getInstance() {
-        if (instance == null) {
-            instance = new ThemeHelper();
-        }
-
+    private ThemeContext() { }
+    private static ThemeContext instance;
+    public static ThemeContext getInstance() {
+        if (instance == null) instance = new ThemeContext();
         return instance;
     }
 
-    public static void setTheme(Activity activity) {
-        activity.setTheme(ThemeHelper.getInstance().getTheme().resValue);
-    }
-
-    public ThemeHelper() {
-    }
-
-    public Theme getTheme() {
-        // TODO
-        //String themeName = ChanPreferences.getTheme();
-        String themeName = "light";
-
-        Theme theme = null;
-        switch (themeName) {
-            case "light":
-                theme = Theme.LIGHT;
-                break;
-            case "dark":
-                theme = Theme.DARK;
-                break;
-            case "black":
-                theme = Theme.BLACK;
-                break;
-        }
-
-        return theme;
-    }
-
-    public Context getThemedContext() {
-        return context;
-    }
-
     public void reloadPostViewColors(Context context) {
-        this.context = context;
         TypedArray ta = context.obtainStyledAttributes(null, R.styleable.PostView, R.attr.post_style, 0);
         quoteColor = ta.getColor(R.styleable.PostView_quote_color, 0);
         highlightQuoteColor = ta.getColor(R.styleable.PostView_highlight_quote_color, 0);

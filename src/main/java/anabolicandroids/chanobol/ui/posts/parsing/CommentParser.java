@@ -42,7 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import anabolicandroids.chanobol.api.data.Post;
-import anabolicandroids.chanobol.ui.ThemeHelper;
+import anabolicandroids.chanobol.ui.ThemeContext;
 
 // Adapted from Clover's ChanParser
 
@@ -132,7 +132,7 @@ public class CommentParser {
                     Set<String> classes = span.classNames();
                     if (classes.contains("deadlink")) {
                         quote = new SpannableString(span.text());
-                        quote.setSpan(new ForegroundColorSpan(ThemeHelper.getInstance().getQuoteColor()), 0, quote.length(), 0);
+                        quote.setSpan(new ForegroundColorSpan(ThemeContext.getInstance().getQuoteColor()), 0, quote.length(), 0);
                         quote.setSpan(new StrikethroughSpan(), 0, quote.length(), 0);
                     } else if (classes.contains("fortune")) {
                         // html looks like <span class="fortune" style="color:#0893e1"><br><br><b>Your fortune:</b>
@@ -163,7 +163,7 @@ public class CommentParser {
                         }
                     } else {
                         quote = new SpannableString(span.text());
-                        quote.setSpan(new ForegroundColorSpan(ThemeHelper.getInstance().getInlineQuoteColor()), 0, quote.length(), 0);
+                        quote.setSpan(new ForegroundColorSpan(ThemeContext.getInstance().getInlineQuoteColor()), 0, quote.length(), 0);
                         detectLinks(span.text(), quote);
                     }
 
@@ -179,7 +179,7 @@ public class CommentParser {
                     Element strong = (Element) node;
 
                     SpannableString red = new SpannableString(strong.text());
-                    red.setSpan(new ForegroundColorSpan(ThemeHelper.getInstance().getQuoteColor()), 0, red.length(), 0);
+                    red.setSpan(new ForegroundColorSpan(ThemeContext.getInstance().getQuoteColor()), 0, red.length(), 0);
                     red.setSpan(new StyleSpan(Typeface.BOLD), 0, red.length(), 0);
 
                     return red;
@@ -210,7 +210,7 @@ public class CommentParser {
                         String text = getNodeText(pre);
                         SpannableString monospace = new SpannableString(text);
                         monospace.setSpan(new TypefaceSpan("monospace"), 0, monospace.length(), 0);
-                        monospace.setSpan(new AbsoluteSizeSpan(ThemeHelper.getInstance().getCodeTagSize()), 0, monospace.length(), 0);
+                        monospace.setSpan(new AbsoluteSizeSpan(ThemeContext.getInstance().getCodeTagSize()), 0, monospace.length(), 0);
                         return monospace;
                     } else {
                         return pre.text();

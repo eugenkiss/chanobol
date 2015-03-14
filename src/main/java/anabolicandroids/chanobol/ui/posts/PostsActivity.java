@@ -51,7 +51,6 @@ import java.util.regex.Pattern;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
-import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.media.GalleryActivity;
@@ -338,7 +337,7 @@ public class PostsActivity extends SwipeRefreshActivity {
                         }
                     }
                     if (p.mediaId != null) {
-                        if (prefs.getBoolean(Settings.PRELOAD_THUMBNAILS, true))
+                        if (prefs.preloadThumbnails())
                             ion.build(PostsActivity.this).load(ApiModule.thumbUrl(boardName, p.mediaId)).asBitmap().tryGet();
                         mediaPointers.add(new MediaPointer(p, p.mediaId, p.mediaExtension, p.mediaWidth, p.mediaHeight));
                         mediaMap.put(p.number, mediaIndex);
@@ -576,7 +575,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             executor.scheduleWithFixedDelay(new Runnable() {
                 @Override
                 public void run() {
-                    if (!prefs.getBoolean(Settings.REFRESH, true)) return;
+                    if (!prefs.autoRefresh()) return;
                     if (pauseUpdating) return;
                     if (System.currentTimeMillis() - lastUpdate > updateInterval) {
                         runOnUiThread(new Runnable() {

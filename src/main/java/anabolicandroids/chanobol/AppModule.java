@@ -25,6 +25,7 @@ import anabolicandroids.chanobol.annotations.SfwMode;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.PersistentData;
+import anabolicandroids.chanobol.ui.Prefs;
 import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
 import anabolicandroids.chanobol.ui.boards.FavoritesActivity;
@@ -37,6 +38,7 @@ import anabolicandroids.chanobol.util.Util;
 import dagger.Module;
 import dagger.Provides;
 
+@SuppressWarnings("UnusedDeclaration")
 @Module(
         injects = {
                 App.class,
@@ -82,6 +84,11 @@ public class AppModule {
     @Provides @Singleton
     SharedPreferences provideSharedPreferences(Application app) {
         return PreferenceManager.getDefaultSharedPreferences(app);
+    }
+
+    @Provides @Singleton
+    Prefs providePrefs(SharedPreferences sharedPreferences) {
+        return new Prefs(sharedPreferences);
     }
 
     @Provides @Singleton
