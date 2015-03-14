@@ -19,6 +19,7 @@ package anabolicandroids.chanobol.ui.posts.parsing;
 
 
 import android.graphics.Typeface;
+import android.text.Html;
 import android.text.SpannableString;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
@@ -217,9 +218,9 @@ public class CommentParser {
                     }
                 }
                 default: {
-                    // Unknown tag, add the inner part
+                    // Unknown tag
                     if (node instanceof Element) {
-                        return ((Element) node).text();
+                        return Html.fromHtml(node.outerHtml());
                     } else {
                         return null;
                     }
