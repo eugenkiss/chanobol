@@ -57,24 +57,16 @@ import dagger.Provides;
 public class AppModule {
     private App app;
 
-    public AppModule(App app) {
-        this.app = app;
-    }
+    public AppModule(App app) { this.app = app; }
 
     @Provides @Singleton
-    App provideApp() {
-        return app;
-    }
+    App provideApp() { return app; }
 
     @Provides @Singleton
-    Application provideApplication() {
-        return app;
-    }
+    Application provideApplication() { return app; }
 
     @Provides @Singleton @ForApplication
-    Context provideApplicationContext() {
-        return app;
-    }
+    Context provideApplicationContext() { return app; }
 
     @Provides @Singleton
     LayoutInflater provideLayoutInflater() {
@@ -82,14 +74,10 @@ public class AppModule {
     }
 
     @Provides @Singleton
-    Resources provideResources() {
-        return app.getResources();
-    }
+    Resources provideResources() { return app.getResources(); }
 
     @Provides @Singleton
-    AssetManager provideAssetManager() {
-        return app.getAssets();
-    }
+    AssetManager provideAssetManager() { return app.getAssets(); }
 
     @Provides @Singleton
     SharedPreferences provideSharedPreferences(Application app) {
@@ -102,14 +90,10 @@ public class AppModule {
     }
 
     @Provides @Singleton @Named("DebugSettings")
-    Class provideDebugSettings() {
-        return null;
-    }
+    Class provideDebugSettings() { return null; }
 
     @Provides @Singleton @SfwMode
-    boolean provideSfwMode() {
-        return false;
-    }
+    boolean provideSfwMode() { return false; }
 
     @Provides @Singleton
     List<Board> provideBoards(@ForApplication Context context, @SfwMode boolean sfw) {
