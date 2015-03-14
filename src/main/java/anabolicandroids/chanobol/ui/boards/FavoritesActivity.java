@@ -47,7 +47,7 @@ public class FavoritesActivity extends UiActivity {
     @Inject @Nsfw List<Board> allBoards;
     BoardsAdapter boardsAdapter;
 
-    @Override protected int getLayoutResource() { return R.layout.fragment_boards; }
+    @Override protected int getLayoutResource() { return R.layout.activity_boards; }
     @Override protected RecyclerView getRootRecyclerView() { return favoritesView; }
 
     @Override public void onCreate(Bundle savedInstanceState) {
