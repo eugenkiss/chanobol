@@ -21,7 +21,7 @@
         android:dialogTitle="Choose Theme"
         android:entries="@array/Themes"
         android:entryValues="@array/Themes"
-        android:defaultValue="light"
+        android:defaultValue="dark"
         android:summary="Needs Restart"
         />
 </PreferenceScreen>
