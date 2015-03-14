@@ -68,8 +68,17 @@ import butterknife.Optional;
 // http://stackoverflow.com/a/26526858/283607
 public abstract class UiActivity extends BaseActivity {
 
+    // Holy shit, why this error?: https://gist.github.com/eugenkiss/1b4864ad7373ca5ce074
+    // It is impossible for me to remove this static variable even though it is not used anymore
+    // Syncing, cleaning, invalidating, restarting, building on command line, nothing helps.
     public static int RIPPLE_DELAY = Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ?
             250 : 50;
+    // So that the user is even able to see the ripple effect before the next activity launches
+    // Method instead of value because Android might static values
+    public static int RIPPLE_DELAY() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ?
+            250 : 50;
+    }
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 

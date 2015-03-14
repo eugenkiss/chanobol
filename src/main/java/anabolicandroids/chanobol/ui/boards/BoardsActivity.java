@@ -67,7 +67,7 @@ public class BoardsActivity extends UiActivity {
                 @Override public void run() {
                     ThreadsActivity.launch(BoardsActivity.this, bv.board);
                 }
-            }, RIPPLE_DELAY);
+            }, RIPPLE_DELAY());
         }
     };
 

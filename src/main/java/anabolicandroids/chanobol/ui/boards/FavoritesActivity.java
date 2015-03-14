@@ -83,7 +83,7 @@ public class FavoritesActivity extends UiActivity {
                 @Override public void run() {
                     ThreadsActivity.launch(FavoritesActivity.this, bv.board);
                 }
-            }, RIPPLE_DELAY);
+            }, RIPPLE_DELAY());
         }
     };
 

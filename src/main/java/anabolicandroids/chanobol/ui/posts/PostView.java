@@ -146,7 +146,7 @@ public class PostView extends CardView {
                     @Override public void run() {
                         cb.onClick(post, image);
                     }
-                }, UiActivity.RIPPLE_DELAY);
+                }, UiActivity.RIPPLE_DELAY());
             }
         };
         imageTouchOverlay.setOnClickListener(l);

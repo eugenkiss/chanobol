@@ -227,7 +227,7 @@ public class PostsActivity extends SwipeRefreshActivity {
                     }
                     showPostsDialog(post, posts);
                 }
-            }, RIPPLE_DELAY);
+            }, RIPPLE_DELAY());
         }
     };
 
@@ -242,7 +242,7 @@ public class PostsActivity extends SwipeRefreshActivity {
                     @Override public void run() {
                         showPostsDialog(postMap.get(quoterId), postMap.get(quotedId));
                     }
-                }, RIPPLE_DELAY);
+                }, RIPPLE_DELAY());
             }
         }
     };
