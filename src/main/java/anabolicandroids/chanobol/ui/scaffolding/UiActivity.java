@@ -1,4 +1,4 @@
-package anabolicandroids.chanobol.ui;
+package anabolicandroids.chanobol.ui.scaffolding;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -52,6 +52,7 @@ import anabolicandroids.chanobol.annotations.ForApplication;
 import anabolicandroids.chanobol.annotations.SfwMode;
 import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Board;
+import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
 import anabolicandroids.chanobol.ui.boards.FavoritesActivity;
 import anabolicandroids.chanobol.ui.threads.ThreadsActivity;

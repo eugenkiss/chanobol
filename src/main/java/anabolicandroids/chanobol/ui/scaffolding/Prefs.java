@@ -1,4 +1,4 @@
-package anabolicandroids.chanobol.ui;
+package anabolicandroids.chanobol.ui.scaffolding;
 
 import android.content.SharedPreferences;
 

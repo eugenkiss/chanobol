@@ -42,7 +42,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import anabolicandroids.chanobol.api.data.Post;
-import anabolicandroids.chanobol.ui.ThemeContext;
+import anabolicandroids.chanobol.ui.scaffolding.ThemeContext;
 
 // Adapted from Clover's ChanParser
 

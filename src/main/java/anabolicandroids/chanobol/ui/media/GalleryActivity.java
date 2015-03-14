@@ -28,8 +28,8 @@ import java.util.List;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Post;
-import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
-import anabolicandroids.chanobol.ui.UiAdapter;
+import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
+import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 

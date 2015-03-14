@@ -10,7 +10,7 @@ import java.util.List;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
-import anabolicandroids.chanobol.ui.UiAdapter;
+import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
 
 class BoardsAdapter extends UiAdapter<Board> {
     private Ion ion;

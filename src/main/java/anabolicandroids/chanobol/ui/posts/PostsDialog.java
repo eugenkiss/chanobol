@@ -17,7 +17,7 @@ import android.widget.ListView;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Post;
-import anabolicandroids.chanobol.ui.UiActivity;
+import anabolicandroids.chanobol.ui.scaffolding.UiActivity;
 import anabolicandroids.chanobol.util.BaseFragment;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;

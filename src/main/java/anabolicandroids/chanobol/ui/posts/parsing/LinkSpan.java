@@ -3,7 +3,7 @@ package anabolicandroids.chanobol.ui.posts.parsing;
 import android.support.annotation.NonNull;
 import android.text.TextPaint;
 
-import anabolicandroids.chanobol.ui.ThemeContext;
+import anabolicandroids.chanobol.ui.scaffolding.ThemeContext;
 
 public class LinkSpan extends PostSpan {
 

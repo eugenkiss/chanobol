@@ -31,12 +31,12 @@ import java.util.concurrent.TimeUnit;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.api.data.Thread;
-import anabolicandroids.chanobol.ui.SwipeRefreshActivity;
-import anabolicandroids.chanobol.ui.UiAdapter;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
 import anabolicandroids.chanobol.ui.media.GalleryActivity;
 import anabolicandroids.chanobol.ui.media.MediaPointer;
 import anabolicandroids.chanobol.ui.posts.PostsActivity;
+import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
+import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 

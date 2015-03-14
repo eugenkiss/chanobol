@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.R;
+import anabolicandroids.chanobol.ui.scaffolding.Prefs;
 import anabolicandroids.chanobol.util.BaseSettings;
 
 // The following resources have been helpful:

@@ -19,8 +19,8 @@ import javax.inject.Inject;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
-import anabolicandroids.chanobol.ui.PersistentData;
-import anabolicandroids.chanobol.ui.UiActivity;
+import anabolicandroids.chanobol.ui.scaffolding.PersistentData;
+import anabolicandroids.chanobol.ui.scaffolding.UiActivity;
 import anabolicandroids.chanobol.ui.threads.ThreadsActivity;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
