@@ -37,7 +37,6 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.UiActivity;
-import anabolicandroids.chanobol.ui.posts.parsing.CommentParser;
 import anabolicandroids.chanobol.ui.posts.parsing.LinkSpan;
 import anabolicandroids.chanobol.ui.posts.parsing.QuoteSpan;
 import anabolicandroids.chanobol.ui.posts.parsing.ThreadLink;
@@ -184,9 +183,7 @@ public class PostView extends CardView {
             });
         }
 
-        String s = post.subject; if (s == null) s = ""; else s = "<h2>" + s + "</h2>";
-        String t = post.text; if (t == null) t = "";
-        text.setText(CommentParser.getInstance().parseComment(post, s + t));
+        text.setText(post.parsedText());
         postViewMovementMethod.quoteCallback = quoteCallback;
         text.setMovementMethod(postViewMovementMethod);
 

@@ -6,11 +6,9 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
 import com.koushikdutta.async.future.FutureCallback;
 import com.koushikdutta.ion.Ion;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,8 +72,15 @@ public class ChanService {
                             cb.onCompleted(e, null);
                             return;
                         }
-                        Type type = new TypeToken<List<Post>>() {}.getType();
-                        List<Post> posts = gson.fromJson(result.get("posts").getAsJsonArray(), type);
+                        List<Post> posts = new ArrayList<>();
+                        for (JsonElement x : result.get("posts").getAsJsonArray()) {
+                            Post p = gson.fromJson(x, Post.class);
+                            // Generate parsed text here instead of in PostView for efficiency reasons
+                            // Although not perfect because on activity restoration the parsed result
+                            // gets lost but infrequent case so still worthwhile.
+                            p.generateParsedTextCache();
+                            posts.add(p);
+                        }
                         cb.onCompleted(null, posts);
                     }
                 });
