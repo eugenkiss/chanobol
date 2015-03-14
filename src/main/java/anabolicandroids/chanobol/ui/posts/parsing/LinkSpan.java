@@ -14,7 +14,7 @@ public class LinkSpan extends PostSpan {
     }
 
     @Override public void updateDrawState(@NonNull TextPaint ds) {
-        ds.setColor(ThemeContext.getInstance().getLinkColor());
+        ds.setColor(ThemeContext.getInstance().linkColor);
         ds.setUnderlineText(true);
     }
 }

@@ -15,7 +15,7 @@ public class QuoteSpan extends PostSpan {
     }
 
     @Override public void updateDrawState(@NonNull TextPaint ds) {
-        ds.setColor(ThemeContext.getInstance().getQuoteColor());
+        ds.setColor(ThemeContext.getInstance().quoteColor);
         ds.setUnderlineText(true);
     }
 }

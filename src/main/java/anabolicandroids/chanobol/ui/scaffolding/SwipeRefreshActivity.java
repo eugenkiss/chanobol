@@ -9,7 +9,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.util.Util;
 
 public abstract class SwipeRefreshActivity extends UiActivity {
@@ -42,7 +41,7 @@ public abstract class SwipeRefreshActivity extends UiActivity {
                 load();
             }
         });
-        swipe.setBackgroundResource(R.color.bg); // Transition bug fix
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) swipe.setTransitionGroup(true);
         return swipe;
     }
 

@@ -13,10 +13,10 @@ public class Prefs {
 
     public static final String THEME = "pref_theme";
     public Theme theme() {
-        String name = p.getString("pref_theme", Theme.LIGHT.name);
+        String name = p.getString("pref_theme", Theme.DARK.name);
         if (name.equals(Theme.LIGHT.name)) return Theme.LIGHT;
         if (name.equals(Theme.DARK.name)) return Theme.DARK;
-        return Theme.LIGHT;
+        return Theme.DARK;
     }
     public void theme(Theme theme) {
         p.edit().putString(THEME, theme.name).apply();

@@ -15,4 +15,13 @@
         android:key="pref_refresh"
         android:title="Background Refresh"
         />
+    <ListPreference
+        android:key="pref_theme"
+        android:title="Theme"
+        android:dialogTitle="Choose Theme"
+        android:entries="@array/Themes"
+        android:entryValues="@array/Themes"
+        android:defaultValue="light"
+        android:summary="Needs Restart"
+        />
 </PreferenceScreen>

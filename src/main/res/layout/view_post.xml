@@ -8,7 +8,7 @@
     android:layout_height="wrap_content"
     android:layout_gravity="top"
     card_view:cardCornerRadius="2dp"
-    app:cardBackgroundColor="@color/fg"
+    app:cardBackgroundColor="?attr/fg"
     android:transitionGroup="false"
     >
 
@@ -28,7 +28,7 @@
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/fg2"
+                android:background="?attr/fg2"
                 android:paddingBottom="6dp"
                 android:paddingLeft="12dp"
                 android:paddingRight="12dp"
@@ -74,6 +74,7 @@
                         android:paddingRight="8dp"
                         android:scaleType="centerInside"
                         android:src="@drawable/ic_replies"
+                        android:tint="?attr/reply_icon_tint"
                         />
 
                     <TextView
@@ -91,7 +92,7 @@
             android:id="@+id/mediaContainer"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#292929"
+            android:background="?attr/postview_image_bg"
             android:transitionGroup="false"
             >
 

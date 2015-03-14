@@ -1,6 +1,7 @@
 package anabolicandroids.chanobol.util;
 
-import android.content.ActivityNotFoundException;
+import android.app.Activity;
+import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -20,6 +21,7 @@ import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewTreeObserver;
+import android.view.Window;
 import android.view.animation.AlphaAnimation;
 import android.widget.Toast;
 
@@ -29,33 +31,21 @@ import com.nineoldandroids.view.ViewHelper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
+import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.R;
+import anabolicandroids.chanobol.ui.boards.FavoritesActivity;
+import anabolicandroids.chanobol.ui.scaffolding.Prefs;
+import anabolicandroids.chanobol.ui.scaffolding.Theme;
+import anabolicandroids.chanobol.ui.scaffolding.ThemeContext;
+
+import static android.content.Intent.FLAG_ACTIVITY_CLEAR_TASK;
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
 
 public class Util {
 
     public static int clamp(double min, double val, double max) {
         return (int) Math.max(min, Math.min(max, val));
-    }
-
-    public static boolean implies(boolean p, boolean q) {
-        return !p || q;
-    }
-
-    public static <T> ArrayList<T> arrayListOf(T... args) {
-        ArrayList<T> result = new ArrayList<>();
-        Collections.addAll(result, args);
-        return result;
-    }
-
-    public static List<Object> extendedList(List<Object> base, Object... others) {
-        ArrayList<Object> list = new ArrayList<>();
-        Collections.addAll(list, others);
-        list.addAll(base);
-        return list;
     }
 
     // http://stackoverflow.com/a/5599842
@@ -233,6 +223,34 @@ public class Util {
             context.startActivity(intent);
         else
             Util.showToast(context, R.string.no_app);
+    }
+
+    public static void restartApp(Application app, Activity activity) {
+        // TODO: Apparently there is a way to recreate the whole back stack: http://stackoverflow.com/a/28799124/283607
+        // From U2020 DebugAppContainer.setEndpointAndRelaunch
+        Intent newApp = new Intent(activity, FavoritesActivity.class);
+        if (Build.VERSION.SDK_INT >= 11) {
+            newApp.setFlags(FLAG_ACTIVITY_CLEAR_TASK | FLAG_ACTIVITY_NEW_TASK);
+        } else {
+            newApp.setFlags(FLAG_ACTIVITY_NEW_TASK);
+        }
+        app.startActivity(newApp);
+        App.get(app).buildAppGraphAndInject();
+    }
+
+    public static void setTheme(Activity activity, Prefs prefs) {
+        Theme theme = prefs.theme();
+        activity.setTheme(theme.resValue);
+        ThemeContext.getInstance().reloadPostViewColors(activity);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // It isn't loaded from the xml in setTheme for some reason
+            Window window = activity.getWindow();
+            Resources r = activity.getResources();
+            if (theme == Theme.LIGHT)
+                window.setStatusBarColor(r.getColor(R.color.colorPrimaryDark_light));
+            if (theme == Theme.DARK)
+                window.setStatusBarColor(r.getColor(R.color.colorPrimaryDark));
+        }
     }
 
     // http://stackoverflow.com/a/10600736/283607

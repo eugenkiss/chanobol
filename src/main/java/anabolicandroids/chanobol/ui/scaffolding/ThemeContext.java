@@ -29,12 +29,12 @@ import anabolicandroids.chanobol.R;
 // A non-global solution would be much too inconvenient.
 public class ThemeContext {
 
-    private int quoteColor;
-    private int highlightQuoteColor;
-    private int linkColor;
-    private int spoilerColor;
-    private int inlineQuoteColor;
-    private int codeTagSize;
+    public int quoteColor;
+    public int highlightQuoteColor;
+    public int linkColor;
+    public int spoilerColor;
+    public int inlineQuoteColor;
+    public int codeTagSize;
 
     private ThemeContext() { }
     private static ThemeContext instance;
@@ -44,6 +44,7 @@ public class ThemeContext {
     }
 
     public void reloadPostViewColors(Context context) {
+        //noinspection ConstantConditions
         TypedArray ta = context.obtainStyledAttributes(null, R.styleable.PostView, R.attr.post_style, 0);
         quoteColor = ta.getColor(R.styleable.PostView_quote_color, 0);
         highlightQuoteColor = ta.getColor(R.styleable.PostView_highlight_quote_color, 0);
@@ -52,30 +53,6 @@ public class ThemeContext {
         inlineQuoteColor = ta.getColor(R.styleable.PostView_inline_quote_color, 0);
         codeTagSize = ta.getDimensionPixelSize(R.styleable.PostView_code_tag_size, 0);
         ta.recycle();
-    }
-
-    public int getQuoteColor() {
-        return quoteColor;
-    }
-
-    public int getHighlightQuoteColor() {
-        return highlightQuoteColor;
-    }
-
-    public int getLinkColor() {
-        return linkColor;
-    }
-
-    public int getSpoilerColor() {
-        return spoilerColor;
-    }
-
-    public int getInlineQuoteColor() {
-        return inlineQuoteColor;
-    }
-
-    public int getCodeTagSize() {
-        return codeTagSize;
     }
 
 }

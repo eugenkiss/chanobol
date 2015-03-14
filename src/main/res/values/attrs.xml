@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <attr name="bg" format="color"/>
+    <attr name="fg" format="color"/>
+    <attr name="fg2" format="color"/>
+    <attr name="postview_image_bg" format="color"/>
+    <attr name="image_bg" format="color"/>
+    <attr name="drawer_bg" format="color"/>
+    <attr name="reply_icon_tint" format="color"/>
     <attr name="post_style" format="reference"/>
 
     <!-- From Clover - Many of these attributes are not needed -->

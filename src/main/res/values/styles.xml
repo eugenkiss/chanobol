@@ -3,8 +3,6 @@
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar" >
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <!--<item name="colorControlHighlight">@color/colorAccentTranslucent</item>-->
-        <!--<item name="colorAccent">@color/colorAccent</item>-->
 
         <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBarOverlay">true</item>
@@ -18,7 +16,33 @@
         <item name="android:windowSharedElementEnterTransition">@transition/move</item>
         <item name="android:windowSharedElementReenterTransition">@transition/move</item>
 
+        <item name="bg">#212121</item>
+        <item name="fg">@color/background_floating_material_dark</item>
+        <item name="fg2">#393939</item>
+        <item name="postview_image_bg">#292929</item>
+        <item name="image_bg">#292929</item>
+        <item name="drawer_bg">?attr/colorPrimaryDark</item>
+        <item name="reply_icon_tint">@color/transparent</item>
         <item name="post_style">@style/PostView.Dark</item>
+    </style>
+
+    <style name="AppTheme.Light">
+        <item name="colorPrimary">@color/colorPrimary_light</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
+        <item name="colorControlHighlight">#608BC34A</item>
+        <item name="colorAccent">#8BC34A</item>
+        <item name="android:textColor">#333</item>
+        <item name="android:textColorPrimary">#333</item>
+        <item name="android:textColorSecondary">#666</item>
+
+        <item name="bg">#dddddd</item>
+        <item name="fg">#fafafa</item>
+        <item name="fg2">#fff1f1f1</item>
+        <item name="postview_image_bg">#fafafa</item>
+        <item name="image_bg">#bd9bc3</item>
+        <item name="drawer_bg">#fff5dcf8</item>
+        <item name="reply_icon_tint">#bbb</item>
+        <item name="post_style">@style/PostView</item>
     </style>
 
     <style name="MediaActivity" parent="AppTheme">
@@ -59,7 +83,7 @@
         <item name="android:fadingEdge">none</item>
         <item name="android:fadingEdgeLength">0dp</item>
         <item name="android:overScrollMode">never</item>
-        <item name="android:background">@color/bg</item>
+        <item name="android:background">?attr/bg</item>
         <item name="android:transitionGroup">false</item>
         <item name="android:clipToPadding">false</item>
         <item name="android:padding">6dp</item>
@@ -140,14 +164,14 @@
         <item name="name_color">#ff117743</item>
         <item name="subject_color">#ff0F0C5D</item>
         <item name="date_color">#ff646464</item>
-        <item name="quote_color">#ffDD0000</item>
+        <item name="quote_color">#ffdd4641</item>
         <item name="highlight_quote_color">#ff950000</item>
-        <item name="link_color">#ff0000B4</item>
+        <item name="link_color">#ff6eb9b2</item>
         <item name="spoiler_color">#ff000000</item>
         <item name="capcode_color">#ffff0000</item>
         <item name="id_background_light">#ff636363</item>
         <item name="id_background_dark">#00000000</item>
-        <item name="inline_quote_color">#ff789922</item>
+        <item name="inline_quote_color">#ff7f9940</item>
 
         <item name="code_tag_size">12sp</item>
     </style>

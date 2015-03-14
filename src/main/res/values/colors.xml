@@ -1,20 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">@color/material_blue_grey_800</color>
-    <color name="colorPrimaryDark">@color/material_blue_grey_900</color>
-
-    <color name="colorSecondary">@color/material_deep_teal_200</color>
-    <color name="colorSecondaryDark">@color/material_deep_teal_500</color>
-
-    <color name="colorAccent">#CE93D8</color>
-    <color name="colorAccentTranslucent">#80CE93D8</color>
-
-    <color name="windowBackgroundColor">#212121</color>
-    <color name="black_translucent">#80000000</color>
     <color name="transparent">#00000000</color>
     <color name="releaseIndicator">#20f0b3fa</color>
 
-    <item name="bg" type="color">#212121</item>
-    <item name="fg" type="color">@color/background_floating_material_dark</item>
-    <item name="fg2" type="color">#393939</item>
+    <!-- Workaround as I don't seem to be able to get ?attr/colorPrimary etc. in Java code for the status bar -->
+    <!-- Otherwise, I would simply inline the colors in AppTheme resp. AppTheme.Light -->
+    <color name="colorPrimary">@color/material_blue_grey_800</color>
+    <color name="colorPrimaryDark">@color/material_blue_grey_900</color>
+    <color name="colorPrimary_light">#9C27B0</color>
+    <color name="colorPrimaryDark_light">#6A1B9A</color>
 </resources>

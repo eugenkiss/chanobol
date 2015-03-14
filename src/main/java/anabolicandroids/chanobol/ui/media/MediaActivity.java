@@ -121,7 +121,7 @@ public class MediaActivity extends UiActivity {
 
     MediaView[] pagerViews;
 
-    @Override protected int getLayoutResource() { return R.layout.activity_image; }
+    @Override protected int getLayoutResource() { return R.layout.activity_media; }
 
     @Override protected void onCreate(final Bundle savedInstanceState) {
         supportPostponeEnterTransition();
@@ -436,7 +436,7 @@ public class MediaActivity extends UiActivity {
                     Util.startWebmActivity(this, url);
                 } else {
                     // TODO: This is not good, download asynchronously
-                    Bitmap bitmap = null;
+                    Bitmap bitmap;
                     try {
                         // TODO: Write directly into Mediastore! Out of Memory possible
                         bitmap = ion.build(this).load(url).asBitmap().get();
@@ -460,7 +460,7 @@ public class MediaActivity extends UiActivity {
                     startActivity(Intent.createChooser(intent, getResources().getText(R.string.share_video)));
                 } else {
                     // TODO: This is not good, download asynchronously
-                    Bitmap bitmap = null;
+                    Bitmap bitmap;
                     try {
                         // TODO: Write directly into Mediastore! Out of Memory possible
                         bitmap = ion.build(this).load(url).asBitmap().get();

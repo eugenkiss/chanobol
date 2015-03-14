@@ -24,7 +24,7 @@
             android:textColor="?android:textColorPrimary"
             android:textSize="15sp"
             android:textStyle="bold"
-            android:background="@color/fg2"
+            android:background="?attr/fg2"
             tools:text="fit"
             />
 
@@ -45,7 +45,7 @@
             android:textColor="?android:textColorPrimary"
             android:textSize="13sp"
             android:gravity="center"
-            android:background="@color/fg"
+            android:background="?attr/fg"
             tools:text="Fitness"
             />
 

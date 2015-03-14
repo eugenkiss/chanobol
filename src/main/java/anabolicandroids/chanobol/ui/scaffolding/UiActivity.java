@@ -117,10 +117,7 @@ public abstract class UiActivity extends BaseActivity {
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        setTheme(prefs.theme().resValue);
-        ThemeContext.getInstance().reloadPostViewColors(this);
-
+        Util.setTheme(this, prefs);
         setContentView(R.layout.activity_ui);
         ViewGroup container = (ViewGroup) findViewById(R.id.container);
         container.addView(onCreateView(getLayoutInflater(), container, savedInstanceState));
