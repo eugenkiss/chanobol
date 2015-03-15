@@ -48,20 +48,19 @@ import butterknife.InjectView;
 public class PostView extends CardView {
     @InjectView(R.id.number) TextView number;
     @InjectView(R.id.name) TextView name;
-    @InjectView(R.id.date) TextView date;
-    @InjectView(R.id.replies) TextView replies;
-    @InjectView(R.id.reply) TextView reply;
+    @InjectView(R.id.tripCode) TextView tripCode;
     @InjectView(R.id.mediaContainer) ViewGroup mediaContainer;
     @InjectView(R.id.imageTouchOverlay) View imageTouchOverlay; // I couldn't get the FrameLayout clickable...
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.play) ImageView play;
     @InjectView(R.id.progressbar) ProgressBar progress;
     @InjectView(R.id.text) TextView text;
-    @InjectView(R.id.footer) ViewGroup footer;
-    @InjectView(R.id.footerTripCode) TextView footerTripCode;
     @InjectView(R.id.footerFlag) ImageView footerFlag;
     @InjectView(R.id.footerCountryName) TextView footerCountryName;
     @InjectView(R.id.footerImage) TextView footerImage;
+    @InjectView(R.id.date) TextView date;
+    @InjectView(R.id.replies) TextView replies;
+    @InjectView(R.id.reply) TextView reply;
 
     private PostViewMovementMethod postViewMovementMethod = new PostViewMovementMethod();
     private static final int W = 0, H = 1;
@@ -110,8 +109,7 @@ public class PostView extends CardView {
         play.setVisibility(GONE);
         progress.setVisibility(GONE);
         text.setVisibility(GONE);
-        footer.setVisibility(View.GONE);
-        footerTripCode.setVisibility(GONE);
+        tripCode.setVisibility(GONE);
         footerFlag.setVisibility(GONE);
         footerFlag.setImageBitmap(null);
         footerCountryName.setVisibility(GONE);
@@ -201,19 +199,16 @@ public class PostView extends CardView {
         text.setMovementMethod(postViewMovementMethod);
 
         if (post.mediaId != null && !"null".equals(post.mediaId)) {
-            footer.setVisibility(VISIBLE);
             footerImage.setVisibility(VISIBLE);
             footerImage.setText(String.format("%dx%d ~ %s ~ %s%s", post.mediaWidth, post.mediaHeight,
                     Util.readableFileSize(post.filesize), post.filename, post.mediaExtension));
         }
         if (post.tripCode != null) {
-            footer.setVisibility(VISIBLE);
-            footerTripCode.setVisibility(VISIBLE);
-            footerTripCode.setText(post.tripCode);
+            tripCode.setVisibility(VISIBLE);
+            tripCode.setText(post.tripCode);
             //name.setText(post.tripCode);
         }
         if (post.country != null) {
-            footer.setVisibility(VISIBLE);
             footerCountryName.setVisibility(VISIBLE);
             footerFlag.setVisibility(VISIBLE);
             footerCountryName.setText(post.countryName);

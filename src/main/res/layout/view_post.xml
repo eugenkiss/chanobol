@@ -82,13 +82,13 @@
                     android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="?android:textColorPrimary"
+                    android:textColor="?android:textColorSecondary"
                     android:textSize="16sp"
                     tools:text="Anonymous"
                     />
 
                 <TextView
-                    android:id="@+id/footerTripCode"
+                    android:id="@+id/tripCode"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginLeft="12dp"
@@ -127,7 +127,6 @@
                 tools:text="What's wrong with being wrong? Lorem ipsum ipsum lorem."/>
 
             <LinearLayout
-                android:id="@+id/footer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
