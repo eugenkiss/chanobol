@@ -22,6 +22,6 @@
         android:entries="@array/Themes"
         android:entryValues="@array/Themes"
         android:defaultValue="dark"
-        android:summary="Needs Restart"
+        android:summary="Experimental. Needs Restart"
         />
 </PreferenceScreen>
