@@ -11,7 +11,7 @@ buildscript {
 
 def versionMajor = 1
 def versionMinor = 3
-def versionPatch = 6
+def versionPatch = 7
 def versionBuild = 0
 
 apply plugin: 'com.android.application'
@@ -84,6 +84,7 @@ android {
         Properties props = new Properties()
         props.load(new FileInputStream(f))
 
+        //noinspection GroovyAssignabilityCheck
         signingConfigs {
             release {
                 storeFile file(props['keystoreFile'])
@@ -99,6 +100,7 @@ android {
             applicationIdSuffix '.dev'
             versionNameSuffix '-dev'
         }
+        //noinspection GroovyMissingReturnStatement
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'

@@ -7,7 +7,11 @@
     <attr name="image_bg" format="color"/>
     <attr name="drawer_bg" format="color"/>
     <attr name="reply_icon_tint" format="color"/>
+    <attr name="postview_divider" format="color"/>
+    <attr name="postview_action" format="color"/>
     <attr name="post_style" format="reference"/>
+    <attr name="toolbar_theme" format="reference"/>
+    <attr name="popup_theme" format="reference"/>
 
     <!-- From Clover - Many of these attributes are not needed -->
     <declare-styleable name="PostView">

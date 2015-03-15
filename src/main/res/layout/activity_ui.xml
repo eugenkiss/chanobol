@@ -37,7 +37,8 @@
             android:background="?attr/colorPrimary"
             android:elevation="4dp"
             android:transitionName="toolbar"
-            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:theme="?toolbar_theme"
+            app:popupTheme="?popup_theme"
             />
 
         <!-- Note: elevation must be higher than toolbar's, otherwise it's behind the

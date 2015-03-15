@@ -46,11 +46,11 @@ import butterknife.ButterKnife;
 import butterknife.InjectView;
 
 public class PostView extends CardView {
-    @InjectView(R.id.header) ViewGroup header;
     @InjectView(R.id.number) TextView number;
+    @InjectView(R.id.name) TextView name;
     @InjectView(R.id.date) TextView date;
-    @InjectView(R.id.repliesContainer) ViewGroup repliesContainer;
     @InjectView(R.id.replies) TextView replies;
+    @InjectView(R.id.reply) TextView reply;
     @InjectView(R.id.mediaContainer) ViewGroup mediaContainer;
     @InjectView(R.id.imageTouchOverlay) View imageTouchOverlay; // I couldn't get the FrameLayout clickable...
     @InjectView(R.id.image) ImageView image;
@@ -98,25 +98,33 @@ public class PostView extends CardView {
             screenHeight = Util.getScreenHeight(getContext());
         }
         maxImgWidth = screenWidth;
-        maxImgHeight = (int) (screenHeight * 0.85);
+        maxImgHeight = (int) (screenHeight * 0.8);
     }
 
     private void reset() {
-        repliesContainer.setVisibility(View.GONE);
-        header.setOnClickListener(null);
-        mediaContainer.setVisibility(View.GONE);
-        image.setVisibility(View.GONE);
+        replies.setOnClickListener(null);
+        mediaContainer.setVisibility(GONE);
+        image.setVisibility(GONE);
         image.setImageBitmap(null);
         image.setOnClickListener(null);
-        play.setVisibility(View.GONE);
-        progress.setVisibility(View.GONE);
+        play.setVisibility(GONE);
+        progress.setVisibility(GONE);
+        text.setVisibility(GONE);
         footer.setVisibility(View.GONE);
-        footerTripCode.setVisibility(View.GONE);
-        footerFlag.setVisibility(View.GONE);
+        footerTripCode.setVisibility(GONE);
+        footerFlag.setVisibility(GONE);
         footerFlag.setImageBitmap(null);
-        footerCountryName.setVisibility(View.GONE);
-        footerImage.setVisibility(View.GONE);
+        footerCountryName.setVisibility(GONE);
+        footerImage.setVisibility(GONE);
+
+        reply.setOnClickListener(dummy);
     }
+
+    OnClickListener dummy = new OnClickListener() {
+        @Override public void onClick(View v) {
+            Util.showToast(getContext(), "Not yet implemented");
+        }
+    };
 
     // If needed reduce the media size such that it is only as big as needed and is
     // never bigger than approx. the screen size. For example, an image with a height
@@ -169,20 +177,25 @@ public class PostView extends CardView {
                           final Post post,
                           final PostsActivity.RepliesCallback repliesCallback,
                           final PostsActivity.QuoteCallback quoteCallback) {
+        name.setText(post.name);
         number.setText(post.number);
         date.setText(DateUtils.getRelativeTimeSpanString(
                 post.time * 1000L, System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS));
         if (post.replyCount != 0) {
-            repliesContainer.setVisibility(View.VISIBLE);
-            replies.setText(post.replyCount + "r");
-            header.setOnClickListener(new OnClickListener() {
+            replies.setVisibility(VISIBLE);
+            String suffix = post.replyCount > 1 ? " REPLIES" : " REPLY";
+            replies.setText(post.replyCount + suffix);
+            replies.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     if (repliesCallback != null) repliesCallback.onClick(post);
                 }
             });
+        } else {
+            replies.setVisibility(GONE);
         }
 
+        Util.setVisibility(text, post.parsedText().length() > 0);
         text.setText(post.parsedText());
         postViewMovementMethod.quoteCallback = quoteCallback;
         text.setMovementMethod(postViewMovementMethod);
@@ -197,6 +210,7 @@ public class PostView extends CardView {
             footer.setVisibility(VISIBLE);
             footerTripCode.setVisibility(VISIBLE);
             footerTripCode.setText(post.tripCode);
+            //name.setText(post.tripCode);
         }
         if (post.country != null) {
             footer.setVisibility(VISIBLE);
@@ -253,6 +267,7 @@ public class PostView extends CardView {
             mediaContainer.setVisibility(View.VISIBLE);
             image.setVisibility(View.VISIBLE);
             image.getLayoutParams().height = size[H];
+            imageTouchOverlay.getLayoutParams().height = size[H];
             String thumbUrl = ApiModule.thumbUrl(boardName, post.mediaId);
             ion.build(image)
                 .load(thumbUrl)

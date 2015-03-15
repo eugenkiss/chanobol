@@ -26,7 +26,7 @@ public class Post extends Common {
     @Transient private CharSequence parsedText;
     public void generateParsedTextCache() {
         if (parsedText == null) {
-            String s = subject; if (s == null) s = ""; else s = "<h2>" + s + "</h2>";
+            String s = subject; if (s == null) s = ""; else s = "<h5>" + s + "</h5>";
             String t = text; if (t == null) t = "";
             parsedText = CommentParser.getInstance().parseComment(this, s + t);
         }

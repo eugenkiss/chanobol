@@ -19,11 +19,15 @@
         <item name="bg">#212121</item>
         <item name="fg">@color/background_floating_material_dark</item>
         <item name="fg2">#393939</item>
-        <item name="postview_image_bg">#292929</item>
+        <item name="postview_image_bg">#393939</item>
         <item name="image_bg">#292929</item>
         <item name="drawer_bg">?attr/colorPrimaryDark</item>
         <item name="reply_icon_tint">@color/transparent</item>
+        <item name="postview_divider">#ff525252</item>
+        <item name="postview_action">#90A4AE</item>
         <item name="post_style">@style/PostView.Dark</item>
+        <item name="toolbar_theme">@style/Toolbar</item>
+        <item name="popup_theme">@style/Toolbar_Popup</item>
     </style>
 
     <style name="AppTheme.Light">
@@ -39,10 +43,24 @@
         <item name="fg">#fafafa</item>
         <item name="fg2">#fff1f1f1</item>
         <item name="postview_image_bg">#fafafa</item>
-        <item name="image_bg">#bd9bc3</item>
+        <item name="image_bg">?attr/colorPrimaryDark</item>
         <item name="drawer_bg">#fff5dcf8</item>
         <item name="reply_icon_tint">#bbb</item>
+        <item name="postview_divider">#ffe8e8e8</item>
+        <item name="postview_action">?attr/colorPrimary</item>
         <item name="post_style">@style/PostView</item>
+    </style>
+
+    <!-- http://stackoverflow.com/a/28953241/283607 -->
+    <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColor">#fff</item>
+        <item name="android:textColorPrimary">#fff</item>
+    </style>
+
+    <style name="Toolbar_Popup" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColor">#fff</item>
+        <item name="android:textColorPrimary">#fff</item>
+        <item name="android:background">?colorPrimary</item>
     </style>
 
     <style name="MediaActivity" parent="AppTheme">
