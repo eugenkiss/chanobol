@@ -22,6 +22,7 @@
         android:layout_gravity="bottom|right"
         android:paddingRight="3dp"
         android:paddingBottom="1dp"
+        android:textColor="#fff"
         android:textSize="11sp"
         android:textStyle="bold"
         android:shadowColor="#000"
