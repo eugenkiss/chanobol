@@ -9,6 +9,7 @@ import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.graphics.Palette;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,11 +18,13 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.koushikdutta.async.future.FutureCallback;
+import com.koushikdutta.ion.ImageViewBitmapInfo;
 import com.koushikdutta.ion.Ion;
 import com.koushikdutta.ion.builder.Builders;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
+import anabolicandroids.chanobol.ui.scaffolding.Prefs;
 import anabolicandroids.chanobol.util.HackyViewPager;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
@@ -42,6 +45,7 @@ public class MediaView extends FrameLayout {
     @InjectView(R.id.progressbar) ProgressBar progressbar;
     @SuppressWarnings("UnusedDeclaration") private PhotoViewAttacher attacher;
 
+    public Prefs prefs;
     public MediaPointer lastMediaPointer;
     boolean loaded;
     // I observed that sometimes the higher quality media is not loaded after a swipe.
@@ -100,10 +104,18 @@ public class MediaView extends FrameLayout {
 
         imageView.setImageBitmap(null);
         String thumbUrl = ApiModule.thumbUrl(boardName, mediaPointer.id);
-        ion.build(imageView).fadeIn(false).load(thumbUrl).setCallback(new FutureCallback<ImageView>() {
-            @Override public void onCompleted(Exception e, ImageView result) {
+        ion.build(imageView).fadeIn(false).load(thumbUrl).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+            @Override public void onCompleted(Exception e, ImageViewBitmapInfo result) {
                 if (attacher != null) attacher.cleanup();
+                if (e != null) return;
                 attacher = new PhotoViewAttacher(imageView);
+                if (result == null || result.getBitmapInfo() == null) return;
+                if (prefs.theme().isLightTheme) {
+                    // TODO: Threadmanager should encapsulate the color...
+                    int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
+                    Palette palette = Palette.generate(result.getBitmapInfo().bitmap);
+                    imageView.setBackgroundColor(palette.getMutedColor(primaryDark));
+                }
             }
         });
     }
@@ -174,7 +186,9 @@ public class MediaView extends FrameLayout {
                     attacher.setDisplayMatrix(previousMatrix);
                     attacher.setOnMatrixChangeListener(this);
                 }
-                background.getBackground().setAlpha(Util.clamp(50, 255*s*Math.sqrt(s)*1.3, 255));
+                int a = Util.clamp(50, 255*s*Math.sqrt(s)*1.3, 255);
+                background.getBackground().setAlpha(a);
+                imageView.getBackground().setAlpha(a);
                 Util.setVisibility(releaseIndicator, s <= releaseScaleThreshold + releaseScaleThresholdBuffer);
                 previousMatrix = attacher.getDisplayMatrix();
             }

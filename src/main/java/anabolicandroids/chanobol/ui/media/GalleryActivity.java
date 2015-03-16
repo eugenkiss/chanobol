@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -112,9 +113,14 @@ public class GalleryActivity extends SwipeRefreshActivity {
             iv.postDelayed(new Runnable() {
                 @Override public void run() {
                     MediaActivity.transitionBitmap = Util.drawableToBitmap(iv.image.getDrawable());
+                    int color = getResources().getColor(R.color.colorPrimaryDark);
+                    if (MediaActivity.transitionBitmap != null) {
+                        Palette palette = Palette.generate(MediaActivity.transitionBitmap);
+                        color = palette.getMutedColor(color);
+                    }
                     MediaActivity.launch(
-                            GalleryActivity.this, iv.image, iv.index + "", new Point(cx, cy), r, true,
-                            boardName, threadNumber, iv.index, mediaPointers
+                            GalleryActivity.this, iv.image, iv.index + "", new Point(cx, cy), r, color,
+                            true, boardName, threadNumber, iv.index, mediaPointers
                     );
                 }
             }, 200);

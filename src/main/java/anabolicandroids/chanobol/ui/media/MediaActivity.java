@@ -60,11 +60,13 @@ public class MediaActivity extends UiActivity {
     private static String EXTRA_TRANSITIONNAME = "transitionName";
     private static String EXTRA_REVEALPOINT = "revealPoint";
     private static String EXTRA_REVEALRADIUS = "revealRadius";
+    private static String EXTRA_REVEALCOLOR = "revealColor";
     private static String EXTRA_FROM_GALLERY = "fromGallery";
     private static String EXTRA_INITIALINDEX = "initialIndex";
     private String transitionName;
     private Point revealPoint;
     private int revealRadius;
+    private int revealColor;
     private boolean fromGallery;
     private int initialIndex;
 
@@ -88,7 +90,7 @@ public class MediaActivity extends UiActivity {
 
     public static void launch(
             Activity activity, View transitionView, String transitionName,
-            Point revealPoint, int revealStartRadius, boolean fromGallery,
+            Point revealPoint, int revealStartRadius, int revealColor, boolean fromGallery,
             String boardName, String threadNumber,
             int index, ArrayList<MediaPointer> mediaPointers
     ) {
@@ -105,6 +107,7 @@ public class MediaActivity extends UiActivity {
             // "java.lang.RuntimeException: Parcel: unable to marshal value Point..."
         }
         intent.putExtra(EXTRA_REVEALRADIUS, revealStartRadius);
+        intent.putExtra(EXTRA_REVEALCOLOR, revealColor);
         intent.putExtra(EXTRA_FROM_GALLERY, fromGallery);
         intent.putExtra(EXTRA_BOARDNAME, boardName);
         intent.putExtra(EXTRA_THREADNUMBER, threadNumber);
@@ -132,6 +135,7 @@ public class MediaActivity extends UiActivity {
         Bundle b = getIntent().getExtras();
         revealPoint   = b.getParcelable(EXTRA_REVEALPOINT);
         revealRadius  = b.getInt(EXTRA_REVEALRADIUS) / 2;
+        revealColor   = b.getInt(EXTRA_REVEALCOLOR);
         boardName     = b.getString(EXTRA_BOARDNAME);
         threadNumber  = b.getString(EXTRA_THREADNUMBER);
         initialIndex  = b.getInt(EXTRA_INITIALINDEX);
@@ -142,6 +146,8 @@ public class MediaActivity extends UiActivity {
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
         ViewCompat.setTransitionName(imageViewForTransition, transitionName);
         imageViewForTransition.setImageBitmap(transitionBitmap);
+        if (prefs.theme().isLightTheme)
+            background.setBackgroundColor(revealColor);
 
         setupViewPager();
 
@@ -258,6 +264,7 @@ public class MediaActivity extends UiActivity {
                 currentIndex = position;
                 MediaPointer current = mediaPointers.get(currentIndex);
                 MediaView currentView = pagerView(currentIndex);
+                currentView.prefs = prefs;
                 currentView.setTransitionNameForImageView(currentIndex+"");
                 currentView.bindTo(boardName, current);
                 // Free bitmaps to be collected
@@ -278,6 +285,7 @@ public class MediaActivity extends UiActivity {
 
         final MediaPointer current = mediaPointers.get(currentIndex);
         final MediaView currentView = pagerView(currentIndex);
+        currentView.prefs = prefs;
         viewPager.postDelayed(new Runnable() {
             @Override public void run() {
                 if (transitionBitmap != null) currentView.bindToPreview(transitionBitmap);
@@ -598,6 +606,7 @@ public class MediaActivity extends UiActivity {
 
         @Override public Object instantiateItem(ViewGroup container, int position) {
             MediaView mediaView = pagerView(position);
+            mediaView.prefs = prefs;
             MediaPointer current = mediaPointers.get(position);
             mediaView.bindToPreview(boardName, current);
             if (container.indexOfChild(mediaView) != -1) container.removeView(mediaView);

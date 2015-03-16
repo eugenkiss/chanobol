@@ -21,6 +21,10 @@ public class Post extends Common {
     // Only used internally, no counterpart in 4Chan API
     public int replyCount;
 
+    // TODO: should be handled by threadmanager...
+    // Transient helper state
+    public int thumbMutedColor = -1;
+
     // Used internally to speed up rendering by temporary caching
     // It would be better to persist the parsedText but SpannableString is not parcelable by default
     @Transient private CharSequence parsedText;

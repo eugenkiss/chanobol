@@ -14,19 +14,19 @@
         android:background="?attr/image_bg"
         />
 
+    <anabolicandroids.chanobol.util.HackyViewPager
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        />
+
     <View
         android:id="@+id/releaseIndicator"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone"
         android:background="@color/releaseIndicator"
-        />
-
-    <anabolicandroids.chanobol.util.HackyViewPager
-        android:id="@+id/viewPager"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="invisible"
         />
 
     <ImageView

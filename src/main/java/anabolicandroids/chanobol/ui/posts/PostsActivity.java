@@ -15,6 +15,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
@@ -136,6 +137,11 @@ public class PostsActivity extends SwipeRefreshActivity {
             String thumbUrl = ApiModule.thumbUrl(boardName, opPost.mediaId);
             try {
                 opImage = new BitmapDrawable(getResources(), ion.build(this).load(thumbUrl).asBitmap().get());
+                if (opImage.getBitmap() != null) {
+                    Palette palette = Palette.generate(opImage.getBitmap());
+                    int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
+                    opPost.thumbMutedColor = palette.getMutedColor(primaryDark);
+                }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -262,8 +268,9 @@ public class PostsActivity extends SwipeRefreshActivity {
             int cy = xy[1] + h/2;
             String uuid = UUID.randomUUID().toString();
             MediaActivity.transitionBitmap = Util.drawableToBitmap(iv.getDrawable());
+            int color = post.thumbMutedColor != -1 ? post.thumbMutedColor : getResources().getColor(R.color.colorPrimaryDark);
             MediaActivity.launch(
-                    PostsActivity.this, iv, uuid, new Point(cx, cy), r, false,
+                    PostsActivity.this, iv, uuid, new Point(cx, cy), r, color, false,
                     boardName, threadNumber, mediaMap.get(post.number), mediaPointers
             );
         }
@@ -644,6 +651,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     private void bindViewDRY(final Post item, int position, View view) {
         PostView v = (PostView) view;
         if (item == null) return;
+        v.prefs = prefs;
         if (position == 0 && firstLoad) {
             v.bindToOp(opImage, transitionName, item, boardName, ion);
         } else {

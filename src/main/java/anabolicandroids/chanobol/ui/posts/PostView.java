@@ -5,10 +5,12 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
 import android.text.Layout;
 import android.text.Spannable;
@@ -40,6 +42,7 @@ import anabolicandroids.chanobol.ui.posts.parsing.LinkSpan;
 import anabolicandroids.chanobol.ui.posts.parsing.QuoteSpan;
 import anabolicandroids.chanobol.ui.posts.parsing.ThreadLink;
 import anabolicandroids.chanobol.ui.posts.parsing.ThreadSpan;
+import anabolicandroids.chanobol.ui.scaffolding.Prefs;
 import anabolicandroids.chanobol.ui.scaffolding.UiActivity;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.ButterKnife;
@@ -67,6 +70,7 @@ public class PostView extends CardView {
     private int maxImgWidth;
     private int maxImgHeight;
 
+    public Prefs prefs;
     public Post post;
 
     public PostView(Context context, AttributeSet attrs) {
@@ -143,6 +147,20 @@ public class PostView extends CardView {
         }
         size[W] = (int) w;
         size[H] = (int) h;
+    }
+
+    private void determineScaleType(int[] size) {
+        // So that there are never borders on top and bottom of image (only possibly left and right)
+        // TODO: Really crude but effect is okay. This should become a better solution, though
+        double imageViewRatio = size[H]*1d / maxImgWidth;
+        double imageRatio = size[H]*1d / size[W];
+        if (imageViewRatio >= imageRatio*0.9) {
+            image.setScaleType(ImageView.ScaleType.CENTER_CROP);
+        } else {
+            image.setScaleType(ImageView.ScaleType.FIT_CENTER);
+        }
+        image.getLayoutParams().height = size[H];
+        imageTouchOverlay.getLayoutParams().height = size[H];
     }
 
     private void initImageCallback(final Post post, final PostsActivity.ImageCallback cb) {
@@ -232,8 +250,11 @@ public class PostView extends CardView {
         final int[] size = new int[2]; calcSize(size, post);
         ViewCompat.setTransitionName(image, transitionName);
         mediaContainer.setVisibility(View.VISIBLE);
+        if (prefs.theme().isLightTheme)
+            mediaContainer.setBackgroundColor(post.thumbMutedColor);
         image.setVisibility(View.VISIBLE);
         image.setImageDrawable(opImage);
+        determineScaleType(size);
         image.getLayoutParams().height = size[H];
         image.requestLayout();
         ion.build(getContext()).load(ApiModule.imgUrl(boardName, post.mediaId, post.mediaExtension)).asBitmap().tryGet();
@@ -259,10 +280,12 @@ public class PostView extends CardView {
                     if (!loaded) progress.setVisibility(View.VISIBLE);
                 }
             }, 500);
+
             mediaContainer.setVisibility(View.VISIBLE);
+            if (prefs.theme().isLightTheme && post.thumbMutedColor != -1)
+                mediaContainer.setBackgroundColor(post.thumbMutedColor);
             image.setVisibility(View.VISIBLE);
-            image.getLayoutParams().height = size[H];
-            imageTouchOverlay.getLayoutParams().height = size[H];
+            determineScaleType(size);
             String thumbUrl = ApiModule.thumbUrl(boardName, post.mediaId);
             ion.build(image)
                 .load(thumbUrl)
@@ -277,6 +300,20 @@ public class PostView extends CardView {
                             return;
                         }
                         bitmapCacheKeys.add(result.getBitmapInfo().key);
+
+                        if (post.thumbMutedColor == -1) {
+                            //Palette palette = Palette.generate(result.getBitmapInfo().bitmap);
+                            final int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
+                            Palette.generateAsync(result.getBitmapInfo().bitmap, new Palette.PaletteAsyncListener() {
+                                @Override public void onGenerated(Palette palette) {
+                                    post.thumbMutedColor = palette.getMutedColor(primaryDark);
+                                    if (prefs.theme().isLightTheme) {
+                                        mediaContainer.setBackgroundColor(post.thumbMutedColor);
+                                    }
+                                }
+                            });
+                        }
+
                         final String ext = post.mediaExtension;
                         final String url = ApiModule.imgUrl(boardName, post.mediaId, post.mediaExtension);
                         switch (ext) {
@@ -303,6 +340,9 @@ public class PostView extends CardView {
                                         if (e != null) { return; }
                                         initImageCallback(post, imageCallback);
                                         if (result.getBitmapInfo() != null) {
+                                            Bitmap b = result.getBitmapInfo().bitmap;
+                                            image.getLayoutParams().height = b.getHeight();
+                                            imageTouchOverlay.getLayoutParams().height = b.getHeight();
                                             bitmapCacheKeys.add(result.getBitmapInfo().key);
                                         }
                                     }
