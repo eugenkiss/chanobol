@@ -59,7 +59,7 @@
         <item name="fg2">#fff1f1f1</item>
         <item name="postview_image_bg">#fafafa</item>
         <item name="image_bg">?attr/colorPrimaryDark</item>
-        <item name="drawer_bg">?attr/colorPrimaryDark</item>
+        <item name="drawer_bg">?attr/colorPrimary</item>
         <item name="drawer_entry">?android:textColorPrimaryInverse</item>
         <item name="drawer_header">?android:textColorPrimaryInverse</item>
         <item name="fav1">?android:textColorPrimaryInverse</item>
