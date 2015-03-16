@@ -22,6 +22,10 @@
         <item name="postview_image_bg">#393939</item>
         <item name="image_bg">#292929</item>
         <item name="drawer_bg">?attr/colorPrimaryDark</item>
+        <item name="drawer_entry">?android:textColorPrimary</item>
+        <item name="drawer_header">?android:textColorPrimary</item>
+        <item name="fav1">?android:textColorPrimary</item>
+        <item name="fav2">?android:textColorSecondary</item>
         <item name="reply_icon_tint">@color/transparent</item>
         <item name="postview_divider">#ff525252</item>
         <item name="postview_action">#90A4AE</item>
@@ -45,15 +49,19 @@
 
         <item name="colorPrimary">@color/colorPrimary_light</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
-        <item name="colorControlHighlight">#608BC34A</item>
         <item name="colorAccent">#8BC34A</item>
+        <item name="colorControlHighlight">#608BC34A</item>
 
         <item name="bg">#dddddd</item>
         <item name="fg">#fafafa</item>
         <item name="fg2">#fff1f1f1</item>
         <item name="postview_image_bg">#fafafa</item>
         <item name="image_bg">?attr/colorPrimaryDark</item>
-        <item name="drawer_bg">#fff5dcf8</item>
+        <item name="drawer_bg">?attr/colorPrimaryDark</item>
+        <item name="drawer_entry">?android:textColorPrimaryInverse</item>
+        <item name="drawer_header">?android:textColorPrimaryInverse</item>
+        <item name="fav1">?android:textColorPrimaryInverse</item>
+        <item name="fav2">?android:textColorSecondaryInverse</item>
         <item name="reply_icon_tint">#bbb</item>
         <item name="postview_divider">#ffe8e8e8</item>
         <item name="postview_action">?attr/colorPrimary</item>
@@ -84,7 +92,7 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:paddingBottom">2dp</item>
-        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textColor">?drawer_header</item>
         <item name="android:textAllCaps">true</item>
         <item name="textAllCaps">true</item>
         <item name="android:textStyle">bold</item>
@@ -98,7 +106,7 @@
     <style name="Widget.Chanobol.Drawer.Entry" parent="">
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_width">match_parent</item>
-        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textColor">?drawer_entry</item>
         <item name="android:textSize">18sp</item>
         <item name="android:padding">14dp</item>
         <item name="android:layout_marginBottom">0dp</item>

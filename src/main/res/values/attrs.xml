@@ -6,6 +6,10 @@
     <attr name="postview_image_bg" format="color"/>
     <attr name="image_bg" format="color"/>
     <attr name="drawer_bg" format="color"/>
+    <attr name="drawer_entry" format="color"/>
+    <attr name="drawer_header" format="color"/>
+    <attr name="fav1" format="color"/>
+    <attr name="fav2" format="color"/>
     <attr name="reply_icon_tint" format="color"/>
     <attr name="postview_divider" format="color"/>
     <attr name="postview_action" format="color"/>

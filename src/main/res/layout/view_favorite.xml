@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textStyle="normal"
-        android:textColor="?android:textColorPrimary"
+        android:textColor="?fav1"
         tools:text="fit"
         />
 
@@ -37,7 +37,7 @@
         android:layout_height="wrap_content"
         android:textSize="14sp"
         android:textStyle="normal"
-        android:textColor="?android:textColorSecondary"
+        android:textColor="?fav2"
         tools:text="Fitness"
         />
 
