@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -301,17 +300,11 @@ public class PostView extends CardView {
                         }
                         bitmapCacheKeys.add(result.getBitmapInfo().key);
 
-                        if (post.thumbMutedColor == -1) {
-                            //Palette palette = Palette.generate(result.getBitmapInfo().bitmap);
+                        if (prefs.theme().isLightTheme && post.thumbMutedColor == -1 && bitmapInfo.bitmap != null) {
                             final int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
-                            Palette.generateAsync(result.getBitmapInfo().bitmap, new Palette.PaletteAsyncListener() {
-                                @Override public void onGenerated(Palette palette) {
-                                    post.thumbMutedColor = palette.getMutedColor(primaryDark);
-                                    if (prefs.theme().isLightTheme) {
-                                        mediaContainer.setBackgroundColor(post.thumbMutedColor);
-                                    }
-                                }
-                            });
+                            Palette palette = Palette.generate(bitmapInfo.bitmap);
+                            post.thumbMutedColor = palette.getMutedColor(primaryDark);
+                            mediaContainer.setBackgroundColor(post.thumbMutedColor);
                         }
 
                         final String ext = post.mediaExtension;
@@ -340,9 +333,6 @@ public class PostView extends CardView {
                                         if (e != null) { return; }
                                         initImageCallback(post, imageCallback);
                                         if (result.getBitmapInfo() != null) {
-                                            Bitmap b = result.getBitmapInfo().bitmap;
-                                            image.getLayoutParams().height = b.getHeight();
-                                            imageTouchOverlay.getLayoutParams().height = b.getHeight();
                                             bitmapCacheKeys.add(result.getBitmapInfo().key);
                                         }
                                     }
