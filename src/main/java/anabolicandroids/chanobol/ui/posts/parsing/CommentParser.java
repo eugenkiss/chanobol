@@ -94,7 +94,20 @@ public class CommentParser {
     public CharSequence parseComment(Post post, Node node) {
         CharSequence total = new SpannableString("");
 
-        if (node.childNodeSize() == 0) return parseNode(post, node);
+        if (node.childNodeSize() == 0) {
+            if (node instanceof TextNode) {
+                String text = ((TextNode) node).text();
+                SpannableString spannable = new SpannableString(text);
+
+                detectLinks(text, spannable);
+
+                return spannable;
+            } else if (node instanceof Element) {
+                return Html.fromHtml(node.outerHtml());
+            } else {
+                return null;
+            }
+        }
 
         try {
             List<Node> nodes = node.childNodes();
