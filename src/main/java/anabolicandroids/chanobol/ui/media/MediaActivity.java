@@ -34,11 +34,13 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 import anabolicandroids.chanobol.R;
@@ -514,7 +516,7 @@ public class MediaActivity extends UiActivity {
                 }
 
                 MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, UUID.randomUUID().toString() , "");
-                Toast.makeText( this, getString( R.string.image_saved_to_gallery ), Toast.LENGTH_SHORT).show();
+                Toast.makeText( this, getString( R.string.image_saved_to_gallery ), Toast.LENGTH_SHORT ).show();
                 break;
         }
         
