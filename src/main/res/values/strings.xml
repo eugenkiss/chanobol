@@ -22,6 +22,7 @@
     <string name="go_to_top">Go to Top</string>
     <string name="refresh">Refresh</string>
     <string name="favorize">Favorize</string>
+    <string name="save">Save</string>
     <!-- Drawer -->
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Closed</string>
@@ -45,4 +46,5 @@
     <string name="no_app">No suitable app</string>
     <string name="no_board">Board doesn\'t exist</string>
     <string name="no_thread">Thread is dead</string>
+    <string name="image_saved_to_gallery">Image saved to gallery</string>
 </resources>

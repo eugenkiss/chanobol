@@ -24,4 +24,9 @@
           android:title="@string/show_gallery"
           app:showAsAction="never"
         />
+
+    <item android:id="@+id/save"
+          android:title="@string/save"
+          app:showAsAction="never"
+            />
 </menu>
