@@ -486,7 +486,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         if (stackHeight > 0) {
             removing = true;
             PostsDialog dialog = (PostsDialog) fm.getFragments().get(stackHeight-1);
-            dialog.animatePostsRemoval();
+            if (dialog != null) dialog.animatePostsRemoval();
             postsView.postDelayed(new Runnable() {
                 @Override public void run() {
                     removing = false;

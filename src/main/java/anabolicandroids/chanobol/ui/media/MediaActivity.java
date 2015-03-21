@@ -620,7 +620,10 @@ public class MediaActivity extends UiActivity {
             container.removeView(mediaView);
         }
 
-        @Override public int getCount() { return mediaPointers.size(); }
+        @Override public int getCount() {
+                if (mediaPointers == null) return 0;
+                return mediaPointers.size();
+        }
         @Override public boolean isViewFromObject(View view, Object object) { return view == object; }
     }
 
