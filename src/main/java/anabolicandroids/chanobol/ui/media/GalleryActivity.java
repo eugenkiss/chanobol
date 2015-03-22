@@ -1,6 +1,7 @@
 package anabolicandroids.chanobol.ui.media;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
@@ -27,10 +28,14 @@ import org.parceler.Parcels;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import anabolicandroids.chanobol.R;
+import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
 import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
+import anabolicandroids.chanobol.util.ImageSaver;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
@@ -63,6 +68,8 @@ public class GalleryActivity extends SwipeRefreshActivity {
         intent.putExtra(EXTRA_IMAGEPOINTERS, Parcels.wrap(mediaPointers));
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
+
+    @Inject ImageSaver imageSaver;
 
     @InjectView(R.id.gallery) RecyclerView galleryView;
 
@@ -170,8 +177,24 @@ public class GalleryActivity extends SwipeRefreshActivity {
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
-        switch(item.getItemId()) { }
+        switch(item.getItemId()) {
+            case R.id.saveAll:
+                saveAll(this, imageSaver, boardName, threadNumber, mediaPointers);
+                break;
+        }
         return super.onOptionsItemSelected(item);
+    }
+
+    public static void saveAll(Context context, ImageSaver imageSaver, String boardName, String threadNumber, List<MediaPointer> mediaPointers) {
+        // From Clover
+        if (mediaPointers.size() > 0) {
+            List<ImageSaver.DownloadPair> list = new ArrayList<>();
+            String folderName = anabolicandroids.chanobol.api.data.Thread.generateTitle(boardName, threadNumber);
+            for (MediaPointer p : mediaPointers) {
+                list.add(new ImageSaver.DownloadPair(ApiModule.imgUrl(boardName, p.id, p.ext), p.fileName()));
+            }
+            imageSaver.saveAll(context, folderName, list);
+        }
     }
 
     // Adapters ////////////////////////////////////////////////////////////////////////////////////

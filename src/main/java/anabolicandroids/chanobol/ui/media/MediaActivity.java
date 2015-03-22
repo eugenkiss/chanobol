@@ -467,7 +467,7 @@ public class MediaActivity extends UiActivity {
                 break;
             case R.id.share:
             case R.id.save:
-                imageSaver.saveImage(this, url, current.id, current.ext.substring(1), item.getItemId() == R.id.share);
+                imageSaver.saveImage(this, url, current.post.filename, current.ext.substring(1), item.getItemId() == R.id.share);
                 break;
             case R.id.showPost:
                 // TODO

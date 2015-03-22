@@ -49,6 +49,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.inject.Inject;
+
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.Post;
@@ -58,6 +60,7 @@ import anabolicandroids.chanobol.ui.media.MediaPointer;
 import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
 import anabolicandroids.chanobol.util.BindableAdapter;
+import anabolicandroids.chanobol.util.ImageSaver;
 import anabolicandroids.chanobol.util.SpacesItemDecoration;
 import anabolicandroids.chanobol.util.TransitionListenerAdapter;
 import anabolicandroids.chanobol.util.Util;
@@ -115,6 +118,8 @@ public class PostsActivity extends SwipeRefreshActivity {
         intent.putExtra(EXTRA_THREADNUMBER, threadNumber);
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
+
+    @Inject ImageSaver imageSaver;
 
     @InjectView(R.id.posts) RecyclerView postsView;
 
@@ -426,6 +431,9 @@ public class PostsActivity extends SwipeRefreshActivity {
                 break;
             case R.id.close:
                 dismissAllPostsDialogs();
+                break;
+            case R.id.saveAll:
+                GalleryActivity.saveAll(this, imageSaver, boardName, threadNumber, mediaPointers);
                 break;
         }
         return super.onOptionsItemSelected(item);

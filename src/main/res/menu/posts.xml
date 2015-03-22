@@ -22,6 +22,10 @@
           android:title="@string/refresh"
           app:showAsAction="never"
         />
+    <item android:id="@+id/saveAll"
+          android:title="@string/save_all_pics"
+          app:showAsAction="never"
+        />
     </group>
     <group
         android:id="@+id/postsDialog"

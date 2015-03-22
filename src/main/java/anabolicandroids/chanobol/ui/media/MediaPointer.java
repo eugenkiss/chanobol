@@ -8,7 +8,7 @@ import anabolicandroids.chanobol.api.data.Post;
 @Parcel
 public class MediaPointer {
     public String id;
-    public String ext;
+    public String ext; // includes dot (e.g. ".webm")
     public int w;
     public int h;
     public Post post;
@@ -29,5 +29,9 @@ public class MediaPointer {
 
     public boolean isWebm() {
         return ".webm".equals(ext);
+    }
+
+    public String fileName() {
+        return post.filename + ext;
     }
 }
