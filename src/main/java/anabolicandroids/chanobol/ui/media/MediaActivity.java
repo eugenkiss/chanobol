@@ -34,19 +34,20 @@ import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+
+import javax.inject.Inject;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.ui.scaffolding.UiActivity;
 import anabolicandroids.chanobol.util.HackyViewPager;
+import anabolicandroids.chanobol.util.ImageSaver;
 import anabolicandroids.chanobol.util.TransitionListenerAdapter;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
@@ -118,6 +119,8 @@ public class MediaActivity extends UiActivity {
         intent.putExtra(EXTRA_IMAGEPOINTERS, Parcels.wrap(mediaPointers));
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
+
+    @Inject ImageSaver imageSaver;
 
     @InjectView(R.id.revealbg) View background;
     @InjectView(R.id.releaseIndicator) View releaseIndicator;
@@ -456,34 +459,15 @@ public class MediaActivity extends UiActivity {
                     }
                     if (bitmap == null) return true;
                     path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null, null);
+                    if (path == null) return false;
                     intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
                     intent.setType("image/*");
                     startActivity(Intent.createChooser(intent, getResources().getText(R.string.view_image)));
                 }
                 break;
             case R.id.share:
-                intent = new Intent();
-                intent.setAction(Intent.ACTION_SEND);
-                if (current.isWebm()) {
-                    // TODO: Webm must be downloaded
-                    intent.setDataAndType(Uri.parse(url), "video/webm");
-                    startActivity(Intent.createChooser(intent, getResources().getText(R.string.share_video)));
-                } else {
-                    // TODO: This is not good, download asynchronously
-                    Bitmap bitmap;
-                    try {
-                        // TODO: Write directly into Mediastore! Out of Memory possible
-                        bitmap = ion.build(this).load(url).asBitmap().get();
-                    } catch (InterruptedException | ExecutionException e) {
-                        e.printStackTrace();
-                        return true;
-                    }
-                    if (bitmap == null) return true;
-                    path = MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, null, null);
-                    intent.putExtra(Intent.EXTRA_STREAM, Uri.parse(path));
-                    intent.setType("image/*");
-                    startActivity(Intent.createChooser(intent, getResources().getText(R.string.share_image)));
-                }
+            case R.id.save:
+                imageSaver.saveImage(this, url, current.id, current.ext.substring(1), item.getItemId() == R.id.share);
                 break;
             case R.id.showPost:
                 // TODO
@@ -503,20 +487,6 @@ public class MediaActivity extends UiActivity {
                     GalleryActivity.launch(this, boardName, threadNumber, mediaPointers);
                     ActivityCompat.finishAfterTransition(this);
                 }
-                break;
-            case R.id.save:
-
-                Bitmap bitmap;
-                try {
-                    // TODO: Write directly into Mediastore! Out of Memory possible
-                    bitmap = ion.build(this).load(url).asBitmap().get();
-                } catch (InterruptedException | ExecutionException e) {
-                    e.printStackTrace();
-                    return true;
-                }
-
-                MediaStore.Images.Media.insertImage(getContentResolver(), bitmap, UUID.randomUUID().toString() , "");
-                Toast.makeText( this, getString( R.string.image_saved_to_gallery ), Toast.LENGTH_SHORT ).show();
                 break;
         }
         

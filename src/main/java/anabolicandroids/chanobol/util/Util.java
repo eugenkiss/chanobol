@@ -11,6 +11,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v8.renderscript.Allocation;
@@ -275,4 +277,10 @@ public class Util {
     public static Bitmap copy(Bitmap b) {
         return b.copy(b.getConfig(), true);
     }
+
+    // From Clover
+    public static void runOnUiThread(Runnable runnable) {
+        new Handler(Looper.getMainLooper()).post(runnable);
+    }
+
 }

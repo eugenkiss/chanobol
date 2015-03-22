@@ -1,6 +1,9 @@
 package anabolicandroids.chanobol.ui.scaffolding;
 
 import android.content.SharedPreferences;
+import android.os.Environment;
+
+import java.io.File;
 
 // Convenience wrapper around SharedPreferences to make use of Java's static nature
 public class Prefs {
@@ -44,5 +47,15 @@ public class Prefs {
     }
     public void autoRefresh(boolean v) {
         p.edit().putBoolean(AUTO_REFRESH, v).apply();
+    }
+
+    public static final String IMAGE_DIR = "pref_image_dir";
+    public File imageDir() {
+        String path = p.getString(IMAGE_DIR, null);
+        if (path == null) return new File(Environment.getExternalStorageDirectory() + File.separator + "Chanobol");
+        else return new File(path);
+    }
+    public void imageDir(String dir) {
+        p.edit().putString(IMAGE_DIR, dir).apply();
     }
 }

@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import com.koushikdutta.ion.Ion;
 
 import java.lang.reflect.Type;
 import java.util.List;
@@ -34,6 +35,8 @@ import anabolicandroids.chanobol.ui.posts.PostsDialog;
 import anabolicandroids.chanobol.ui.scaffolding.PersistentData;
 import anabolicandroids.chanobol.ui.scaffolding.Prefs;
 import anabolicandroids.chanobol.ui.threads.ThreadsActivity;
+import anabolicandroids.chanobol.util.FileCache;
+import anabolicandroids.chanobol.util.ImageSaver;
 import anabolicandroids.chanobol.util.Util;
 import dagger.Module;
 import dagger.Provides;
@@ -94,6 +97,11 @@ public class AppModule {
     @Provides @Singleton
     PersistentData providePersistentData(SharedPreferences prefs) {
         return new PersistentData(prefs);
+    }
+
+    @Provides @Singleton
+    ImageSaver provideImageSaver(Prefs prefs, Ion ion, FileCache fileCache) {
+        return new ImageSaver(prefs, ion, fileCache);
     }
 
     @Provides @Singleton @Named("DebugSettings")

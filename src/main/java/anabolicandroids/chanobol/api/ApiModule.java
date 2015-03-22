@@ -5,9 +5,13 @@ import android.content.Context;
 
 import com.koushikdutta.ion.Ion;
 
+import java.io.File;
+
 import javax.inject.Singleton;
 
+import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.annotations.ForApplication;
+import anabolicandroids.chanobol.util.FileCache;
 import dagger.Module;
 import dagger.Provides;
 
@@ -40,5 +44,15 @@ public class ApiModule {
     @Provides @Singleton
     ChanService provideChanService(@ForApplication Context context, Ion ion) {
         return new ChanService(context, ion);
+    }
+
+    // From Clover
+    private static final long FILE_CACHE_DISK_SIZE = 50 * 1024 * 1024; // 50mb
+    private static final String FILE_CACHE_NAME = "filecache";
+
+    @Provides @Singleton
+    FileCache provideFileCache(App app, Ion ion) {
+        File cacheDir = app.getExternalCacheDir() != null ? app.getExternalCacheDir() : app.getCacheDir();
+        return new FileCache(new File(cacheDir, FILE_CACHE_NAME), FILE_CACHE_DISK_SIZE, ion);
     }
 }
