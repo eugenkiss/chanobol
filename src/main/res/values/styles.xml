@@ -1,6 +1,42 @@
 <resources xmlns:tools="http://schemas.android.com/tools" tools:ignore="NewApi">
 
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar" >
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar" >
+        <item name="windowActionModeOverlay">true</item>
+        <item name="windowActionBarOverlay">true</item>
+        <item name="windowActionBar">false</item>
+
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowActivityTransitions">true</item>
+        <item name="android:windowContentTransitions">true</item>
+        <item name="android:windowAllowEnterTransitionOverlap">true</item>
+        <item name="android:windowAllowReturnTransitionOverlap">true</item>
+        <item name="android:windowSharedElementEnterTransition">@transition/move</item>
+        <item name="android:windowSharedElementReenterTransition">@transition/move</item>
+
+        <item name="colorPrimary">@color/colorPrimary_light</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
+        <item name="colorAccent">#8BC34A</item>
+        <item name="colorControlHighlight">#608BC34A</item>
+
+        <item name="bg">#dddddd</item>
+        <item name="fg">#fafafa</item>
+        <item name="fg2">#fff1f1f1</item>
+        <item name="postview_image_bg">#fafafa</item>
+        <item name="image_bg">?attr/colorPrimaryDark</item>
+        <item name="drawer_bg">?attr/colorPrimary</item>
+        <item name="drawer_entry">?android:textColorPrimaryInverse</item>
+        <item name="drawer_header">?android:textColorPrimaryInverse</item>
+        <item name="fav1">?android:textColorPrimaryInverse</item>
+        <item name="fav2">?android:textColorSecondaryInverse</item>
+        <item name="reply_icon_tint">#bbb</item>
+        <item name="postview_divider">#ffe8e8e8</item>
+        <item name="postview_action">?attr/colorPrimary</item>
+        <item name="post_style">@style/PostView</item>
+        <item name="toolbar_theme">@style/Toolbar</item>
+        <item name="popup_theme">@style/Toolbar_Popup</item>
+    </style>
+
+    <style name="AppTheme.Dark" parent="Theme.AppCompat.NoActionBar">
         <item name="windowActionModeOverlay">true</item>
         <item name="windowActionBarOverlay">true</item>
         <item name="windowActionBar">false</item>
@@ -34,40 +70,6 @@
         <item name="post_style">@style/PostView.Dark</item>
         <item name="toolbar_theme">@style/Toolbar</item>
         <item name="popup_theme">@style/Toolbar_Popup</item>
-    </style>
-
-    <style name="AppTheme.Light" parent="Theme.AppCompat.Light.NoActionBar">
-        <item name="windowActionModeOverlay">true</item>
-        <item name="windowActionBarOverlay">true</item>
-        <item name="windowActionBar">false</item>
-
-        <item name="android:windowNoTitle">true</item>
-        <item name="android:windowActivityTransitions">true</item>
-        <item name="android:windowContentTransitions">true</item>
-        <item name="android:windowAllowEnterTransitionOverlap">true</item>
-        <item name="android:windowAllowReturnTransitionOverlap">true</item>
-        <item name="android:windowSharedElementEnterTransition">@transition/move</item>
-        <item name="android:windowSharedElementReenterTransition">@transition/move</item>
-
-        <item name="colorPrimary">@color/colorPrimary_light</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark_light</item>
-        <item name="colorAccent">#8BC34A</item>
-        <item name="colorControlHighlight">#608BC34A</item>
-
-        <item name="bg">#dddddd</item>
-        <item name="fg">#fafafa</item>
-        <item name="fg2">#fff1f1f1</item>
-        <item name="postview_image_bg">#fafafa</item>
-        <item name="image_bg">?attr/colorPrimaryDark</item>
-        <item name="drawer_bg">?attr/colorPrimary</item>
-        <item name="drawer_entry">?android:textColorPrimaryInverse</item>
-        <item name="drawer_header">?android:textColorPrimaryInverse</item>
-        <item name="fav1">?android:textColorPrimaryInverse</item>
-        <item name="fav2">?android:textColorSecondaryInverse</item>
-        <item name="reply_icon_tint">#bbb</item>
-        <item name="postview_divider">#ffe8e8e8</item>
-        <item name="postview_action">?attr/colorPrimary</item>
-        <item name="post_style">@style/PostView</item>
     </style>
 
     <!-- http://stackoverflow.com/a/28953241/283607 -->

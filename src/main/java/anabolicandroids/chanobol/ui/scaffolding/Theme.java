@@ -3,8 +3,8 @@ package anabolicandroids.chanobol.ui.scaffolding;
 import anabolicandroids.chanobol.R;
 
 public enum Theme {
-    DARK("dark", R.style.AppTheme, false),
-    LIGHT("light", R.style.AppTheme_Light, true);
+    LIGHT("light", R.style.AppTheme, true),
+    DARK("dark", R.style.AppTheme_Dark, false);
 
     public String name;
     public int resValue;
