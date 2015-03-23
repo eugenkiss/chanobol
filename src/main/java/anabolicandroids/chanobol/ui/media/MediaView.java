@@ -109,7 +109,7 @@ public class MediaView extends FrameLayout {
                 if (attacher != null) attacher.cleanup();
                 if (e != null) return;
                 attacher = new PhotoViewAttacher(imageView);
-                if (result == null || result.getBitmapInfo() == null) return;
+                if (result == null || result.getBitmapInfo() == null || result.getBitmapInfo().bitmap == null) return;
                 if (prefs.theme().isLightTheme) {
                     // TODO: Threadmanager should encapsulate the color...
                     int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
