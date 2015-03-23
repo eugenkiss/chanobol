@@ -5,6 +5,8 @@ import android.os.Environment;
 
 import java.io.File;
 
+import anabolicandroids.chanobol.ui.threads.ThreadSortOrder;
+
 // Convenience wrapper around SharedPreferences to make use of Java's static nature
 public class Prefs {
 
@@ -57,5 +59,19 @@ public class Prefs {
     }
     public void imageDir(String dir) {
         p.edit().putString(IMAGE_DIR, dir).apply();
+    }
+
+
+    public static final String THREAD_SORT_ORDER = "pref_thread_sort_order";
+    public ThreadSortOrder threadSortOrder() {
+        String s = p.getString(THREAD_SORT_ORDER, ThreadSortOrder.Bump.string);
+        if (s.equals(ThreadSortOrder.Bump.string)) return ThreadSortOrder.Bump;
+        if (s.equals(ThreadSortOrder.Replies.string)) return ThreadSortOrder.Replies;
+        if (s.equals(ThreadSortOrder.Images.string)) return ThreadSortOrder.Images;
+        if (s.equals(ThreadSortOrder.Date.string)) return ThreadSortOrder.Date;
+        return ThreadSortOrder.Bump;
+    }
+    public void threadSortOrder(ThreadSortOrder order) {
+        p.edit().putString(THREAD_SORT_ORDER, order.string).apply();
     }
 }

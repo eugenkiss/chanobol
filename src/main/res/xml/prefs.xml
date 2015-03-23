@@ -24,4 +24,12 @@
         android:defaultValue="light"
         android:summary="Needs Restart"
         />
+    <ListPreference
+        android:key="pref_thread_sort_order"
+        android:title="Thread Sort Order"
+        android:dialogTitle="Choose Order"
+        android:entries="@array/sort_names"
+        android:entryValues="@array/sort_keys"
+        android:defaultValue="bump"
+        />
 </PreferenceScreen>

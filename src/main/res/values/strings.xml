@@ -49,6 +49,11 @@
     <string name="no_board">Board doesn\'t exist</string>
     <string name="no_thread">Thread is dead</string>
     <string name="image_saved_to_gallery">Image saved to gallery</string>
+    <!-- Threads -->
+    <string name="sort_bump">Bump order</string>
+    <string name="sort_replies">Reply count</string>
+    <string name="sort_images">Image count</string>
+    <string name="sort_date">Creation date</string>
 
     <!-- For ImageSaver from Clover -->
     <string name="open_link_failed">No applications found to open link</string>

@@ -22,6 +22,8 @@ import com.koushikdutta.async.future.FutureCallback;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -54,6 +56,9 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     private ArrayList<Thread> threads;
     private HashMap<String, Integer> threadMap;
     private ThreadsAdapter threadsAdapter;
+    // No need to persist, is recreated on demand
+    private ArrayList<Thread> sortedThreads;
+    private ThreadSortOrder sortOrder;
 
     // This whole bitMap stuff is only needed to prevent the thumbnails from blinking after
     // update is finished. I tried many other approaches but this is the only one that worked.
@@ -90,6 +95,9 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             threadMap = Parcels.unwrap(savedInstanceState.getParcelable(THREADMAP));
         }
 
+        sortOrder = prefs.threadSortOrder();
+        sortedThreads = new ArrayList<>();
+
         bitMap = new HashMap<>();
 
         threadsAdapter = new ThreadsAdapter(clickCallback, longClickCallback);
@@ -99,7 +107,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         threadsView.setLayoutManager(glm);
         Util.calcDynamicSpanCountById(ThreadsActivity.this, threadsView, glm, R.dimen.column_width);
 
-        if (savedInstanceState == null) load();
+        if (savedInstanceState == null) load(); else notifyDataSetChanged();
     }
 
     @Override protected void onSaveInstanceState(Bundle outState) {
@@ -158,6 +166,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
                 }
                 boolean empty = threads.isEmpty();
                 threads.clear();
+                sortedThreads.clear();
                 threadMap.clear();
                 bitMap.clear(); // prevent strong references to possibly stale bitmaps
                 for (int i = 0; i < result.size(); i++) {
@@ -168,7 +177,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
                 if (empty) {
                     animateThreadsArrival();
                 } else {
-                    threadsAdapter.notifyDataSetChanged();
+                    notifyDataSetChanged();
                 }
                 loaded();
                 lastUpdate = System.currentTimeMillis();
@@ -196,7 +205,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
                 }
                 for (int i = 0; i < positions.length; i++)
                     if (!positions[i]) threads.get(i).dead = true;
-                threadsAdapter.notifyDataSetChangedWithoutBlinking();
+                notifyDataSetChangedWithoutBlinking();
                 lastUpdate = System.currentTimeMillis();
             }
         });
@@ -208,10 +217,47 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         //ion.cancelAll(this);
     }
 
+    private void notifyDataSetChanged() {
+        sortedThreads.clear();
+        boolean hasSticky = threads.size() > 0 && threads.get(0).isSticky();
+        for (int i = hasSticky ? 1 : 0; i < threads.size(); i++) {
+            sortedThreads.add(threads.get(i));
+        }
+        Collections.sort(sortedThreads, new Comparator<Thread>() {
+            @Override public int compare(Thread lhs, Thread rhs) {
+                switch(sortOrder) {
+                    case Bump: return 0;
+                    case Replies: return rhs.replies - lhs.replies;
+                    case Images: return rhs.images - lhs.images;
+                    case Date: return rhs.time - lhs.time;
+                }
+                return 0;
+            }
+        });
+        if (hasSticky) sortedThreads.add(0, threads.get(0));
+        threadsAdapter.notifyDataSetChanged();
+    }
+
+    boolean onlyUpdateText;
+    public void notifyDataSetChangedWithoutBlinking() {
+        onlyUpdateText = true;
+        notifyDataSetChanged();
+        threadsView.postDelayed(new Runnable() {
+            @Override public void run() {
+                onlyUpdateText = false;
+            }
+        }, 500);
+    }
+
     // Lifecycle ///////////////////////////////////////////////////////////////////////////////////
 
     @Override public void onResume() {
         super.onResume();
+        // When the sort order has been changed in the settings activity and one resumes back to this activity
+        if (sortOrder != prefs.threadSortOrder()) {
+            sortOrder = prefs.threadSortOrder();
+            notifyDataSetChanged();
+        }
         update();
         initBackgroundUpdater();
         pauseUpdating = false;
@@ -288,7 +334,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void animateThreadsArrival() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-            threadsAdapter.notifyDataSetChanged();
+            notifyDataSetChanged();
             return;
         }
         // Add slight delay because thumbnails must be retrieved, too,
@@ -296,10 +342,10 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         threadsView.postDelayed(new Runnable() {
             @Override public void run() {
                 threadsAdapter.hide = true;
-                threadsAdapter.notifyDataSetChanged();
+                notifyDataSetChanged();
                 TransitionManager.beginDelayedTransition(threadsView, new Slide(Gravity.BOTTOM));
                 threadsAdapter.hide = false;
-                threadsAdapter.notifyDataSetChanged();
+                notifyDataSetChanged();
             }
         }, 300);
     }
@@ -307,22 +353,11 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     // Adapters ////////////////////////////////////////////////////////////////////////////////////
 
     class ThreadsAdapter extends UiAdapter<Thread> {
-        boolean onlyUpdateText;
         boolean hide = false;
 
         public ThreadsAdapter(View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
             super(ThreadsActivity.this, clickListener, longClickListener);
-            this.items = threads;
-        }
-
-        public void notifyDataSetChangedWithoutBlinking() {
-            onlyUpdateText = true;
-            notifyDataSetChanged();
-            threadsView.postDelayed(new Runnable() {
-                @Override public void run() {
-                    onlyUpdateText = false;
-                }
-            }, 500);
+            this.items = sortedThreads;
         }
 
         @Override public View newView(ViewGroup container) {

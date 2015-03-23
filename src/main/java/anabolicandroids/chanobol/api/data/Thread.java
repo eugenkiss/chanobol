@@ -12,6 +12,10 @@ import java.lang.reflect.Type;
 @Parcel
 public class Thread extends Common {
 
+    public boolean isSticky() {
+        return sticky == 1;
+    }
+
     // Only used internally, no counterpart in 4Chan API
     public boolean dead;
 

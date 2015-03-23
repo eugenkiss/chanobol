@@ -4,4 +4,18 @@
         <item>light</item>
         <item>dark</item>
     </string-array>
+
+    <string-array name="sort_keys">
+        <item>bump</item>
+        <item>replies</item>
+        <item>images</item>
+        <item>date</item>
+    </string-array>
+
+    <string-array name="sort_names">
+        <item>@string/sort_bump</item>
+        <item>@string/sort_replies</item>
+        <item>@string/sort_images</item>
+        <item>@string/sort_date</item>
+    </string-array>
 </resources>
