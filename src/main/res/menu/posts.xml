@@ -26,6 +26,10 @@
           android:title="@string/save_all_pics"
           app:showAsAction="never"
         />
+    <item android:id="@+id/up"
+          android:title="@string/go_to_top"
+          app:showAsAction="never"
+        />
     </group>
     <group
         android:id="@+id/postsDialog"

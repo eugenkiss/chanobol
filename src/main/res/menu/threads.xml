@@ -21,4 +21,8 @@
           android:title="@string/refresh"
           app:showAsAction="never"
         />
+    <item android:id="@+id/down"
+          android:title="@string/go_to_bottom"
+          app:showAsAction="never"
+        />
 </menu>

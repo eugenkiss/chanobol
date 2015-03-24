@@ -294,6 +294,9 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             case R.id.up:
                 threadsView.scrollToPosition(0);
                 break;
+            case R.id.down:
+                threadsView.scrollToPosition(threads.size()-1);
+                break;
             case R.id.favorize:
                 BoardsActivity.showAddFavoriteDialog(this, persistentData, board);
                 break;

@@ -420,6 +420,9 @@ public class PostsActivity extends SwipeRefreshActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
+            case R.id.up:
+                postsView.scrollToPosition(0);
+                break;
             case R.id.down:
                 postsView.scrollToPosition(postsAdapter.getItemCount() - 1);
                 break;
