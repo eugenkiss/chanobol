@@ -319,6 +319,11 @@ public class PostView extends CardView {
                                 break;
                             default:
                                 initImageCallback(post, imageCallback);
+                                if (prefs.onlyThumbnailsInPostlist()) {
+                                    loaded = true;
+                                    progress.setVisibility(View.GONE);
+                                    break;
+                                }
                                 Builders.IV.F<?> placeholder = ion.build(image);
                                 // I'd love to have something like Picasso's noplaceholder s.t.
                                 // Ion doesn't clear the thumbnail preview...

@@ -43,6 +43,14 @@ public class Prefs {
         p.edit().putBoolean(PRELOAD_THUMBNAILS, v).apply();
     }
 
+    public static final String ONLY_THUMBNAILS = "pref_only_thumbnails_postlist";
+    public boolean onlyThumbnailsInPostlist() {
+        return p.getBoolean(ONLY_THUMBNAILS, false);
+    }
+    public void onlyThumbnailsInPostlist(boolean v) {
+        p.edit().putBoolean(ONLY_THUMBNAILS, v).apply();
+    }
+
     public static final String AUTO_REFRESH = "pref_refresh";
     public boolean autoRefresh() {
         return p.getBoolean(AUTO_REFRESH, true);
