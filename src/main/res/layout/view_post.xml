@@ -226,6 +226,17 @@
                 android:textStyle="bold"
                 />
 
+            <TextView
+                android:id="@+id/more"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:padding="4dp"
+                android:layout_marginLeft="14dp"
+                android:text="MORE"
+                android:textSize="16sp"
+                />
+
             <View
                 android:layout_width="0dp"
                 android:layout_height="0dp"
@@ -239,7 +250,6 @@
                 android:background="?attr/selectableItemBackgroundBorderless"
                 android:padding="4dp"
                 android:textSize="16sp"
-                android:textStyle="bold"
                 tools:text="5 REPLIES"
                 />
 

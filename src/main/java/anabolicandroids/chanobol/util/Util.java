@@ -2,6 +2,8 @@ package anabolicandroids.chanobol.util;
 
 import android.app.Activity;
 import android.app.Application;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -283,4 +285,15 @@ public class Util {
         new Handler(Looper.getMainLooper()).post(runnable);
     }
 
+    // From Clover and http://stackoverflow.com/a/10965541/283607
+    public static void copyToClipboard(Context context, String text) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+            ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = ClipData.newPlainText(context.getResources().getString(R.string.clipoard_copy_label), text);
+            clipboard.setPrimaryClip(clip);
+        } else {
+            android.text.ClipboardManager clipboard = (android.text.ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+            clipboard.setText(text);
+        }
+    }
 }

@@ -11,12 +11,15 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.CardView;
+import android.support.v7.widget.PopupMenu;
 import android.text.Layout;
 import android.text.Spannable;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.util.AttributeSet;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -63,6 +66,7 @@ public class PostView extends CardView {
     @InjectView(R.id.date) TextView date;
     @InjectView(R.id.replies) TextView replies;
     @InjectView(R.id.reply) TextView reply;
+    @InjectView(R.id.more) TextView more;
 
     private PostViewMovementMethod postViewMovementMethod = new PostViewMovementMethod();
     private static final int W = 0, H = 1;
@@ -118,12 +122,34 @@ public class PostView extends CardView {
         footerCountryName.setVisibility(GONE);
         footerImage.setVisibility(GONE);
 
+        more.setOnClickListener(moreListener);
         reply.setOnClickListener(dummy);
     }
 
     OnClickListener dummy = new OnClickListener() {
         @Override public void onClick(View v) {
             Util.showToast(getContext(), "Not yet implemented");
+        }
+    };
+
+    OnClickListener moreListener = new OnClickListener() {
+        @Override public void onClick(View v) {
+            PopupMenu popupMenu = new PopupMenu(getContext(), v);
+            Menu m = popupMenu.getMenu();
+            final int COPY = 0;
+            m.add(Menu.NONE, COPY, Menu.NONE, R.string.copy_text);
+            popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override public boolean onMenuItemClick(MenuItem menuItem) {
+                    switch (menuItem.getItemId()) {
+                        case COPY:
+                            Util.copyToClipboard(getContext(), post.parsedText().toString());
+                            Util.showToast(getContext(), R.string.copied_text);
+                            break;
+                    }
+                    return false;
+                }
+            });
+            popupMenu.show();
         }
     };
 

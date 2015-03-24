@@ -44,11 +44,15 @@
     <string name="favorize_title">Favorize?</string>
     <string name="favorite_added">added as favorite</string>
     <string name="open_thread_confirmation">Open this thread?</string>
+    <!-- Post Popup Dialog -->
+    <string name="copy_text">Copy Text</string>
+    <string name="clipoard_copy_label">Post text</string>
     <!-- Toasts -->
     <string name="no_app">No suitable app</string>
     <string name="no_board">Board doesn\'t exist</string>
     <string name="no_thread">Thread is dead</string>
     <string name="image_saved_to_gallery">Image saved to gallery</string>
+    <string name="copied_text">Copied text to clipboard</string>
     <!-- Threads -->
     <string name="sort_bump">Bump order</string>
     <string name="sort_replies">Reply count</string>
