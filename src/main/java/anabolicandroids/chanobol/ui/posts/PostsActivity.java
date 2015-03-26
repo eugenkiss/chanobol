@@ -357,7 +357,8 @@ public class PostsActivity extends SwipeRefreshActivity {
                     }
                 }
                 lastUpdate = System.currentTimeMillis();
-                revealAnimationCallback.markDataLoaded();
+                if (firstLoad) revealAnimationCallback.markDataLoaded();
+                else postsAdapter.notifyDataSetChanged();
                 loaded();
             }
         });
