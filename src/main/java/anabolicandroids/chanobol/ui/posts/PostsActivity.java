@@ -259,10 +259,10 @@ public class PostsActivity extends SwipeRefreshActivity {
     };
 
     public static interface ImageCallback {
-        public void onClick(Post post, ImageView iv);
+        public void onClick(int position, Post post, ImageView iv);
     }
     ImageCallback imageCallback = new ImageCallback() {
-        @Override public void onClick(Post post, ImageView iv) {
+        @Override public void onClick(int position, Post post, ImageView iv) {
             int w = iv.getWidth();
             int h = iv.getHeight();
             Drawable d = iv.getDrawable();
@@ -271,7 +271,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             iv.getLocationOnScreen(xy);
             int cx = xy[0] + w/2;
             int cy = xy[1] + h/2;
-            String uuid = UUID.randomUUID().toString();
+            String uuid = position == 0 ? transitionName : UUID.randomUUID().toString();
             MediaActivity.transitionBitmap = Util.drawableToBitmap(iv.getDrawable());
             int color = post.thumbMutedColor != -1 ? post.thumbMutedColor : getResources().getColor(R.color.colorPrimaryDark);
             MediaActivity.launch(
@@ -665,13 +665,12 @@ public class PostsActivity extends SwipeRefreshActivity {
         if (item == null) return;
         v.prefs = prefs;
         if (position == 0 && firstLoad) {
-            v.bindToOp(opImage, transitionName, item, boardName, ion);
+            v.bindToOp(opImage, item, boardName, ion);
         } else {
-            v.bindTo(item, boardName, threadNumber, ion, bitmapCacheKeys,
+            v.bindTo(position, item, boardName, threadNumber, ion, bitmapCacheKeys,
                      repliesCallback, quoteCallback, imageCallback);
         }
-        if (position == 0)  ViewCompat.setTransitionName(v.image, transitionName);
-        else  ViewCompat.setTransitionName(v.image, null);
+        v.setImageTransitionName(position == 0 ? transitionName : null);
     }
 
     class PostsDialogAdapter extends BindableAdapter<Post> {

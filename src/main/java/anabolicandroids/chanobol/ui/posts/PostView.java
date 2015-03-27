@@ -113,6 +113,7 @@ public class PostView extends CardView {
         image.setVisibility(GONE);
         image.setImageBitmap(null);
         image.setOnClickListener(null);
+        ViewCompat.setTransitionName(image, null);
         play.setVisibility(GONE);
         progress.setVisibility(GONE);
         text.setVisibility(GONE);
@@ -188,12 +189,12 @@ public class PostView extends CardView {
         imageTouchOverlay.getLayoutParams().height = size[H];
     }
 
-    private void initImageCallback(final Post post, final PostsActivity.ImageCallback cb) {
+    private void initImageCallback(final int position, final Post post, final PostsActivity.ImageCallback cb) {
         OnClickListener l = new OnClickListener() {
             @Override public void onClick(View v) {
                 imageTouchOverlay.postDelayed(new Runnable() {
                     @Override public void run() {
-                        cb.onClick(post, image);
+                        cb.onClick(position, post, image);
                     }
                 }, UiActivity.RIPPLE_DELAY());
             }
@@ -261,11 +262,15 @@ public class PostView extends CardView {
         }
     }
 
+    public void setImageTransitionName(String transitionName) {
+        ViewCompat.setTransitionName(image, transitionName);
+    }
+
     // The raison d'être for this method is to immediately populate the OP post cardview
     // when viewing a single thread without first waiting for the 4Chan API request to finish
     // that gets all the posts in order to give the impression (illusion) of promptness
     // (compare with the iOS splash screen concept).
-    public void bindToOp(final Drawable opImage, final String transitionName,
+    public void bindToOp(final Drawable opImage,
                          final Post post, final String boardName,
                          final Ion ion) {
         this.post = post;
@@ -273,7 +278,6 @@ public class PostView extends CardView {
         initText(ion, post, null, null);
 
         final int[] size = new int[2]; calcSize(size, post);
-        ViewCompat.setTransitionName(image, transitionName);
         mediaContainer.setVisibility(View.VISIBLE);
         if (prefs.theme().isLightTheme)
             mediaContainer.setBackgroundColor(post.thumbMutedColor);
@@ -286,7 +290,7 @@ public class PostView extends CardView {
     }
 
     private boolean loaded;
-    public void bindTo(final Post post, final String boardName,
+    public void bindTo(final int position, final Post post, final String boardName,
                        @SuppressWarnings("UnusedParameters") final String threadId, final Ion ion,
                        final ArrayList<String> bitmapCacheKeys,
                        final PostsActivity.RepliesCallback repliesCallback,
@@ -341,10 +345,10 @@ public class PostView extends CardView {
                                 progress.setVisibility(View.GONE);
                                 play.setVisibility(View.VISIBLE);
                                 //initWebmCallback(url);
-                                initImageCallback(post, imageCallback);
+                                initImageCallback(position, post, imageCallback);
                                 break;
                             default:
-                                initImageCallback(post, imageCallback);
+                                initImageCallback(position, post, imageCallback);
                                 if (prefs.onlyThumbnailsInPostlist()) {
                                     loaded = true;
                                     progress.setVisibility(View.GONE);
@@ -363,7 +367,7 @@ public class PostView extends CardView {
                                         loaded = true;
                                         progress.setVisibility(View.GONE);
                                         if (e != null) { return; }
-                                        initImageCallback(post, imageCallback);
+                                        initImageCallback(position, post, imageCallback);
                                         if (result.getBitmapInfo() != null) {
                                             bitmapCacheKeys.add(result.getBitmapInfo().key);
                                         }
