@@ -18,7 +18,7 @@
         <item name="colorAccent">#8BC34A</item>
         <item name="colorControlHighlight">#608BC34A</item>
 
-        <item name="bg">#dddddd</item>
+        <item name="bg">@color/bgLight</item>
         <item name="fg">#fafafa</item>
         <item name="fg2">#fff1f1f1</item>
         <item name="postview_image_bg">#fafafa</item>
@@ -54,7 +54,7 @@
         <item name="colorAccent">#80cbc4</item>
         <item name="colorControlHighlight">#6080cbc4</item>
 
-        <item name="bg">#212121</item>
+        <item name="bg">@color/bgDark</item>
         <item name="fg">@color/background_floating_material_dark</item>
         <item name="fg2">#393939</item>
         <item name="postview_image_bg">#393939</item>

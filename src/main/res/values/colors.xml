@@ -7,6 +7,8 @@
     <!-- Otherwise, I would simply inline the colors in AppTheme resp. AppTheme.Light -->
     <color name="colorPrimary">@color/material_blue_grey_800</color>
     <color name="colorPrimaryDark">@color/material_blue_grey_900</color>
+    <color name="bgDark">#212121</color>
     <color name="colorPrimary_light">#9C27B0</color>
     <color name="colorPrimaryDark_light">#6A1B9A</color>
+    <color name="bgLight">#dddddd</color>
 </resources>

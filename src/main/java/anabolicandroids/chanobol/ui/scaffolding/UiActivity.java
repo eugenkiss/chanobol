@@ -118,6 +118,7 @@ public abstract class UiActivity extends BaseActivity {
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Util.setTheme(this, prefs);
+        getWindow().setBackgroundDrawableResource(prefs.theme().isLightTheme ? R.color.bgLight : R.color.bgDark);
         setContentView(R.layout.activity_ui);
         ViewGroup container = (ViewGroup) findViewById(R.id.container);
         container.addView(onCreateView(getLayoutInflater(), container, savedInstanceState));
