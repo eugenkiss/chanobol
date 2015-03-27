@@ -348,6 +348,10 @@ public class MediaActivity extends UiActivity {
     }
 
     @Override public void onBackPressed() {
+        if (drawerLayout.isDrawerOpen(drawer)) {
+            drawerLayout.closeDrawers();
+            return;
+        }
         if (Build.VERSION.SDK_INT >= 21) {
             // Such that the image flies back from left/right back into its former position
             // in the previous activity depending on the direction the user swiped to.
