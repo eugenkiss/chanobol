@@ -46,6 +46,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -141,13 +142,13 @@ public class PostsActivity extends SwipeRefreshActivity {
         if (opPost != null) {
             String thumbUrl = ApiModule.thumbUrl(boardName, opPost.mediaId);
             try {
-                opImage = new BitmapDrawable(getResources(), ion.build(this).load(thumbUrl).asBitmap().get());
+                opImage = new BitmapDrawable(getResources(), ion.build(this).load(thumbUrl).asBitmap().get(500, TimeUnit.MILLISECONDS));
                 if (opImage.getBitmap() != null) {
                     Palette palette = Palette.generate(opImage.getBitmap());
                     int primaryDark = getResources().getColor(R.color.colorPrimaryDark);
                     opPost.thumbMutedColor = palette.getMutedColor(primaryDark);
                 }
-            } catch (InterruptedException | ExecutionException e) {
+            } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 e.printStackTrace();
             }
         }
