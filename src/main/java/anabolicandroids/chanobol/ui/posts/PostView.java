@@ -362,7 +362,7 @@ public class PostView extends CardView {
                                 // Resized Gifs don't animate apparently, that's the reason for the case analysis
                                 if (".gif".equals(ext)) placeholder.animateGif(AnimateGifMode.ANIMATE).smartSize(true);
                                 else placeholder.resize(size[W], size[H]);
-                                placeholder.load(url).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
+                                placeholder.crossfade(true).load(url).withBitmapInfo().setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                                     @Override public void onCompleted(Exception e, final ImageViewBitmapInfo result) {
                                         loaded = true;
                                         progress.setVisibility(View.GONE);
