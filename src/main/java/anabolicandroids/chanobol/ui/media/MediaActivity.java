@@ -288,6 +288,8 @@ public class MediaActivity extends UiActivity {
             }
         });
 
+        // TODO: Get crash report here http://crashes.to/s/43716a0559b
+        // Either mediaPointers or currentIndex can be null need to maybe think of a smooth handling of this situation
         final MediaPointer current = mediaPointers.get(currentIndex);
         final MediaView currentView = pagerView(currentIndex);
         currentView.prefs = prefs;
