@@ -84,6 +84,13 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         Bundle b = getIntent().getExtras();
         board = Parcels.unwrap(b.getParcelable(EXTRA_BOARD));
 
+        if (board == null || board.name == null) {
+            // Get some crash reports for this: http://crashes.to/s/9eae4cc77a6
+            // TODO: Add test for situation if provided board is null
+            showToast("Could not load board");
+            Util.restartApp(app, this);
+        }
+
         setTitle(board.name);
 
         if (savedInstanceState == null) {
