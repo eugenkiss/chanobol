@@ -47,8 +47,8 @@ public class ThreadView extends FrameLayout {
                        boolean onlyUpdateText, final HashMap<String, Bitmap> bitMap) {
 
         // Remove reference to bitmap which is out of view
-        if (this.thread != null) {
-            bitMap.remove(thread.number);
+        if (this.thread != null && !thread.number.equals(this.thread.number)) {
+            bitMap.remove(this.thread.number);
         }
         this.thread = thread;
         Bitmap b = bitMap.get(thread.number);
