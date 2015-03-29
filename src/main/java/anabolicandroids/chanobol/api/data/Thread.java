@@ -63,8 +63,8 @@ public class Thread {
     }
 
     public String title(boolean gallery) {
-        if (posts.size() == 0) return id;
         Post op = opPost();
+        if (op == null) return id;
         String title = "";
         if (op.subject != null && !op.subject.equals("null") && op.subject.length() > 0) title = op.subject;
         else if (op.text != null && !op.text.equals("null") && op.text.length() > 0) title = op.text;

@@ -101,6 +101,8 @@ public class PostsActivity extends SwipeRefreshActivity {
             }
         }
 
+        // Must not be null or there will be glitches with the first PostView!
+        if (transitionName == null) transitionName = "not null";
         if (transitionView != null) ViewCompat.setTransitionName(transitionView, transitionName);
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity,
                 Pair.create(transitionView, transitionName)
@@ -133,8 +135,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     public static void launchFromWatchlist(Activity activity, Thread thread) {
-        String transitionName = "Must not be null or there will be glitches with the first PostView!";
-        launch(activity, null, transitionName, thread, true);
+        launch(activity, null, null, thread, true);
     }
 
     @Inject ImageSaver imageSaver;

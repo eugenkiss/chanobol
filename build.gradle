@@ -12,7 +12,7 @@ buildscript {
 def versionMajor = 1
 def versionMinor = 3
 def versionPatch = 12
-def versionBuild = 3
+def versionBuild = 4
 
 apply plugin: 'com.android.application'
 
