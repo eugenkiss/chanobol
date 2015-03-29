@@ -7,5 +7,4 @@
 
 Chanobol is a 4Chan app for Android.
 Get the SFW version on the [Play Store][Play] or the unrestricted from [here][NSFW].
-
 Find more information in the [wiki](https://github.com/eugenkiss/chanobol/wiki).
