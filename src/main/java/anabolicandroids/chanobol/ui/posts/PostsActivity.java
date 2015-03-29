@@ -133,7 +133,8 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     public static void launchFromWatchlist(Activity activity, Thread thread) {
-        launch(activity, null, null, thread, true);
+        String transitionName = "Must not be null or there will be glitches with the first PostView!";
+        launch(activity, null, transitionName, thread, true);
     }
 
     @Inject ImageSaver imageSaver;
