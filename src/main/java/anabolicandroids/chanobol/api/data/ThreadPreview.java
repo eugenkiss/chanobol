@@ -26,6 +26,16 @@ public class ThreadPreview extends Common {
     public String strippedSubject;
     public String excerpt;
 
+    public void generateExcerpt() {
+        if (subject == null) subject = "";
+        if (text == null) text = "";
+        strippedSubject = android.text.Html.fromHtml(subject).toString();
+        String strippedText = android.text.Html.fromHtml(text).toString();
+        excerpt = strippedSubject
+                + (strippedSubject.isEmpty() ? "" : "\n")
+                + strippedText.substring(0, Math.min(160, strippedText.length()));
+    }
+
     public Post toOpPost() {
         Gson gson = new Gson();
         Type type = new TypeToken<Post>() {}.getType();

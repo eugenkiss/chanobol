@@ -33,7 +33,6 @@
             />
 
         <TextView
-            android:visibility="gone"
             android:id="@+id/watchlistBtn"
             style="@style/Widget.Chanobol.Drawer.Entry"
             android:text="@string/watchlist"

@@ -27,6 +27,7 @@ import butterknife.InjectView;
 public class ThreadView extends FrameLayout {
     @InjectView(R.id.blackness) View blackness;
     @InjectView(R.id.numReplies) TextView numReplies;
+    @InjectView(R.id.board) TextView board;
     @InjectView(R.id.numImages) TextView numImages;
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.text) TextView text;
@@ -44,7 +45,7 @@ public class ThreadView extends FrameLayout {
     }
 
     public void bindTo(final ThreadPreview threadPreview, String boardName, Ion ion,
-                       boolean onlyUpdateText, final HashMap<String, Bitmap> bitMap) {
+                       boolean onlyUpdateText, boolean inWatchlist, final HashMap<String, Bitmap> bitMap) {
 
         // Remove reference to bitmap which is out of view
         if (this.threadPreview != null && !threadPreview.number.equals(this.threadPreview.number)) {
@@ -75,5 +76,12 @@ public class ThreadView extends FrameLayout {
 
         if (threadPreview.dead) blackness.setVisibility(View.VISIBLE);
         else blackness.setVisibility(View.GONE);
+
+        if (inWatchlist) {
+            board.setVisibility(View.VISIBLE);
+            board.setText(boardName);
+        } else {
+            board.setVisibility(View.GONE);
+        }
     }
 }

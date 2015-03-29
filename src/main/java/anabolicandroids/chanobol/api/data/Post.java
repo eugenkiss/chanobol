@@ -1,9 +1,13 @@
 package anabolicandroids.chanobol.api.data;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
+import com.google.gson.reflect.TypeToken;
 
 import org.parceler.Parcel;
 import org.parceler.Transient;
+
+import java.lang.reflect.Type;
 
 import anabolicandroids.chanobol.ui.posts.parsing.CommentParser;
 
@@ -11,6 +15,14 @@ import anabolicandroids.chanobol.ui.posts.parsing.CommentParser;
 public class Post extends Common {
     @SerializedName("resto")
     public String replyTo;
+
+    public ThreadPreview toThreadPreview() {
+        Gson gson = new Gson();
+        Type type = new TypeToken<ThreadPreview>() {}.getType();
+        ThreadPreview result = gson.fromJson(gson.toJson(this), type);
+        result.generateExcerpt();
+        return result;
+    }
 
     @SuppressWarnings("UnusedDeclaration")
     public boolean isOp() { return "0".equals(replyTo); }

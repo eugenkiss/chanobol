@@ -86,8 +86,8 @@ import anabolicandroids.chanobol.api.data.Thread;
 
 
     public static class WatchlistEntry implements Comparable<WatchlistEntry> {
-        String id;
-        String title;
+        public String id;
+        public String title;
         @SuppressWarnings("UnusedDeclaration") WatchlistEntry(){}
         WatchlistEntry(String id) { this.id = id; }
         WatchlistEntry(String id, String title) {

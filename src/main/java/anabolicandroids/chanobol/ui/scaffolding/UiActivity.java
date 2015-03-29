@@ -287,8 +287,7 @@ public abstract class UiActivity extends BaseActivity {
     }
 
     @OnClick(R.id.watchlistBtn) void onWatchlist() {
-        // TODO
-        FavoritesActivity.launch(this);
+        ThreadsActivity.launchForWatchlist(this);
     }
 
     @OnClick(R.id.settings) void onSettings() {

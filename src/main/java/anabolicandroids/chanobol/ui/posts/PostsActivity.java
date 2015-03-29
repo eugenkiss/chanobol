@@ -223,7 +223,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             @Override public void run() {
                 supportStartPostponedEnterTransition();
             }
-        }, 10);
+        }, inWatchlist ? 100 : 20);
     }
 
     @Override protected void onSaveInstanceState(Bundle outState) {

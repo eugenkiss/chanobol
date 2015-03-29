@@ -13,7 +13,7 @@ import anabolicandroids.chanobol.util.Util;
 
 public abstract class SwipeRefreshActivity extends UiActivity {
 
-    private SwipeRefreshLayout swipe;
+    protected SwipeRefreshLayout swipe;
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
