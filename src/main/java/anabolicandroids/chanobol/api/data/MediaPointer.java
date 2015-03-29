@@ -1,9 +1,7 @@
-package anabolicandroids.chanobol.ui.media;
+package anabolicandroids.chanobol.api.data;
 
 
 import org.parceler.Parcel;
-
-import anabolicandroids.chanobol.api.data.Post;
 
 @Parcel
 public class MediaPointer {

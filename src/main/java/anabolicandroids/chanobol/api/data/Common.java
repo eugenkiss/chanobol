@@ -2,6 +2,7 @@ package anabolicandroids.chanobol.api.data;
 
 import com.google.gson.annotations.SerializedName;
 
+@SuppressWarnings("UnusedDeclaration")
 public abstract class Common {
     @SerializedName("no")
     public String number;
@@ -64,4 +65,21 @@ public abstract class Common {
 
     @SerializedName("country_name")
     public String countryName;
+
+    public String board;
+
+
+    public String uid() {
+        return board + "/" + number;
+    }
+
+    @Override public String toString() { return board + "/" + number + " - " + subject; }
+    @Override public int hashCode() { return uid() != null ? uid().hashCode() : 0; }
+    @Override public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ThreadPreview threadPreview = (ThreadPreview) o;
+        return !(uid() != null ? !uid().equals(threadPreview.uid()) : threadPreview.uid() != null);
+    }
+
 }

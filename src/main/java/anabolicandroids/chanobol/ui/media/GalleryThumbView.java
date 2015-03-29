@@ -10,6 +10,7 @@ import com.koushikdutta.ion.Ion;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
+import anabolicandroids.chanobol.api.data.MediaPointer;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 

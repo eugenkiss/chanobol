@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -37,18 +38,22 @@ import anabolicandroids.chanobol.api.data.ThreadPreview;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
 import anabolicandroids.chanobol.ui.media.GalleryActivity;
 import anabolicandroids.chanobol.ui.posts.PostsActivity;
+import anabolicandroids.chanobol.ui.scaffolding.PersistentData;
 import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
 import anabolicandroids.chanobol.util.Util;
 import butterknife.InjectView;
 
-public class ThreadsActivity extends SwipeRefreshActivity {
+// TODO: See if it makes sense to create an abstract class for WatchlistActivity and ThreadsActivity
+public class WatchlistActivity extends SwipeRefreshActivity {
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 
     // To load the respective threads from 4Chan
     private static String EXTRA_BOARD = "board";
+    private static String EXTRA_IS_WATCHLIST = "watchlist";
     private Board board;
+    private boolean watchlist;
 
     // Internal state
     private static String THREADS = "threads";
@@ -64,9 +69,9 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     // update is finished. I tried many other approaches but this is the only one that worked.
     private HashMap<String, Bitmap> bitMap;
 
-    public static void launch(Activity activity, Board board) {
-        Intent intent = new Intent(activity, ThreadsActivity.class);
-        intent.putExtra(EXTRA_BOARD, Parcels.wrap(board));
+    public static void launch(Activity activity) {
+        Intent intent = new Intent(activity, WatchlistActivity.class);
+        intent.putExtra(EXTRA_IS_WATCHLIST, true);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);
         activity.finish();
@@ -83,15 +88,17 @@ public class ThreadsActivity extends SwipeRefreshActivity {
 
         Bundle b = getIntent().getExtras();
         board = Parcels.unwrap(b.getParcelable(EXTRA_BOARD));
+        watchlist = b.getBoolean(EXTRA_IS_WATCHLIST);
 
-        if (board == null || board.name == null) {
+        if (!watchlist && (board == null || board.name == null)) {
             // Get some crash reports for this: http://crashes.to/s/9eae4cc77a6
             // TODO: Add test for situation if provided board is null
             showToast("Could not load board");
             Util.restartApp(app, this);
         }
 
-        setTitle(board.name);
+        if (watchlist) setTitle(getResources().getString(R.string.watchlist));
+        else setTitle(board.name);
 
         if (savedInstanceState == null) {
             freeMemory();
@@ -110,11 +117,21 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         threadsAdapter = new ThreadsAdapter(clickCallback, longClickCallback);
         threadsView.setAdapter(threadsAdapter);
         threadsView.setHasFixedSize(true);
-        GridLayoutManager glm = new GridLayoutManager(ThreadsActivity.this, 2);
+        GridLayoutManager glm = new GridLayoutManager(WatchlistActivity.this, 2);
         threadsView.setLayoutManager(glm);
-        Util.calcDynamicSpanCountById(ThreadsActivity.this, threadsView, glm, R.dimen.column_width);
+        Util.calcDynamicSpanCountById(WatchlistActivity.this, threadsView, glm, R.dimen.column_width);
 
-        if (savedInstanceState == null) load(); else notifyDataSetChanged();
+        if (watchlist) {
+            if (savedInstanceState == null) {
+                Set<PersistentData.WatchlistEntry> watchlistEntries = persistentData.getWatchlist();
+                for (PersistentData.WatchlistEntry e : watchlistEntries) {
+                    ThreadPreview p = new ThreadPreview();
+                }
+            }
+            notifyDataSetChanged();
+        } else {
+            if (savedInstanceState == null) load(); else notifyDataSetChanged();
+        }
     }
 
     @Override protected void onSaveInstanceState(Bundle outState) {
@@ -137,7 +154,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             String uuid = UUID.randomUUID().toString();
             pauseUpdating = true; // To prevent update during transition
             PostsActivity.launch(
-                    ThreadsActivity.this, tv.image, uuid,
+                    WatchlistActivity.this, tv.image, uuid,
                     threadPreview.toOpPost(), board.name, threadPreview.number
             );
         }
@@ -155,7 +172,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             // TODO: Shared element animation
             pauseUpdating = true; // To prevent update during transition
             GalleryActivity.launch(
-                    ThreadsActivity.this, board.name, threadPreview.number, new ArrayList<MediaPointer>()
+                    WatchlistActivity.this, board.name, threadPreview.number, new ArrayList<MediaPointer>()
             );
             return true;
         }
@@ -164,6 +181,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     // Data Loading ////////////////////////////////////////////////////////////////////////////////
 
     @Override protected void load() {
+        if (watchlist) return;
         super.load();
         service.listThreads(this, board.name, new FutureCallback<List<ThreadPreview>>() {
             @Override public void onCompleted(Exception e, List<ThreadPreview> result) {
@@ -195,6 +213,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     }
 
     private void update() {
+        if (watchlist) return;
         if (loading) return;
         lastUpdate = System.currentTimeMillis();
         service.listThreads(this, board.name, new FutureCallback<List<ThreadPreview>>() {
@@ -292,6 +311,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
 
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.threads, menu);
+        if (watchlist) menu.findItem(R.id.favorize).setVisible(false);
         return true;
     }
 
@@ -368,7 +388,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         boolean hide = false;
 
         public ThreadsAdapter(View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
-            super(ThreadsActivity.this, clickListener, longClickListener);
+            super(WatchlistActivity.this, clickListener, longClickListener);
             this.items = sortedThreadPreviews;
         }
 

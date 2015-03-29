@@ -22,6 +22,14 @@
           android:title="@string/refresh"
           app:showAsAction="never"
         />
+    <item android:id="@+id/addWatchlist"
+          android:title="@string/add_watchlist"
+          app:showAsAction="never"
+        />
+    <item android:id="@+id/removeWatchlist"
+          android:title="@string/remove_watchlist"
+          app:showAsAction="never"
+        />
     <item android:id="@+id/saveAll"
           android:title="@string/save_all_pics"
           app:showAsAction="never"

@@ -32,7 +32,9 @@ import javax.inject.Inject;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
+import anabolicandroids.chanobol.api.data.MediaPointer;
 import anabolicandroids.chanobol.api.data.Post;
+import anabolicandroids.chanobol.api.data.ThreadPreview;
 import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
 import anabolicandroids.chanobol.util.ImageSaver;
@@ -78,6 +80,9 @@ public class GalleryActivity extends SwipeRefreshActivity {
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // To prevent transition glitch
+        getWindow().setBackgroundDrawableResource(R.color.transparent);
 
         Bundle b = getIntent().getExtras();
         boardName = b.getString("boardName");
@@ -189,7 +194,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
         // From Clover
         if (mediaPointers.size() > 0) {
             List<ImageSaver.DownloadPair> list = new ArrayList<>();
-            String folderName = anabolicandroids.chanobol.api.data.Thread.generateTitle(boardName, threadNumber);
+            String folderName = ThreadPreview.generateTitle(boardName, threadNumber);
             for (MediaPointer p : mediaPointers) {
                 list.add(new ImageSaver.DownloadPair(ApiModule.imgUrl(boardName, p.id, p.ext), p.fileName()));
             }

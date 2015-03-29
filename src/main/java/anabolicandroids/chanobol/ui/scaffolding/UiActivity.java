@@ -55,6 +55,7 @@ import anabolicandroids.chanobol.api.data.Board;
 import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
 import anabolicandroids.chanobol.ui.boards.FavoritesActivity;
+import anabolicandroids.chanobol.ui.posts.PostsActivity;
 import anabolicandroids.chanobol.ui.threads.ThreadsActivity;
 import anabolicandroids.chanobol.util.BaseActivity;
 import anabolicandroids.chanobol.util.BindableAdapter;
@@ -96,14 +97,17 @@ public abstract class UiActivity extends BaseActivity {
     @InjectView(R.id.toolbarShadow) public ImageView toolbarShadow;
     @InjectView(R.id.loadingBar) public ProgressBar loadingBar;
     @InjectView(R.id.drawerLayout) public DrawerLayout drawerLayout;
-    @InjectView(R.id.drawer) public LinearLayout drawer;
+    @InjectView(R.id.drawer) public View drawer;
     @InjectView(R.id.allBoards) public TextView allBoards;
     @InjectView(R.id.debugSettings) public TextView debugSettings;
     @InjectView(R.id.favoriteBoardsHeader) public CompatTextView favoriteBoardsHeader;
     @InjectView(R.id.favoriteBoards) public ListView favoriteBoardsView;
+    @InjectView(R.id.watchlistHeader) public CompatTextView watchlistHeader;
+    @InjectView(R.id.watchlist) public ListView watchlistView;
 
     public ActionBarDrawerToggle drawerToggle;
     public FavoritesAdapter favoriteBoardsAdapter;
+    public WatchlistAdapter watchlistAdapter;
     // http://stackoverflow.com/q/17702202/283607
     public boolean taskRoot;
 
@@ -130,6 +134,7 @@ public abstract class UiActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         setupDrawer();
         setupFavoritesInDrawer();
+        setupWatchlistInDrawer();
         RecyclerView rv = getRootRecyclerView(); if (rv != null) setupQuickReturnToolbar(rv);
         updateUpButtonState();
     }
@@ -146,8 +151,19 @@ public abstract class UiActivity extends BaseActivity {
         favoriteBoardsView.setAdapter(favoriteBoardsAdapter);
         favoriteBoardsAdapter.notifyDataSetChanged();
         persistentData.addFavoritesChangedCallback(favoritesChangedCallback);
-        favoriteBoardsView.setOnItemClickListener(favoriteCallback);
+        favoriteBoardsView.setOnItemClickListener(favoriteClickCallback);
+        favoriteBoardsView.setOnItemLongClickListener(favoritesLongClickCallback);
         setVisibility(favoriteBoardsHeader, persistentData.getFavorites().size() != 0);
+    }
+
+    private void setupWatchlistInDrawer() {
+        watchlistAdapter = new WatchlistAdapter(this, new ArrayList<>(persistentData.getWatchlist()));
+        watchlistView.setAdapter(watchlistAdapter);
+        watchlistAdapter.notifyDataSetChanged();
+        persistentData.addWatchlistChangedCallback(watchlistChangedCallback);
+        watchlistView.setOnItemClickListener(watchlistClickCallback);
+        watchlistView.setOnItemLongClickListener(watchlistLongClickCallback);
+        setVisibility(watchlistHeader, persistentData.getWatchlist().size() != 0);
     }
 
     private void updateUpButtonState() {
@@ -205,10 +221,24 @@ public abstract class UiActivity extends BaseActivity {
         }
     };
 
-    private AdapterView.OnItemClickListener favoriteCallback = new AdapterView.OnItemClickListener() {
+    private AdapterView.OnItemClickListener favoriteClickCallback = new AdapterView.OnItemClickListener() {
         @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final Board board = favoriteBoardsAdapter.getItem(position);
             ThreadsActivity.launch(UiActivity.this, board);
+        }
+    };
+    private AdapterView.OnItemLongClickListener favoritesLongClickCallback = new AdapterView.OnItemLongClickListener() {
+        @Override public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            final Board board = favoriteBoardsAdapter.getItem(position);
+            new AlertDialog.Builder(UiActivity.this)
+                    .setTitle(R.string.delete_title)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            persistentData.removeFavorite(board);
+                        }
+                    }).show();
+            return true;
         }
     };
 
@@ -219,11 +249,45 @@ public abstract class UiActivity extends BaseActivity {
         }
     };
 
+    private AdapterView.OnItemClickListener watchlistClickCallback = new AdapterView.OnItemClickListener() {
+        @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            PersistentData.WatchlistEntry entry = watchlistAdapter.getItem(position);
+            anabolicandroids.chanobol.api.data.Thread thread = persistentData.getWatchlistThread(entry.id);
+            PostsActivity.launchFromWatchlist(UiActivity.this, thread);
+        }
+    };
+    private AdapterView.OnItemLongClickListener watchlistLongClickCallback = new AdapterView.OnItemLongClickListener() {
+        @Override public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+            final PersistentData.WatchlistEntry entry = watchlistAdapter.getItem(position);
+            new AlertDialog.Builder(UiActivity.this)
+                    .setTitle(R.string.delete_title)
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int whichButton) {
+                            persistentData.removeWatchlistThread(entry);
+                        }
+                    }).show();
+            return true;
+        }
+    };
+
+    private PersistentData.WatchlistCallback watchlistChangedCallback = new PersistentData.WatchlistCallback() {
+        @Override public void onChanged(Set<PersistentData.WatchlistEntry> newWatchlist) {
+            watchlistAdapter.updateItems(new ArrayList<>(newWatchlist));
+            setVisibility(watchlistHeader, !newWatchlist.isEmpty());
+        }
+    };
+
     @OnClick(R.id.allBoards) void onAllBoards() {
         BoardsActivity.launch(this);
     }
 
     @OnClick(R.id.favoriteBoardsBtn) void onFavoriteBoards() {
+        FavoritesActivity.launch(this);
+    }
+
+    @OnClick(R.id.watchlistBtn) void onWatchlist() {
+        // TODO
         FavoritesActivity.launch(this);
     }
 
@@ -255,6 +319,8 @@ public abstract class UiActivity extends BaseActivity {
     @Override public void onBackPressed() {
         if (drawerLayout.isDrawerOpen(drawer)) {
             drawerLayout.closeDrawers();
+        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            super.onBackPressed();
         } else if (isTaskRoot() || taskRoot) {
             new AlertDialog.Builder(this)
                     .setMessage(R.string.exit_sure)
@@ -319,6 +385,7 @@ public abstract class UiActivity extends BaseActivity {
         // activity and it won't be collected. To prevent this memory leak remove the callback
         // when the respective activity is destroyed.
         persistentData.removeFavoritesChangedCallback(favoritesChangedCallback);
+        persistentData.removeWatchlistChangedCallback(watchlistChangedCallback);
         super.onDestroy();
     }
 
@@ -446,6 +513,51 @@ public abstract class UiActivity extends BaseActivity {
         public void bindTo(Board board) {
             shortName.setText(board.name);
             longName.setText(board.title);
+        }
+    }
+
+    private static class WatchlistAdapter extends BindableAdapter<PersistentData.WatchlistEntry> {
+        private List<PersistentData.WatchlistEntry> items;
+
+        public WatchlistAdapter(Context context, List<PersistentData.WatchlistEntry> items) {
+            super(context);
+            this.items = items;
+        }
+
+        public void updateItems(List<PersistentData.WatchlistEntry> items) {
+            this.items = items;
+            notifyDataSetChanged();
+        }
+
+        @Override
+        public View newView(LayoutInflater inflater, int position, ViewGroup container) {
+            return inflater.inflate(R.layout.view_watchlist_thread, container, false);
+        }
+
+        @Override
+        public void bindView(PersistentData.WatchlistEntry item, int position, View view) {
+            ((WatchlistThreadView) view).bindTo(item);
+        }
+
+        @Override public int getCount() { return items.size(); }
+        @Override public PersistentData.WatchlistEntry getItem(int position) { return items.get(position); }
+        @Override public long getItemId(int position) { return position; }
+    }
+
+    public static class WatchlistThreadView extends LinearLayout {
+        @InjectView(R.id.name) TextView name;
+
+        public WatchlistThreadView(Context context, AttributeSet attrs) {
+            super(context, attrs);
+        }
+
+        @Override protected void onFinishInflate() {
+            super.onFinishInflate();
+            ButterKnife.inject(this);
+        }
+
+        public void bindTo(PersistentData.WatchlistEntry thread) {
+            name.setText(thread.title);
         }
     }
 

@@ -24,6 +24,7 @@ import com.koushikdutta.ion.builder.Builders;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
+import anabolicandroids.chanobol.api.data.MediaPointer;
 import anabolicandroids.chanobol.ui.scaffolding.Prefs;
 import anabolicandroids.chanobol.util.HackyViewPager;
 import anabolicandroids.chanobol.util.Util;

@@ -20,6 +20,8 @@
     <string name="show_gallery">Gallery</string>
     <string name="go_to_bottom">Go to Bottom</string>
     <string name="go_to_top">Go to Top</string>
+    <string name="add_watchlist">Add to Watchlist</string>
+    <string name="remove_watchlist">Remove from Watchlist</string>
     <string name="refresh">Refresh</string>
     <string name="favorize">Favorize</string>
     <string name="save">Save</string>
@@ -30,6 +32,7 @@
     <string name="navigation_drawer_close">Closed</string>
     <string name="favorite_boards">Favorite Boards</string>
     <string name="all_boards">All Boards</string>
+    <string name="watchlist">Watchlist</string>
     <string name="about">About</string>
     <string name="favorites">Favorites</string>
     <!-- About -->

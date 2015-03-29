@@ -38,26 +38,22 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
+import anabolicandroids.chanobol.api.data.MediaPointer;
 import anabolicandroids.chanobol.api.data.Post;
+import anabolicandroids.chanobol.api.data.Thread;
+import anabolicandroids.chanobol.api.data.ThreadPreview;
 import anabolicandroids.chanobol.ui.media.GalleryActivity;
 import anabolicandroids.chanobol.ui.media.MediaActivity;
-import anabolicandroids.chanobol.ui.media.MediaPointer;
 import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
 import anabolicandroids.chanobol.util.BindableAdapter;
@@ -73,51 +69,70 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     // Transition related
     private static String EXTRA_TRANSITIONNAME = "transitionName";
-    private static String EXTRA_OPPOST = "opPost";
     private String transitionName;
     private BitmapDrawable opImage;
 
-    // To load the respective posts from 4Chan
-    private static String EXTRA_THREADNUMBER = "threadNumber";
-    private static String EXTRA_BOARDNAME = "boardName";
-    private String threadNumber;
-    private String boardName;
+    // Essential state
+    private static String EXTRA_ROOT = "root";
+    private static String THREAD_MANAGER = "threadManager";
+    private Thread thread;
 
     // Internal state
-    private static String POSTS = "posts";
-    private static String POSTMAP = "postMap";
-    private static String REPLIES = "replies";
-    private static String MEDIAPOINTERS = "mediaPointers";
-    private static String MEDIAMAP = "mediaMap";
-    private static String BITMAPCACHEKEYS = "bitmapCacheKeys";
-    private ArrayList<Post> posts;
     private PostsAdapter postsAdapter;
-    // Map from a post number to its post POJO
-    private HashMap<String, Post> postMap;
-    // Map from a post number X to the post numbers of the posts that refer to X
-    private HashMap<String, ArrayList<String>> replies;
-    // This is provided to the gallery fragment so that it can immediately load its images without
-    // waiting for the result of requesting the thread json and extracting its media references once more
-    private ArrayList<MediaPointer> mediaPointers;
-    // Map from a post number to the index of its mediaPointer in mediaPointers (important for swiping)
-    public Map<String, Integer> mediaMap;
     // To remove all the bitmaps from Ion's cache once the activity's been destroyed
+    private static String BITMAP_CACHE_KEYS = "bitmapCacheKeys";
     private ArrayList<String> bitmapCacheKeys;
+    // Convenience
+    private String boardName;
+    private String threadNumber;
+    private LinearLayoutManager layoutManager;
 
     public static void launch(
             Activity activity, View transitionView, String transitionName,
-            Post opPost, String boardName, String threadNumber
+            Thread thread, boolean root
     ) {
+        if (activity instanceof PostsActivity) {
+            // Special case: Thread was opened from catalog, is scrolled and reopened from
+            // watchlist in nav drawer. Then the scroll position should be remembered correctly.
+            PostsActivity pa = (PostsActivity) activity;
+            if (thread.id.equals(pa.thread.id)) {
+                pa.persistPositionMaybe();
+            }
+        }
+
         if (transitionView != null) ViewCompat.setTransitionName(transitionView, transitionName);
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity,
                 Pair.create(transitionView, transitionName)
         );
         Intent intent = new Intent(activity, PostsActivity.class);
         intent.putExtra(EXTRA_TRANSITIONNAME, transitionName);
-        intent.putExtra(EXTRA_OPPOST, Parcels.wrap(opPost));
-        intent.putExtra(EXTRA_BOARDNAME, boardName);
-        intent.putExtra(EXTRA_THREADNUMBER, threadNumber);
-        ActivityCompat.startActivity(activity, intent, options.toBundle());
+        intent.putExtra(EXTRA_ROOT, root);
+        intent.putExtra(THREAD_MANAGER, Parcels.wrap(thread));
+        if (root) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+            activity.startActivity(intent);
+            activity.finish();
+        } else {
+            ActivityCompat.startActivity(activity, intent, options.toBundle());
+        }
+    }
+
+    public static void launch(
+            Activity activity, View transitionView, String transitionName,
+            Thread thread
+    ) { launch(activity, transitionView, transitionName, thread, false); }
+
+    public static void launch(
+            Activity activity, View transitionView, String transitionName,
+            Post opPost, String boardName, String threadNumber
+    ) {
+        Thread thread = new Thread(boardName, threadNumber);
+        thread.posts.add(opPost);
+        launch(activity, transitionView, transitionName, thread);
+    }
+
+    public static void launchFromWatchlist(Activity activity, Thread thread) {
+        launch(activity, null, null, thread, true);
     }
 
     @Inject ImageSaver imageSaver;
@@ -129,15 +144,19 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         supportPostponeEnterTransition();
+        Bundle b = getIntent().getExtras();
+        taskRoot = b.getBoolean(EXTRA_ROOT);
         super.onCreate(savedInstanceState);
 
-        Bundle b = getIntent().getExtras();
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
-        boardName = b.getString(EXTRA_BOARDNAME);
-        threadNumber = b.getString(EXTRA_THREADNUMBER);
-        Post opPost = Parcels.unwrap(b.getParcelable(EXTRA_OPPOST));
+        thread = Parcels.unwrap(b.getParcelable(THREAD_MANAGER));
+        boolean inWatchlist = persistentData.isInWatchlist(thread.id);
+        if (inWatchlist) thread = persistentData.getWatchlistThread(thread.id);
+        boardName = thread.boardName;
+        threadNumber = thread.threadNumber;
+        Post opPost = thread.opPost();
 
-        setTitle(boardName + "/" + threadNumber);
+        setTitle(thread.title());
 
         if (opPost != null) {
             String thumbUrl = ApiModule.thumbUrl(boardName, opPost.mediaId);
@@ -155,20 +174,11 @@ public class PostsActivity extends SwipeRefreshActivity {
 
         if (savedInstanceState == null) {
             firstLoad = true;
-            posts = new ArrayList<>();
-            postMap = new HashMap<>();
-            replies = new HashMap<>();
-            mediaPointers = new ArrayList<>();
-            mediaMap = new HashMap<>();
             bitmapCacheKeys = new ArrayList<>();
         } else {
             firstLoad = false;
-            posts = Parcels.unwrap(savedInstanceState.getParcelable(POSTS));
-            postMap = Parcels.unwrap(savedInstanceState.getParcelable(POSTMAP));
-            replies = Parcels.unwrap(savedInstanceState.getParcelable(REPLIES));
-            mediaPointers = Parcels.unwrap(savedInstanceState.getParcelable(MEDIAPOINTERS));
-            mediaMap = Parcels.unwrap(savedInstanceState.getParcelable(MEDIAMAP));
-            bitmapCacheKeys = Parcels.unwrap(savedInstanceState.getParcelable(BITMAPCACHEKEYS));
+            thread = Parcels.unwrap(savedInstanceState.getParcelable(THREAD_MANAGER));
+            bitmapCacheKeys = Parcels.unwrap(savedInstanceState.getParcelable(BITMAP_CACHE_KEYS));
 
             previousToolbarPosition = savedInstanceState.getFloat(PREVIOUS_TOOLBAR_POSITION);
             previousStackHeight = savedInstanceState.getInt(PREVIOUS_STACK_HEIGHT);
@@ -177,30 +187,35 @@ public class PostsActivity extends SwipeRefreshActivity {
 
         postsAdapter = new PostsAdapter();
         postsView.setAdapter(postsAdapter);
-        postsView.setLayoutManager(new LinearLayoutManager(this));
+        layoutManager = new LinearLayoutManager(this);
+        postsView.setLayoutManager(layoutManager);
         postsView.addItemDecoration(new SpacesItemDecoration((int) resources.getDimension(R.dimen.post_spacing)));
+        if (inWatchlist) postsView.scrollToPosition(thread.lastVisibleIndex);
 
         getSupportFragmentManager().addOnBackStackChangedListener(backStackChangedListener);
         setupUpLongClickCloseAll();
 
         if (firstLoad && opPost != null) {
-            posts.add(opPost);
             postsAdapter.notifyItemChanged(0);
         }
 
-        if (savedInstanceState == null) load();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
-                @Override public void onTransitionEnd(Transition transition) {
-                    revealAnimationCallback.markTransitionFinished();
-                }
-            });
-            getWindow().setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_right));
-            getWindow().setReturnTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_right));
+        if (inWatchlist) {
+            postsAdapter.notifyDataSetChanged();
         } else {
-            revealAnimationCallback.markTransitionFinished();
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                getWindow().getSharedElementEnterTransition().addListener(new TransitionListenerAdapter() {
+                    @Override public void onTransitionEnd(Transition transition) {
+                        revealAnimationCallback.markTransitionFinished();
+                    }
+                });
+                getWindow().setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_right));
+                getWindow().setReturnTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_right));
+            } else {
+                revealAnimationCallback.markTransitionFinished();
+            }
         }
+
+        if (savedInstanceState == null) load();
 
         // Why this trivial delay? Otherwise the transition glitches for some reason.
         postsView.postDelayed(new Runnable() {
@@ -212,12 +227,8 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     @Override protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(POSTS, Parcels.wrap(posts));
-        outState.putParcelable(POSTMAP, Parcels.wrap(postMap));
-        outState.putParcelable(REPLIES, Parcels.wrap(replies));
-        outState.putParcelable(MEDIAPOINTERS, Parcels.wrap(mediaPointers));
-        outState.putParcelable(MEDIAMAP, Parcels.wrap(mediaMap));
-        outState.putParcelable(BITMAPCACHEKEYS, Parcels.wrap(bitmapCacheKeys));
+        outState.putParcelable(THREAD_MANAGER, Parcels.wrap(thread));
+        outState.putParcelable(BITMAP_CACHE_KEYS, Parcels.wrap(bitmapCacheKeys));
 
         outState.putString(PREVIOUS_TITLE, previousTitle);
         outState.putFloat(PREVIOUS_TOOLBAR_POSITION, previousToolbarPosition);
@@ -234,8 +245,8 @@ public class PostsActivity extends SwipeRefreshActivity {
             postsView.postDelayed(new Runnable() {
                 @Override public void run() {
                     ArrayList<Post> posts = new ArrayList<>(post.replyCount);
-                    for (String id : replies.get(post.number)) {
-                        posts.add(postMap.get(id));
+                    for (String id : thread.replies.get(post.number)) {
+                        posts.add(thread.postMap.get(id));
                     }
                     showPostsDialog(post, posts);
                 }
@@ -248,11 +259,11 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
     QuoteCallback quoteCallback = new QuoteCallback() {
         @Override public void onClick(final String quoterId, final String quotedId) {
-            Post quoted = postMap.get(quotedId);
+            Post quoted = thread.postMap.get(quotedId);
             if (quoted != null) {
                 postsView.postDelayed(new Runnable() {
                     @Override public void run() {
-                        showPostsDialog(postMap.get(quoterId), postMap.get(quotedId));
+                        showPostsDialog(thread.postMap.get(quoterId), thread.postMap.get(quotedId));
                     }
                 }, RIPPLE_DELAY());
             }
@@ -277,7 +288,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             int color = post.thumbMutedColor != -1 ? post.thumbMutedColor : getResources().getColor(R.color.colorPrimaryDark);
             MediaActivity.launch(
                     PostsActivity.this, iv, uuid, new Point(cx, cy), r, color, false,
-                    boardName, threadNumber, mediaMap.get(post.number), mediaPointers
+                    boardName, threadNumber, thread.mediaMap.get(post.number), thread.mediaPointers
             );
         }
     };
@@ -310,6 +321,12 @@ public class PostsActivity extends SwipeRefreshActivity {
     @Override protected void load() { load(false); }
 
     private void load(final boolean silent) {
+        if (thread.dead) {
+            loaded();
+            if (!silent) showToast(R.string.no_thread);
+            return;
+        }
+
         super.load();
         if (silent || firstLoad) loadingBar.setVisibility(View.GONE);
 
@@ -324,50 +341,48 @@ public class PostsActivity extends SwipeRefreshActivity {
             }, 500);
         }
 
-        service.listPosts(this, boardName, threadNumber, new FutureCallback<List<Post>>() {
-            @Override public void onCompleted(Exception e, List<Post> result) {
-                if (e != null) {
-                    if (!silent && e.getMessage() != null) showToast(e.getMessage());
-                    System.out.println("" + e.getMessage());
-                    loaded();
-                    return;
+        thread.load(service, new anabolicandroids.chanobol.api.data.Thread.OnResultCallback() {
+            @Override public void onSuccess() {
+                if (prefs.preloadThumbnails()) {
+                    for (MediaPointer mp : thread.mediaPointers)
+                        ion.build(PostsActivity.this).load(ApiModule.thumbUrl(boardName, mp.id)).asBitmap().tryGet();
                 }
-                posts.clear();
-                postMap.clear();
-                replies.clear();
-                mediaPointers.clear();
-                mediaMap.clear();
-                int mediaIndex = 0;
-                for (Post p : result) {
-                    posts.add(p);
-                    postMap.put(p.number, p);
-                    for (String number : referencedPosts(p)) {
-                        if (!replies.containsKey(number)) replies.put(number, new ArrayList<String>());
-                        Post referenced = postMap.get(number);
-                        if (referenced != null) { // e.g. a stale reference to deleted post could be null
-                            replies.get(number).add(p.number);
-                            referenced.replyCount++;
-                        }
-                    }
-                    if (p.mediaId != null) {
-                        if (prefs.preloadThumbnails())
-                            ion.build(PostsActivity.this).load(ApiModule.thumbUrl(boardName, p.mediaId)).asBitmap().tryGet();
-                        mediaPointers.add(new MediaPointer(p, p.mediaId, p.mediaExtension, p.mediaWidth, p.mediaHeight));
-                        mediaMap.put(p.number, mediaIndex);
-                        mediaIndex++;
-                    }
-                }
-                lastUpdate = System.currentTimeMillis();
                 if (firstLoad) revealAnimationCallback.markDataLoaded();
                 else postsAdapter.notifyDataSetChanged();
                 loaded();
+            }
+
+            @Override public void onError(String message) {
+                if (!silent) showToast(message);
+                loaded();
+            }
+        });
+
+        service.listThreads(this, boardName, new FutureCallback<List<ThreadPreview>>() {
+            @Override public void onCompleted(Exception e, List<ThreadPreview> result) {
+                if (e != null) return;
+                boolean dead = true;
+                for (ThreadPreview t : result) {
+                    if (t.number.equals(threadNumber)) {
+                        dead = false;
+                        break;
+                    }
+                }
+                if (dead) {
+                    thread.dead = true;
+                    setTitle(thread.title());
+                    // Simply to update the title in the nav bar with a dead indication
+                    if (persistentData.isInWatchlist(thread.id)) {
+                        persistentData.addWatchlistThread(thread);
+                    }
+                }
             }
         });
     }
 
     private void update() {
         if (loading) return;
-        lastUpdate = System.currentTimeMillis();
+        thread.resetUpdateTimer();
         load(true);
     }
 
@@ -381,13 +396,21 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     @Override public void onResume() {
         super.onResume();
-        initBackgroundUpdater();
-        pauseUpdating = false;
+        thread.initBackgroundUpdater(prefs, new Runnable() {
+            @Override public void run() {
+                PostsActivity.this.runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        update();
+                    }
+                });
+            }
+        });
+        thread.resumeBackgroundUpdating();
     }
 
     @Override public void onStop() {
         super.onStop();
-        pauseUpdating = true;
+        thread.stopBackgroundUpdating();
     }
 
     @Override public void onConfigurationChanged(Configuration newConfig) {
@@ -400,13 +423,21 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     @Override public void onDestroy() {
-        if (executor != null) executor.shutdown();
+        thread.killBackgroundUpdater();
+        persistPositionMaybe();
         getSupportFragmentManager().removeOnBackStackChangedListener(backStackChangedListener);
         for (String key : bitmapCacheKeys) {
             if (key != null) ion.getBitmapCache().remove(key);
         }
         System.gc();
         super.onDestroy();
+    }
+
+    public void persistPositionMaybe() {
+        if (persistentData.isInWatchlist(thread.id)) {
+            thread.lastVisibleIndex = layoutManager.findFirstVisibleItemPosition();
+            persistentData.addWatchlistThread(thread);
+        }
     }
 
     // Toolbar Menu ////////////////////////////////////////////////////////////////////////////////
@@ -416,6 +447,13 @@ public class PostsActivity extends SwipeRefreshActivity {
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.posts, menu);
         this.menu = menu;
+        if (persistentData.isInWatchlist(thread.id)) {
+            menu.findItem(R.id.addWatchlist).setVisible(false);
+            menu.findItem(R.id.removeWatchlist).setVisible(true);
+        } else {
+            menu.findItem(R.id.addWatchlist).setVisible(true);
+            menu.findItem(R.id.removeWatchlist).setVisible(false);
+        }
         return true;
     }
 
@@ -432,13 +470,21 @@ public class PostsActivity extends SwipeRefreshActivity {
                 load();
                 break;
             case R.id.gallery:
-                GalleryActivity.launch(this, boardName, threadNumber, mediaPointers);
+                GalleryActivity.launch(this, boardName, threadNumber, thread.mediaPointers);
                 break;
             case R.id.close:
                 dismissAllPostsDialogs();
                 break;
             case R.id.saveAll:
-                GalleryActivity.saveAll(this, imageSaver, boardName, threadNumber, mediaPointers);
+                GalleryActivity.saveAll(this, imageSaver, boardName, threadNumber, thread.mediaPointers);
+                break;
+            case R.id.addWatchlist:
+                persistentData.addWatchlistThread(thread);
+                invalidateOptionsMenu();
+                break;
+            case R.id.removeWatchlist:
+                persistentData.removeWatchlistThread(thread);
+                invalidateOptionsMenu();
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -572,44 +618,6 @@ public class PostsActivity extends SwipeRefreshActivity {
         }, PostsDialog.ANIM_DURATION);
     }
 
-    public static Pattern postReferencePattern = Pattern.compile("#p(\\d+)");
-    // http://stackoverflow.com/a/6020436/283607
-    private static LinkedHashSet<String> referencedPosts(Post post) {
-        LinkedHashSet<String> refs = new LinkedHashSet<>();
-        Matcher m = postReferencePattern.matcher(post.text == null ? "" : post.text);
-        while (m.find()) { refs.add(m.group(1)); }
-        return refs;
-    }
-
-    // Background Refresh //////////////////////////////////////////////////////////////////////////
-
-    // TODO: Isn't there a more elegant solution?
-    long lastUpdate;
-    static final long updateInterval = 60_000;
-    boolean pauseUpdating = false;
-    private ScheduledThreadPoolExecutor executor;
-
-    private void initBackgroundUpdater() {
-        if (executor == null) {
-            executor = new ScheduledThreadPoolExecutor(1);
-            executor.scheduleWithFixedDelay(new Runnable() {
-                @Override
-                public void run() {
-                    if (!prefs.autoRefresh()) return;
-                    if (pauseUpdating) return;
-                    if (System.currentTimeMillis() - lastUpdate > updateInterval) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                update();
-                            }
-                        });
-                    }
-                }
-            }, 5000, 5000, TimeUnit.MILLISECONDS);
-        }
-    }
-
     // Animations //////////////////////////////////////////////////////////////////////////////////
 
     public boolean firstLoad;
@@ -637,7 +645,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         boolean hide;
         boolean firstLoad;
 
-        public PostsAdapter() { this(posts, null, null); }
+        public PostsAdapter() { this(thread.posts, null, null); }
         public PostsAdapter(List<Post> posts,
                             View.OnClickListener clickListener,
                             View.OnLongClickListener longClickListener) {

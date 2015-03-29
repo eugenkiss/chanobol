@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import anabolicandroids.chanobol.api.data.Post;
-import anabolicandroids.chanobol.api.data.Thread;
+import anabolicandroids.chanobol.api.data.ThreadPreview;
 
 public class ChanService {
     Ion ion;
@@ -26,7 +26,7 @@ public class ChanService {
         gson = new Gson();
     }
 
-    public void listThreads(Object group, String board, final FutureCallback<List<Thread>> cb) {
+    public void listThreads(Object group, final String board, final FutureCallback<List<ThreadPreview>> cb) {
         String path = String.format("/%s/catalog.json", board);
         ion.build(cxt)
                 .load(ApiModule.endpoint + path)
@@ -38,10 +38,11 @@ public class ChanService {
                             cb.onCompleted(e, null);
                             return;
                         }
-                        List<Thread> threads = new ArrayList<>(50);
+                        List<ThreadPreview> threadPreviews = new ArrayList<>(50);
                         for (JsonElement x : result) {
                             for (JsonElement y : x.getAsJsonObject().get("threads").getAsJsonArray()) {
-                                Thread t = gson.fromJson(y, Thread.class);
+                                ThreadPreview t = gson.fromJson(y, ThreadPreview.class);
+                                t.board = board;
 
                                 // Generate excerpt here instead of ThreadView for efficiency reasons
                                 if (t.subject == null) t.subject = "";
@@ -52,15 +53,15 @@ public class ChanService {
                                         + (t.strippedSubject.isEmpty() ? "" : "\n")
                                         + strippedText.substring(0, Math.min(160, strippedText.length()));
 
-                                threads.add(t);
+                                threadPreviews.add(t);
                             }
                         }
-                        cb.onCompleted(null, threads);
+                        cb.onCompleted(null, threadPreviews);
                     }
                 });
     }
 
-    public void listPosts(Object group, String board, String number, final FutureCallback<List<Post>> cb) {
+    public void listPosts(Object group, final String board, String number, final FutureCallback<List<Post>> cb) {
         String path = String.format("/%s/thread/%s.json", board, number);
         ion.build(cxt)
                 .load(ApiModule.endpoint + path)
@@ -75,6 +76,7 @@ public class ChanService {
                         List<Post> posts = new ArrayList<>();
                         for (JsonElement x : result.get("posts").getAsJsonArray()) {
                             Post p = gson.fromJson(x, Post.class);
+                            p.board = board;
                             // Generate parsed text here instead of in PostView for efficiency reasons
                             // Although not perfect because on activity restoration the parsed result
                             // gets lost but infrequent case so still worthwhile.

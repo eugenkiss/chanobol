@@ -45,6 +45,7 @@ import javax.inject.Inject;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
+import anabolicandroids.chanobol.api.data.MediaPointer;
 import anabolicandroids.chanobol.ui.scaffolding.UiActivity;
 import anabolicandroids.chanobol.util.HackyViewPager;
 import anabolicandroids.chanobol.util.ImageSaver;
@@ -134,6 +135,7 @@ public class MediaActivity extends UiActivity {
     @Override protected void onCreate(final Bundle savedInstanceState) {
         supportPostponeEnterTransition();
         super.onCreate(savedInstanceState);
+        getWindow().setBackgroundDrawableResource(R.color.transparent);
         background.getBackground().setAlpha(255);
         setTitle("");
 

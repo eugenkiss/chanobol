@@ -27,7 +27,7 @@ public class Post extends Common {
 
     // Used internally to speed up rendering by temporary caching
     // It would be better to persist the parsedText but SpannableString is not parcelable by default
-    @Transient private CharSequence parsedText;
+    @Transient transient private CharSequence parsedText;
     public void generateParsedTextCache() {
         if (parsedText == null) {
             String s = subject; if (s == null) s = ""; else s = "<h5>" + s + "</h5>";

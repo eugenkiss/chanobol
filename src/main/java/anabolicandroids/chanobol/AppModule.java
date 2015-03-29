@@ -95,8 +95,8 @@ public class AppModule {
     }
 
     @Provides @Singleton
-    PersistentData providePersistentData(SharedPreferences prefs) {
-        return new PersistentData(prefs);
+    PersistentData providePersistentData(App app, SharedPreferences prefs) {
+        return new PersistentData(app, prefs);
     }
 
     @Provides @Singleton

@@ -20,7 +20,7 @@ import java.util.HashMap;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
-import anabolicandroids.chanobol.api.data.Thread;
+import anabolicandroids.chanobol.api.data.ThreadPreview;
 import butterknife.ButterKnife;
 import butterknife.InjectView;
 
@@ -31,7 +31,7 @@ public class ThreadView extends FrameLayout {
     @InjectView(R.id.image) ImageView image;
     @InjectView(R.id.text) TextView text;
 
-    public Thread thread;
+    public ThreadPreview threadPreview;
 
     StyleSpan boldSpan;
 
@@ -43,37 +43,37 @@ public class ThreadView extends FrameLayout {
         boldSpan = new StyleSpan(Typeface.BOLD);
     }
 
-    public void bindTo(final Thread thread, String boardName, Ion ion,
+    public void bindTo(final ThreadPreview threadPreview, String boardName, Ion ion,
                        boolean onlyUpdateText, final HashMap<String, Bitmap> bitMap) {
 
         // Remove reference to bitmap which is out of view
-        if (this.thread != null && !thread.number.equals(this.thread.number)) {
-            bitMap.remove(this.thread.number);
+        if (this.threadPreview != null && !threadPreview.number.equals(this.threadPreview.number)) {
+            bitMap.remove(this.threadPreview.number);
         }
-        this.thread = thread;
-        Bitmap b = bitMap.get(thread.number);
-        numReplies.setText(thread.replies+"r");
-        numImages.setText(thread.images+"i");
+        this.threadPreview = threadPreview;
+        Bitmap b = bitMap.get(threadPreview.number);
+        numReplies.setText(threadPreview.replies+"r");
+        numImages.setText(threadPreview.images+"i");
         if (!onlyUpdateText || b == null) {
             ion.build(image)
-                    .load(ApiModule.thumbUrl(boardName, thread.mediaId))
+                    .load(ApiModule.thumbUrl(boardName, threadPreview.mediaId))
                     .withBitmapInfo()
                     .setCallback(new FutureCallback<ImageViewBitmapInfo>() {
                         @Override public void onCompleted(Exception e, ImageViewBitmapInfo result) {
                             if (e == null && result.getBitmapInfo() != null)
-                                if (bitMap.get(thread.number) == null)
-                                    bitMap.put(thread.number, result.getBitmapInfo().bitmap);
+                                if (bitMap.get(threadPreview.number) == null)
+                                    bitMap.put(threadPreview.number, result.getBitmapInfo().bitmap);
                         }
                     });
         } else {
             image.setImageDrawable(new BitmapDrawable(getResources(), b));
         }
 
-        text.setText(thread.excerpt);
+        text.setText(threadPreview.excerpt);
         Spannable spannable = (Spannable) text.getText();
-        spannable.setSpan(boldSpan, 0, thread.strippedSubject.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
+        spannable.setSpan(boldSpan, 0, threadPreview.strippedSubject.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
 
-        if (thread.dead) blackness.setVisibility(View.VISIBLE);
+        if (threadPreview.dead) blackness.setVisibility(View.VISIBLE);
         else blackness.setVisibility(View.GONE);
     }
 }

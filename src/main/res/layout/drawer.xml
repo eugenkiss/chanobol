@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<ScrollView
     android:id="@+id/drawer"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedAttribute"
     android:layout_width="300dp"
     android:layout_height="match_parent"
     android:layout_gravity="start"
@@ -11,52 +12,80 @@
     android:elevation="4dp"
     android:orientation="vertical"
     android:padding="10dp"
-    tools:ignore="UnusedAttribute"
     >
 
-    <TextView
-        android:id="@+id/favoriteBoardsBtn"
-        style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="@string/favorite_boards"
-        />
-
-    <TextView
-        android:id="@+id/allBoards"
-        style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="@string/all_boards"
-        />
-
-    <TextView
-        android:id="@+id/settings"
-        style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="@string/settings"
-        />
-
-    <TextView
-        android:id="@+id/debugSettings"
-        style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="@string/debug_settings"
-        android:visibility="gone"
-        />
-
-    <TextView
-        android:id="@+id/about"
-        style="@style/Widget.Chanobol.Drawer.Entry"
-        android:text="@string/about"
-        />
-
-    <android.support.v7.internal.widget.CompatTextView
-        android:id="@+id/favoriteBoardsHeader"
-        style="@style/Widget.Chanobol.Drawer.Header"
-        android:text="@string/favorites"
-        />
-
-    <ListView
-        android:id="@+id/favoriteBoards"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:choiceMode="singleChoice"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="0dp"
-        />
-</LinearLayout>
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+
+        <TextView
+            android:id="@+id/favoriteBoardsBtn"
+            style="@style/Widget.Chanobol.Drawer.Entry"
+            android:text="@string/favorite_boards"
+            />
+
+        <TextView
+            android:id="@+id/allBoards"
+            style="@style/Widget.Chanobol.Drawer.Entry"
+            android:text="@string/all_boards"
+            />
+
+        <TextView
+            android:visibility="gone"
+            android:id="@+id/watchlistBtn"
+            style="@style/Widget.Chanobol.Drawer.Entry"
+            android:text="@string/watchlist"
+            />
+
+        <TextView
+            android:id="@+id/settings"
+            style="@style/Widget.Chanobol.Drawer.Entry"
+            android:text="@string/settings"
+            />
+
+        <TextView
+            android:id="@+id/debugSettings"
+            style="@style/Widget.Chanobol.Drawer.Entry"
+            android:text="@string/debug_settings"
+            android:visibility="gone"
+            />
+
+        <TextView
+            android:id="@+id/about"
+            style="@style/Widget.Chanobol.Drawer.Entry"
+            android:text="@string/about"
+            />
+
+        <android.support.v7.internal.widget.CompatTextView
+            android:id="@+id/favoriteBoardsHeader"
+            style="@style/Widget.Chanobol.Drawer.Header"
+            android:text="@string/favorites"
+            />
+
+        <anabolicandroids.chanobol.util.NonScrollListView
+            android:id="@+id/favoriteBoards"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            />
+
+        <android.support.v7.internal.widget.CompatTextView
+            android:id="@+id/watchlistHeader"
+            style="@style/Widget.Chanobol.Drawer.Header"
+            android:text="@string/watchlist"
+            />
+
+        <anabolicandroids.chanobol.util.NonScrollListView
+            android:id="@+id/watchlist"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            />
+    </LinearLayout>
+</ScrollView>
