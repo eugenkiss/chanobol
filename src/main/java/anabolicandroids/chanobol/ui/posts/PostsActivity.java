@@ -201,6 +201,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         }
 
         if (inWatchlist) {
+            firstLoad = false;
             postsAdapter.notifyDataSetChanged();
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
