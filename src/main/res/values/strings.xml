@@ -27,6 +27,7 @@
     <string name="save">Save</string>
     <string name="save_all">Save All</string>
     <string name="save_all_pics">Save All Pics</string>
+    <string name="open_browser">Open in Browser</string>
     <!-- Drawer -->
     <string name="navigation_drawer_open">Open</string>
     <string name="navigation_drawer_close">Closed</string>

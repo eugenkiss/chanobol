@@ -38,6 +38,10 @@
           android:title="@string/go_to_top"
           app:showAsAction="never"
         />
+    <item android:id="@+id/openBrowser"
+          android:title="@string/open_browser"
+          app:showAsAction="never"
+        />
     </group>
     <group
         android:id="@+id/postsDialog"

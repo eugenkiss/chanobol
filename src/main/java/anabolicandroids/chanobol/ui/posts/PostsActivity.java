@@ -7,6 +7,7 @@ import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
@@ -485,6 +486,10 @@ public class PostsActivity extends SwipeRefreshActivity {
             case R.id.removeWatchlist:
                 persistentData.removeWatchlistThread(thread);
                 invalidateOptionsMenu();
+                break;
+            case R.id.openBrowser:
+                Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(ApiModule.threadUrl(boardName, threadNumber)));
+                startActivity(Intent.createChooser(i, "Open in Browser"));
                 break;
         }
         return super.onOptionsItemSelected(item);

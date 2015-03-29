@@ -36,6 +36,11 @@ public class ApiModule {
         return imgCdn + "/" + board + "/" + imageId + ending;
     }
 
+    // http://boards.4chan.org/fit/thread/31627542
+    public static String threadUrl(String board, String number) {
+        return "http://boards.4chan.org/" + board + "/thread/" + number;
+    }
+
     @Provides @Singleton
     Ion provideIon(Application app) {
         return Ion.getDefault(app);
