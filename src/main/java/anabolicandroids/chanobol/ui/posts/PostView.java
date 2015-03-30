@@ -72,6 +72,7 @@ public class PostView extends CardView {
     private static final int W = 0, H = 1;
     private int maxImgWidth;
     private int maxImgHeight;
+    private int minImgHeight;
 
     public Prefs prefs;
     public Post post;
@@ -105,6 +106,7 @@ public class PostView extends CardView {
         }
         maxImgWidth = screenWidth;
         maxImgHeight = (int) (screenHeight * 0.8);
+        minImgHeight = (int) (screenHeight * 0.15);
     }
 
     private void reset() {
@@ -161,16 +163,28 @@ public class PostView extends CardView {
     // screen height.
     private void calcSize(int[] size, Post post) {
         double w = post.mediaWidth, h = post.mediaHeight;
-        if (w >= maxImgWidth) {
+        if (w < maxImgWidth) {
+            double w_old = w;
+            w = Math.min(maxImgWidth, w_old * 2);
+            h *= w / w_old;
+        }
+        if (h < minImgHeight) {
+            double h_old = h;
+            h = minImgHeight;
+            w *= h / h_old;
+        }
+
+        if (w > maxImgWidth) {
             double w_old = w;
             w = maxImgWidth;
             h *= w / w_old;
         }
-        if (h >= maxImgHeight) {
+        if (h > maxImgHeight) {
             double h_old = h;
             h = maxImgHeight;
             w *= h / h_old;
         }
+
         size[W] = (int) w;
         size[H] = (int) h;
     }
