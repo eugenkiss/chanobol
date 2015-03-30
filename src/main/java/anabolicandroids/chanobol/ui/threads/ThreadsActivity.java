@@ -133,7 +133,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         Util.calcDynamicSpanCountById(ThreadsActivity.this, threadsView, glm, R.dimen.column_width);
 
         if (watchlist) {
-            swipe.setEnabled(false);
+            if (swipe != null) swipe.setEnabled(false); // null-check due to: http://crashes.to/s/172ca87ecb8 and http://crashes.to/s/9ef45e4e36b
             persistentData.addWatchlistChangedCallback(watchlistChangedCallback);
             if (savedInstanceState == null) loadWatchlistThreadsFromStorage();
             else notifyDataSetChanged();
