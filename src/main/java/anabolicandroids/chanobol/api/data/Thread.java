@@ -70,8 +70,8 @@ public class Thread {
         else if (op.text != null && !op.text.equals("null") && op.text.length() > 0) title = op.text;
         title = Html.fromHtml(title).toString();
         title = title.substring(0, Math.min(title.length(), 60));
-        title = title.split("\\r?\\n")[0];
         if (title.length() == 0) return id;
+        title = title.split("\\r?\\n")[0];
         if (gallery) title = boardName + "/gal/" + threadNumber + " – " + title;
         else title = id + " – " + title;
         if (dead) title = "☠ " + title;
