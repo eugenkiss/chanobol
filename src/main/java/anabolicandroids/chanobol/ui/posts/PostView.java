@@ -419,7 +419,8 @@ public class PostView extends CardView {
                     ClickableSpan span = spans[0];
                     if (span instanceof QuoteSpan) {
                         QuoteSpan quoteSpan = (QuoteSpan) span;
-                        quoteCallback.onClick(quoteSpan.quoterId, quoteSpan.quotedId);
+                        if (quoteCallback != null) // http://crashes.to/s/284005742d9 (but why?...)
+                            quoteCallback.onClick(quoteSpan.quoterId, quoteSpan.quotedId);
                     } else if (span instanceof LinkSpan) {
                         LinkSpan linkSpan = (LinkSpan) span;
                         Util.openLink(getContext(), linkSpan.url);
