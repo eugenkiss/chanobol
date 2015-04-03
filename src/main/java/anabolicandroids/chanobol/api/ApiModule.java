@@ -26,14 +26,14 @@ public class ApiModule {
     // http://t.4cdn.org/board/1358180697001s.jpg
     public static final String thumbCdn = "http://t.4cdn.org";
     // http://i.4cdn.org/board/1358180697001.ext
-    public static final String imgCdn = "http://i.4cdn.org";
+    public static final String mediaCdn = "http://i.4cdn.org";
 
-    public static String thumbUrl(String board, String imageId) {
-        return thumbCdn + "/" + board + "/" + imageId + "s.jpg";
+    public static String thumbUrl(String board, String mediaId) {
+        return thumbCdn + "/" + board + "/" + mediaId + "s.jpg";
     }
 
-    public static String imgUrl(String board, String imageId, String ending) {
-        return imgCdn + "/" + board + "/" + imageId + ending;
+    public static String mediaUrl(String board, String mediaId, String ending) {
+        return mediaCdn + "/" + board + "/" + mediaId + ending;
     }
 
     // http://boards.4chan.org/fit/thread/31627542

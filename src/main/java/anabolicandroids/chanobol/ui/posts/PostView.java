@@ -300,7 +300,7 @@ public class PostView extends CardView {
         determineScaleType(size);
         image.getLayoutParams().height = size[H];
         image.requestLayout();
-        ion.build(getContext()).load(ApiModule.imgUrl(boardName, post.mediaId, post.mediaExtension)).asBitmap().tryGet();
+        ion.build(getContext()).load(ApiModule.mediaUrl(boardName, post.mediaId, post.mediaExtension)).asBitmap().tryGet();
     }
 
     private boolean loaded;
@@ -352,7 +352,7 @@ public class PostView extends CardView {
                         }
 
                         final String ext = post.mediaExtension;
-                        final String url = ApiModule.imgUrl(boardName, post.mediaId, post.mediaExtension);
+                        final String url = ApiModule.mediaUrl(boardName, post.mediaId, post.mediaExtension);
                         switch (ext) {
                             case ".webm":
                                 loaded = true;

@@ -32,7 +32,7 @@ public class MockImageLoader extends SimpleLoader {
     @Override
     public Future<DataEmitter> load(Ion ion, AsyncHttpRequest request, final FutureCallback<LoaderEmitter> callback) {
         String uri = request.getUri().toString();
-        if (!uri.startsWith(ApiModule.imgCdn) && !uri.startsWith(ApiModule.thumbCdn))
+        if (!uri.startsWith(ApiModule.mediaCdn) && !uri.startsWith(ApiModule.thumbCdn))
             return null;
         Timber.i("Mocked Image Request!");
         return (Future<DataEmitter>)(Future)ion.getHttpClient().execute(request, new HttpConnectCallback() {

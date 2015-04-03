@@ -445,7 +445,7 @@ public class MediaActivity extends UiActivity {
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         MediaPointer current = mediaPointers.get(currentIndex);
-        String url = ApiModule.imgUrl(boardName, current.id, current.ext);
+        String url = ApiModule.mediaUrl(boardName, current.id, current.ext);
         Intent intent;
         String path;
         // https://github.com/codepath/android_guides/wiki/Sharing-Content-with-Intents#sharing-remote-images-without-explicit-file-io

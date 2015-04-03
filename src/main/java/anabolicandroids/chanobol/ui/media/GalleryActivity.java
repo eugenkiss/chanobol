@@ -196,7 +196,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
             List<ImageSaver.DownloadPair> list = new ArrayList<>();
             String folderName = ThreadPreview.generateTitle(boardName, threadNumber);
             for (MediaPointer p : mediaPointers) {
-                list.add(new ImageSaver.DownloadPair(ApiModule.imgUrl(boardName, p.id, p.ext), p.fileName()));
+                list.add(new ImageSaver.DownloadPair(ApiModule.mediaUrl(boardName, p.id, p.ext), p.fileName()));
             }
             imageSaver.saveAll(context, folderName, list);
         }

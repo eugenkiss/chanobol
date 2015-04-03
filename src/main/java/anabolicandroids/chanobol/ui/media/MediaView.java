@@ -159,7 +159,7 @@ public class MediaView extends FrameLayout {
         higherQualityAlreadyLoading = true;
         lastMediaPointer = mediaPointer;
 
-        final String url = ApiModule.imgUrl(boardName, mediaPointer.id, mediaPointer.ext);
+        final String url = ApiModule.mediaUrl(boardName, mediaPointer.id, mediaPointer.ext);
 
         if (mediaPointer.isWebm()) {
             if (attacher != null) attacher.cleanup();
