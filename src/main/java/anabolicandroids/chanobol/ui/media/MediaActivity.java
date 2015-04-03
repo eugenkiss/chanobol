@@ -282,7 +282,7 @@ public class MediaActivity extends UiActivity {
                         otherView.setTransitionNameForImageView("");
                         MediaPointer last = otherView.lastMediaPointer;
                         if (last != null) {
-                            otherView.reset();
+                            otherView.clear();
                             otherView.bindToPreview(boardName, last);
                         }
                     }
@@ -611,7 +611,7 @@ public class MediaActivity extends UiActivity {
 
         @Override public void destroyItem(ViewGroup container, int position, Object object) {
             MediaView mediaView = pagerView(position);
-            mediaView.reset();
+            mediaView.clear();
             container.removeView(mediaView);
         }
 

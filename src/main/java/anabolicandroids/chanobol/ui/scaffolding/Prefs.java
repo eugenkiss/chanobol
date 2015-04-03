@@ -1,6 +1,7 @@
 package anabolicandroids.chanobol.ui.scaffolding;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Environment;
 
 import java.io.File;
@@ -82,4 +83,13 @@ public class Prefs {
     public void threadSortOrder(ThreadSortOrder order) {
         p.edit().putString(THREAD_SORT_ORDER, order.string).apply();
     }
+
+    public static final String EXTERNAL_WEBM = "pref_external_webm";
+    public boolean externalWebm() {
+        return p.getBoolean(EXTERNAL_WEBM, false) && Build.VERSION.SDK_INT >= 15;
+    }
+    public void externalWebm(boolean v) {
+        p.edit().putBoolean(EXTERNAL_WEBM, v).apply();
+    }
+
 }

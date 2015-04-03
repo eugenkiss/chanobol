@@ -1,7 +1,9 @@
 package anabolicandroids.chanobol.ui;
 
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.Preference;
 
 import anabolicandroids.chanobol.App;
 import anabolicandroids.chanobol.R;
@@ -17,6 +19,13 @@ public class Settings extends BaseSettings {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.prefs);
+
+        Preference p = findPreference(Prefs.EXTERNAL_WEBM);
+        if (Build.VERSION.SDK_INT < 15) {
+            p.setSummary("In-app WebM playback needs at least Android 3.0");
+            p.setEnabled(false);
+            p.getEditor().putBoolean(Prefs.EXTERNAL_WEBM, true).apply();
+        }
     }
 
     @Override

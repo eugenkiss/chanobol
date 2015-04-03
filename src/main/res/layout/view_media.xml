@@ -13,6 +13,29 @@
         android:background="@color/transparent"
         />
 
+    <FrameLayout
+        android:id="@+id/videoContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:visibility="invisible"
+        >
+        <com.malmstein.fenster.view.FensterVideoView
+            android:id="@+id/videoView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:background="@color/transparent"
+            />
+        <com.malmstein.fenster.controller.SimpleMediaFensterPlayerController
+            android:id="@+id/videoViewController"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            android:background="@color/transparent"
+            />
+    </FrameLayout>
+
     <ImageView
         android:id="@+id/play"
         android:layout_width="100dp"

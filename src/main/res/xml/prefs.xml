@@ -37,4 +37,9 @@
         android:entryValues="@array/sort_keys"
         android:defaultValue="bump"
         />
+    <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_external_webm"
+        android:title="Open webms externally"
+        />
 </PreferenceScreen>

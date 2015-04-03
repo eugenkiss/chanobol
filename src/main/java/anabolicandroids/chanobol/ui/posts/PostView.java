@@ -358,8 +358,8 @@ public class PostView extends CardView {
                                 loaded = true;
                                 progress.setVisibility(View.GONE);
                                 play.setVisibility(View.VISIBLE);
-                                //initWebmCallback(url);
-                                initImageCallback(position, post, imageCallback);
+                                if (prefs.externalWebm()) initWebmCallback(url);
+                                else initImageCallback(position, post, imageCallback);
                                 break;
                             default:
                                 initImageCallback(position, post, imageCallback);

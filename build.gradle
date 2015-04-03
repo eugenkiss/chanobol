@@ -11,8 +11,8 @@ buildscript {
 
 def versionMajor = 1
 def versionMinor = 3
-def versionPatch = 12
-def versionBuild = 6
+def versionPatch = 13
+def versionBuild = 0
 
 apply plugin: 'com.android.application'
 
@@ -48,6 +48,8 @@ dependencies {
 
     // TODO: Update to 1.2.4 once it's out (https://github.com/chrisbanes/PhotoView/issues/72)
     compile  'com.github.chrisbanes.photoview:library:1.2.2'
+
+    compile project(':libs:fenster')
 
     compile ('com.crashlytics.sdk.android:crashlytics:2.2.0@aar') {
         transitive = true;
