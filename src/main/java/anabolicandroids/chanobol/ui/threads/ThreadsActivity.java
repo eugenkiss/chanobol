@@ -7,8 +7,10 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.transition.Slide;
 import android.transition.TransitionManager;
 import android.view.Gravity;
@@ -59,12 +61,15 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     // Internal state
     private static String THREADS = "threads";
     private static String THREADMAP = "threadMap";
+    private static String SEARCH_QUERY = "searchQuery";
     private ArrayList<ThreadPreview> threadPreviews;
     private HashMap<String, Integer> threadMap;
     private ThreadsAdapter threadsAdapter;
+    private String searchQuery;
     // No need to persist, is recreated on demand
-    private ArrayList<ThreadPreview> sortedThreadPreviews;
     private ThreadSortOrder sortOrder;
+    private ArrayList<ThreadPreview> sortedThreadPreviews;
+    private ArrayList<ThreadPreview> filteredThreadPreviews;
 
     // This whole bitMap stuff is only needed to prevent the thumbnails from blinking after
     // update is finished. I tried many other approaches but this is the only one that worked.
@@ -94,7 +99,6 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         taskRoot = true;
         super.onCreate(savedInstanceState);
 
-        String watchlistTitle = getResources().getString(R.string.watchlist);
 
         Bundle b = getIntent().getExtras();
         watchlist = b.getBoolean(EXTRA_IS_WATCHLIST);
@@ -106,22 +110,26 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             // TODO: Add test for situation if provided board is null
             showToast("Could not load board");
             Util.restartApp(app, this);
+            return;
         }
-
-        if (watchlist) setTitle(watchlistTitle);
-        else setTitle(board.name);
 
         if (savedInstanceState == null) {
             freeMemory();
             threadPreviews = new ArrayList<>();
             threadMap = new HashMap<>();
+            searchQuery = "";
         } else {
             threadPreviews = Parcels.unwrap(savedInstanceState.getParcelable(THREADS));
             threadMap = Parcels.unwrap(savedInstanceState.getParcelable(THREADMAP));
+            searchQuery = savedInstanceState.getString(SEARCH_QUERY);
         }
+
+        if (watchlist) setTitle(getResources().getString(R.string.watchlist));
+        else setTitle(board.name);
 
         sortOrder = prefs.threadSortOrder();
         sortedThreadPreviews = new ArrayList<>();
+        filteredThreadPreviews = new ArrayList<>();
 
         bitMap = new HashMap<>();
 
@@ -163,11 +171,12 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         super.onSaveInstanceState(outState);
         outState.putParcelable(THREADS, Parcels.wrap(threadPreviews));
         outState.putParcelable(THREADMAP, Parcels.wrap(threadMap));
+        outState.putString(SEARCH_QUERY, searchQuery);
     }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
 
-    View.OnClickListener clickCallback = new View.OnClickListener() {
+    private View.OnClickListener clickCallback = new View.OnClickListener() {
         @Override public void onClick(View v) {
             final ThreadView tv = (ThreadView) v;
             ThreadPreview threadPreview = tv.threadPreview;
@@ -185,7 +194,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         }
     };
 
-    View.OnLongClickListener longClickCallback = new View.OnLongClickListener() {
+    private View.OnLongClickListener longClickCallback = new View.OnLongClickListener() {
         @Override public boolean onLongClick(View v) {
             final ThreadView tv = (ThreadView) v;
             ThreadPreview threadPreview = tv.threadPreview;
@@ -208,6 +217,25 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             loadWatchlistThreadsFromStorage();
         }
     };
+
+    private void setSearchCallback(final SearchView searchView) {
+        if (searchQuery.length() > 0) {
+            searchView.setIconified(false);
+            searchView.setQuery(searchQuery, false);
+            searchView.clearFocus();
+        }
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override public boolean onQueryTextSubmit(String query) {
+                searchView.clearFocus();
+                return true;
+            }
+            @Override public boolean onQueryTextChange(String query) {
+                searchQuery = query;
+                notifyDataSetChanged();
+                return true;
+            }
+        });
+    }
 
     // Data Loading ////////////////////////////////////////////////////////////////////////////////
 
@@ -294,6 +322,13 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             }
         });
         if (hasSticky) sortedThreadPreviews.add(0, threadPreviews.get(0));
+
+        filteredThreadPreviews.clear();
+        for (ThreadPreview t : sortedThreadPreviews) {
+            if (t.excerpt.toLowerCase().contains(searchQuery))
+                filteredThreadPreviews.add(t);
+        }
+
         threadsAdapter.notifyDataSetChanged();
     }
 
@@ -347,7 +382,13 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             menu.findItem(R.id.favorize).setVisible(false);
             menu.findItem(R.id.refresh).setVisible(false);
         }
-        return true;
+
+        final MenuItem searchItem = menu.findItem(R.id.search);
+        SearchView searchView = null;
+        if (searchItem != null) searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        if (searchView != null) setSearchCallback(searchView);
+
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
@@ -424,7 +465,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
 
         public ThreadsAdapter(View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
             super(ThreadsActivity.this, clickListener, longClickListener);
-            this.items = sortedThreadPreviews;
+            this.items = filteredThreadPreviews;
         }
 
         @Override public View newView(ViewGroup container) {
@@ -437,4 +478,5 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             setVisibility(tv, !hide);
         }
     }
+
 }

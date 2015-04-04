@@ -1,15 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:app="http://schemas.android.com/apk/res-auto">
-    <!--<item android:id="@+id/search"-->
-          <!--android:icon="@drawable/ic_search"-->
-          <!--android:title="Search"-->
-          <!--app:showAsAction="always"-->
-        <!--/>-->
+<menu xmlns:tools="http://schemas.android.com/tools"
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+    <item android:id="@+id/search"
+          android:icon="@drawable/ic_search"
+          android:title="Search"
+          app:showAsAction="always"
+          app:actionViewClass="android.support.v7.widget.SearchView"
+          tools:ignore="AlwaysShowAction"
+        />
     <item android:id="@+id/up"
           android:icon="@drawable/ic_up"
           android:title="@string/go_to_top"
-          app:showAsAction="ifRoom"
+          app:showAsAction="never"
         />
     <item android:id="@+id/favorize"
           android:icon="@drawable/ic_favorite"
