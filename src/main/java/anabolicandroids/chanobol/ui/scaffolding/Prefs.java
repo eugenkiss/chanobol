@@ -9,6 +9,7 @@ import java.io.File;
 import anabolicandroids.chanobol.ui.threads.ThreadSortOrder;
 
 // Convenience wrapper around SharedPreferences to make use of Java's static nature
+@SuppressWarnings("UnusedDeclaration")
 public class Prefs {
 
     private final SharedPreferences p;
@@ -86,10 +87,20 @@ public class Prefs {
 
     public static final String EXTERNAL_WEBM = "pref_external_webm";
     public boolean externalWebm() {
-        return p.getBoolean(EXTERNAL_WEBM, false) && Build.VERSION.SDK_INT >= 15;
+        if (Build.VERSION.SDK_INT < 15) return true;
+        return p.getBoolean(EXTERNAL_WEBM, false);
     }
     public void externalWebm(boolean v) {
         p.edit().putBoolean(EXTERNAL_WEBM, v).apply();
+    }
+
+    public static final String IMMERSIVE_MODE = "pref_immersive_mode";
+    public boolean immersiveMode() {
+        if (Build.VERSION.SDK_INT < 19) return false;
+        return p.getBoolean(IMMERSIVE_MODE, false);
+    }
+    public void immersiveMode(boolean v) {
+        p.edit().putBoolean(IMMERSIVE_MODE, v).apply();
     }
 
 }

@@ -26,6 +26,16 @@ public class Settings extends BaseSettings {
             p.setEnabled(false);
             p.getEditor().putBoolean(Prefs.EXTERNAL_WEBM, true).apply();
         }
+
+        p = findPreference(Prefs.IMMERSIVE_MODE);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+            p.setSummary("Immersive Mode needs at least Android 4.4");
+            p.setEnabled(false);
+            p.getEditor().putBoolean(Prefs.IMMERSIVE_MODE, false).apply();
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            p.setSummary("Experimental");
+        }
     }
 
     @Override

@@ -113,6 +113,10 @@ public class MediaView extends FrameLayout {
         ViewCompat.setTransitionName(imageView, name);
     }
 
+    public void removeAttacher() {
+        if (attacher != null) attacher.cleanup();
+    }
+
     public void bindToPreview(Bitmap bitmap) {
         imageView.setImageBitmap(bitmap);
         // Otherwise there will be glitches sometimes

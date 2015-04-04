@@ -245,6 +245,22 @@ public class MediaActivity extends UiActivity {
         });
     }
 
+    // https://developer.android.com/training/system-ui/immersive.html
+    @TargetApi(Build.VERSION_CODES.KITKAT) @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && prefs.immersiveMode()) {
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        }
+    }
+
     @Override protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(EXTRA_INDEX, currentIndex);
@@ -370,6 +386,7 @@ public class MediaActivity extends UiActivity {
             } else {
                 MediaView currentView = pagerView(currentIndex);
                 currentView.setTransitionNameForImageView(transitionName);
+                currentView.removeAttacher(); // Very important, fixes: "java.lang.IllegalStateException: The ImageView's ScaleType has been changed since attaching a PhotoViewAttacher"
             }
 
             Drawable bg = toolbar.getBackground();
