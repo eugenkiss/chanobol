@@ -80,6 +80,16 @@ public class Thread {
     public String title() { return title(false); }
     public String titleForGallery() { return title(true); }
 
+    /** -1 if not found */
+    public int indexForPost(Post post) {
+        int i = 0;
+        for (Post p : posts) {
+            if (p.number.equals(post.number)) return i;
+            i++;
+        }
+        return -1;
+    }
+
     public static interface OnResultCallback {
         public void onSuccess();
         public void onError(String message);

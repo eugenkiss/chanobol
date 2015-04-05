@@ -196,7 +196,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         if (inWatchlist) postsView.scrollToPosition(thread.lastVisibleIndex);
 
         getSupportFragmentManager().addOnBackStackChangedListener(backStackChangedListener);
-        setupUpLongClickCloseAll();
+        setupUpLongClickDismissAll();
 
         if (firstLoad && opPost != null) {
             postsAdapter.notifyItemChanged(0);
@@ -294,6 +294,27 @@ public class PostsActivity extends SwipeRefreshActivity {
                     PostsActivity.this, iv, uuid, new Point(cx, cy), r, color, false,
                     thread, thread.mediaMap.get(post.number)
             );
+        }
+    };
+
+    public static interface JumpCallback {
+        public void onJumpTo(Post post);
+    }
+    JumpCallback jumpCallback = new JumpCallback() {
+        @Override public void onJumpTo(Post post) {
+            final int index = thread.indexForPost(post);
+            if (index == -1) return;
+            dismissAllPostsDialogs();
+            showToolbar();
+            postsView.scrollToPosition(index);
+            postsView.postDelayed(new Runnable() {
+                // A more reliable way would be to listen to when the scroll finished
+                // but too much work for this visual hint, so a rough delay it will be.
+                @Override public void run() {
+                    PostView pv = (PostView) layoutManager.findViewByPosition(index);
+                    if (pv != null) pv.blinkRed();
+                }
+            }, 500);
         }
     };
 
@@ -578,7 +599,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     // http://stackoverflow.com/a/27180584/283607
-    private void setupUpLongClickCloseAll() {
+    private void setupUpLongClickDismissAll() {
         if (Build.VERSION.SDK_INT >= 14) {
             toolbar.setNavigationContentDescription("up");
             final ArrayList<View> outViews = new ArrayList<>();
@@ -615,8 +636,10 @@ public class PostsActivity extends SwipeRefreshActivity {
     boolean removingAll = false;
     private void dismissAllPostsDialogs() {
         if (removingAll) return;
-        removingAll = true;
         FragmentManager fm = getSupportFragmentManager();
+        if (fm.getFragments() == null) return;
+        removingAll = true;
+
         for (Fragment f : fm.getFragments()) { if (f instanceof PostsDialog) { PostsDialog d = (PostsDialog) f;
             d.animatePostsRemoval();
         }}
@@ -666,7 +689,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         }
 
         @Override public void bindView(final Post item, int position, View view) {
-            bindViewDRY(item, position, view);
+            bindViewDRY(item, position, false, view);
             setVisibility(view, !hide || position == 0);
         }
     }
@@ -677,15 +700,15 @@ public class PostsActivity extends SwipeRefreshActivity {
         return getLayoutInflater().inflate(R.layout.view_post, container, false);
     }
 
-    private void bindViewDRY(final Post item, int position, View view) {
+    private void bindViewDRY(final Post item, int position, boolean inDialog, View view) {
         PostView v = (PostView) view;
         if (item == null) return;
         v.prefs = prefs;
         if (position == 0 && firstLoad) {
             v.bindToOp(opImage, item, boardName, ion);
         } else {
-            v.bindTo(position, item, boardName, threadNumber, ion, bitmapCacheKeys,
-                     repliesCallback, quoteCallback, imageCallback);
+            v.bindTo(position, item, boardName, ion, bitmapCacheKeys, inDialog,
+                     repliesCallback, quoteCallback, imageCallback, jumpCallback);
         }
         v.setImageTransitionName(position == 0 ? transitionName : null);
     }
@@ -704,7 +727,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         }
 
         @Override public void bindView(final Post item, int position, View view) {
-            bindViewDRY(item, position, view);
+            bindViewDRY(item, position, true, view);
             setVisibility(view, !hide);
         }
 

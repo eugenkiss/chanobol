@@ -51,6 +51,7 @@
     <!-- Post Popup Dialog -->
     <string name="copy_text">Copy Text</string>
     <string name="clipoard_copy_label">Post text</string>
+    <string name="jump">Jump to Post</string>
     <!-- Toasts -->
     <string name="no_app">No suitable app</string>
     <string name="no_board">Board doesn\'t exist</string>

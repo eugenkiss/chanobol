@@ -1,11 +1,16 @@
 package anabolicandroids.chanobol.ui.posts;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
@@ -76,6 +81,7 @@ public class PostView extends CardView {
 
     public Prefs prefs;
     public Post post;
+    boolean inDialog;
 
     public PostView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -140,13 +146,20 @@ public class PostView extends CardView {
             PopupMenu popupMenu = new PopupMenu(getContext(), v);
             Menu m = popupMenu.getMenu();
             final int COPY = 0;
+            final int JUMP = 1;
             m.add(Menu.NONE, COPY, Menu.NONE, R.string.copy_text);
+            if (inDialog) m.add(Menu.NONE, JUMP, Menu.NONE, R.string.jump);
             popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                 @Override public boolean onMenuItemClick(MenuItem menuItem) {
                     switch (menuItem.getItemId()) {
                         case COPY:
                             Util.copyToClipboard(getContext(), post.parsedText().toString());
                             Util.showToast(getContext(), R.string.copied_text);
+                            break;
+                        case JUMP:
+                            if (jumpCallback != null) {
+                                jumpCallback.onJumpTo(post);
+                            }
                             break;
                     }
                     return false;
@@ -155,6 +168,36 @@ public class PostView extends CardView {
             popupMenu.show();
         }
     };
+
+    PostsActivity.JumpCallback jumpCallback;
+
+    public void setImageTransitionName(String transitionName) {
+        ViewCompat.setTransitionName(image, transitionName);
+    }
+
+    public void blinkRed() {
+        final Drawable foreground = new ColorDrawable(Color.RED);
+        foreground.setAlpha(0);
+        setForeground(foreground);
+
+        ValueAnimator animator;
+        animator = ValueAnimator.ofInt(0, 128, 0);
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override public void onAnimationUpdate(ValueAnimator animation) {
+                foreground.setAlpha((int) animation.getAnimatedValue());
+            }
+        });
+        animator.addListener(new AnimatorListenerAdapter() {
+            @Override public void onAnimationEnd(Animator animation) {
+                setForeground(null);
+            }
+            @Override public void onAnimationCancel(Animator animation) {
+                setForeground(null);
+            }
+        });
+        animator.setDuration(700);
+        animator.start();
+    }
 
     // If needed reduce the media size such that it is only as big as needed and is
     // never bigger than approx. the screen size. For example, an image with a height
@@ -276,10 +319,6 @@ public class PostView extends CardView {
         }
     }
 
-    public void setImageTransitionName(String transitionName) {
-        ViewCompat.setTransitionName(image, transitionName);
-    }
-
     // The raison d'être for this method is to immediately populate the OP post cardview
     // when viewing a single thread without first waiting for the 4Chan API request to finish
     // that gets all the posts in order to give the impression (illusion) of promptness
@@ -288,6 +327,8 @@ public class PostView extends CardView {
                          final Post post, final String boardName,
                          final Ion ion) {
         this.post = post;
+        this.inDialog = false;
+        this.jumpCallback = null;
         reset();
         initText(ion, post, null, null);
 
@@ -304,13 +345,15 @@ public class PostView extends CardView {
     }
 
     private boolean loaded;
-    public void bindTo(final int position, final Post post, final String boardName,
-                       @SuppressWarnings("UnusedParameters") final String threadId, final Ion ion,
-                       final ArrayList<String> bitmapCacheKeys,
+    public void bindTo(final int position, final Post post, final String boardName, final Ion ion,
+                       final ArrayList<String> bitmapCacheKeys, boolean inDialog,
                        final PostsActivity.RepliesCallback repliesCallback,
                        final PostsActivity.QuoteCallback quoteCallback,
-                       final PostsActivity.ImageCallback imageCallback) {
+                       final PostsActivity.ImageCallback imageCallback,
+                       final PostsActivity.JumpCallback jumpCallback) {
         this.post = post;
+        this.inDialog = inDialog;
+        this.jumpCallback = jumpCallback;
         reset();
         initText(ion, post, repliesCallback, quoteCallback);
 

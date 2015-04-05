@@ -2,14 +2,13 @@
 <anabolicandroids.chanobol.ui.posts.PostView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_gravity="top"
     android:transitionGroup="false"
     app:cardBackgroundColor="?attr/fg"
-    card_view:cardCornerRadius="3dp"
+    app:cardCornerRadius="3dp"
     >
 
     <LinearLayout
