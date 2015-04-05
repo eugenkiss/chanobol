@@ -224,6 +224,7 @@ public abstract class UiActivity extends BaseActivity {
     private AdapterView.OnItemClickListener favoriteClickCallback = new AdapterView.OnItemClickListener() {
         @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final Board board = favoriteBoardsAdapter.getItem(position);
+            FavoritesActivity.launch(UiActivity.this);
             ThreadsActivity.launch(UiActivity.this, board);
         }
     };

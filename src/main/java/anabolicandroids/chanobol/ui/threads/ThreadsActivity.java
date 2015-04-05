@@ -80,7 +80,6 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         intent.putExtra(EXTRA_IS_WATCHLIST, isWatchlist);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         activity.startActivity(intent);
-        activity.finish();
     }
     public static void launch(Activity activity, Board board) {
         launch(activity, board, false);
@@ -95,9 +94,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     @Override protected RecyclerView getRootRecyclerView() { return threadsView; }
 
     @Override protected void onCreate(Bundle savedInstanceState) {
-        taskRoot = true;
         super.onCreate(savedInstanceState);
-
 
         Bundle b = getIntent().getExtras();
         watchlist = b.getBoolean(EXTRA_IS_WATCHLIST);
