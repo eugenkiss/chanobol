@@ -33,7 +33,7 @@ import javax.inject.Inject;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.MediaPointer;
-import anabolicandroids.chanobol.api.data.Post;
+import anabolicandroids.chanobol.api.data.Thread;
 import anabolicandroids.chanobol.api.data.ThreadPreview;
 import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
@@ -45,29 +45,18 @@ public class GalleryActivity extends SwipeRefreshActivity {
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 
-    // To immediately load thumbnails without a request to load the respective thread first
-    private static String EXTRA_IMAGEPOINTERS = "imagePointers";
-    // Needed to form a valid request to 4Chan
-    @SuppressWarnings("FieldCanBeLocal")
-    private static String EXTRA_BOARDNAME = "boardName";
-    @SuppressWarnings("FieldCanBeLocal")
-    private static String EXTRA_THREADNUMBER = "threadNumber";
-
-    private ArrayList<MediaPointer> mediaPointers;
+    private static String THREAD = "thread";
+    private Thread thread;
+    // Convenience
     private String boardName;
     private String threadNumber;
+
     private GalleryAdapter galleryAdapter;
 
-    public static void launch(
-            Activity activity,
-            String boardName, String threadNumber,
-            List<MediaPointer> mediaPointers
-    ) {
+    public static void launch(Activity activity, Thread thread) {
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity);
         Intent intent = new Intent(activity, GalleryActivity.class);
-        intent.putExtra(EXTRA_BOARDNAME, boardName);
-        intent.putExtra(EXTRA_THREADNUMBER, threadNumber);
-        intent.putExtra(EXTRA_IMAGEPOINTERS, Parcels.wrap(mediaPointers));
+        intent.putExtra(THREAD, Parcels.wrap(thread));
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
 
@@ -85,11 +74,19 @@ public class GalleryActivity extends SwipeRefreshActivity {
         getWindow().setBackgroundDrawableResource(R.color.transparent);
 
         Bundle b = getIntent().getExtras();
-        boardName = b.getString("boardName");
-        threadNumber = b.getString("threadNumber");
-        mediaPointers = Parcels.unwrap(b.getParcelable(EXTRA_IMAGEPOINTERS));
+        thread = Parcels.unwrap(b.getParcelable(THREAD));
+        boardName = thread.boardName;
+        threadNumber = thread.threadNumber;
 
-        setTitle(boardName + "/gal/" + threadNumber);
+        if (savedInstanceState == null) {
+            firstLoad = true;
+            load();
+        } else {
+            firstLoad = false;
+            thread = Parcels.unwrap(savedInstanceState.getParcelable(THREAD));
+        }
+
+        setTitle(thread.titleForGallery());
 
         galleryAdapter = new GalleryAdapter(clickListener, null);
         galleryView.setAdapter(galleryAdapter);
@@ -99,14 +96,15 @@ public class GalleryActivity extends SwipeRefreshActivity {
         galleryView.setItemAnimator(new DefaultItemAnimator());
         Util.calcDynamicSpanCountById(this, galleryView, glm, R.dimen.column_width_gallery);
 
-        if (savedInstanceState == null) load();
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // TODO: Ideally the thumbnails should explode in and out but I guess I need to
-            // use the begindelayedtransition trick from PostsActivity
             getWindow().setEnterTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_right));
             getWindow().setReturnTransition(TransitionInflater.from(this).inflateTransition(android.R.transition.slide_right));
         }
+    }
+
+    @Override protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable(THREAD, Parcels.wrap(thread));
     }
 
     // Callbacks ///////////////////////////////////////////////////////////////////////////////////
@@ -132,7 +130,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
                     }
                     MediaActivity.launch(
                             GalleryActivity.this, iv.image, iv.index + "", new Point(cx, cy), r, color,
-                            true, boardName, threadNumber, iv.index, mediaPointers
+                            true, thread, iv.index
                     );
                 }
             }, 200);
@@ -141,24 +139,67 @@ public class GalleryActivity extends SwipeRefreshActivity {
 
     // Data Loading ////////////////////////////////////////////////////////////////////////////////
 
-    @Override protected void load() {
+    public boolean firstLoad;
+
+    @Override protected void load() { load(false); }
+
+    private void load(final boolean silent) {
+        if (thread.dead) {
+            loaded();
+            if (!silent) showToast(R.string.no_thread);
+            return;
+        }
+
         super.load();
-        service.listPosts(this, boardName, threadNumber, new FutureCallback<List<Post>>() {
-            @Override public void onCompleted(Exception e, List<Post> result) {
-                if (e != null) {
-                    showToast(e.getMessage());
-                    System.out.println("" + e.getMessage());
-                    loaded();
-                    return;
+        if (silent || firstLoad) loadingBar.setVisibility(View.GONE);
+
+        // Indicate ongoing request after all if first load takes especially long
+        if (firstLoad) {
+            galleryView.postDelayed(new Runnable() {
+                @Override public void run() {
+                    if (firstLoad && loading) {
+                        loadingBar.setVisibility(View.VISIBLE);
+                    }
                 }
-                mediaPointers.clear();
-                for (Post p : result) { if (p.mediaId != null) {
-                    mediaPointers.add(new MediaPointer(p, p.mediaId, p.mediaExtension, p.mediaWidth, p.mediaHeight));
-                }}
+            }, 500);
+        }
+
+        thread.load(service, new Thread.OnResultCallback() {
+            @Override public void onSuccess() {
                 galleryAdapter.notifyDataSetChanged();
+                firstLoad = false;
+                loaded();
+            }
+
+            @Override public void onError(String message) {
+                if (!silent) showToast(message);
+                firstLoad = false;
                 loaded();
             }
         });
+
+        service.listThreads(this, boardName, new FutureCallback<List<ThreadPreview>>() {
+            @Override public void onCompleted(Exception e, List<ThreadPreview> result) {
+                if (e != null) return;
+                boolean dead = true;
+                for (ThreadPreview t : result) {
+                    if (t.number.equals(threadNumber)) {
+                        dead = false;
+                        break;
+                    }
+                }
+                if (dead) {
+                    thread.dead = true;
+                    setTitle(thread.titleForGallery());
+                }
+            }
+        });
+    }
+
+    private void update() {
+        if (loading) return;
+        thread.resetUpdateTimer();
+        load(true);
     }
 
     @Override protected void cancelPending() {
@@ -168,6 +209,25 @@ public class GalleryActivity extends SwipeRefreshActivity {
     }
 
     // Lifecycle ///////////////////////////////////////////////////////////////////////////////////
+
+    @Override protected void onResume() {
+        super.onResume();
+        thread.initBackgroundUpdater(prefs, new Runnable() {
+            @Override public void run() {
+                GalleryActivity.this.runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        update();
+                    }
+                });
+            }
+        });
+        thread.resumeBackgroundUpdating();
+    }
+
+    @Override protected void onStop() {
+        super.onStop();
+        thread.stopBackgroundUpdating();
+    }
 
     @Override public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
@@ -184,7 +244,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
     @Override public boolean onOptionsItemSelected(MenuItem item) {
         switch(item.getItemId()) {
             case R.id.saveAll:
-                saveAll(this, imageSaver, boardName, threadNumber, mediaPointers);
+                saveAll(this, imageSaver, boardName, threadNumber, thread.mediaPointers);
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -208,7 +268,7 @@ public class GalleryActivity extends SwipeRefreshActivity {
 
         public GalleryAdapter(View.OnClickListener clickListener, View.OnLongClickListener longClickListener) {
             super(GalleryActivity.this, clickListener, longClickListener);
-            this.items = mediaPointers;
+            this.items = thread.mediaPointers;
         }
 
         @Override public View newView(ViewGroup container) {

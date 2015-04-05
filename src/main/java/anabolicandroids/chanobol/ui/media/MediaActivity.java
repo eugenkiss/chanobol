@@ -37,8 +37,6 @@ import android.widget.ImageView;
 
 import org.parceler.Parcels;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import javax.inject.Inject;
@@ -81,11 +79,9 @@ public class MediaActivity extends UiActivity {
     private Thread thread;
     // Convenience
     private String boardName;
-    private String threadNumber;
 
     // Swipes
     private static String EXTRA_INDEX = "index";
-    private List<MediaPointer> mediaPointers;
     private int currentIndex;
 
     // To prevent transition glitches
@@ -120,19 +116,6 @@ public class MediaActivity extends UiActivity {
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
 
-    public static void launch(
-            Activity activity, View transitionView, String transitionName,
-            Point revealPoint, int revealStartRadius, int revealColor, boolean fromGallery,
-            String boardName, String threadNumber,
-            int index, ArrayList<MediaPointer> mediaPointers
-    ) {
-        Thread thread = new Thread(boardName, threadNumber);
-        thread.mediaPointers = mediaPointers;
-        launch(activity, transitionView, transitionName,
-               revealPoint, revealStartRadius, revealColor, fromGallery,
-               thread, index);
-    }
-
     @Inject ImageSaver imageSaver;
 
     @InjectView(R.id.revealbg) View background;
@@ -157,11 +140,9 @@ public class MediaActivity extends UiActivity {
         revealColor   = b.getInt(EXTRA_REVEALCOLOR);
         thread        = Parcels.unwrap(b.getParcelable(THREAD));
         boardName     = thread.boardName;
-        threadNumber  = thread.threadNumber;
         initialIndex  = b.getInt(EXTRA_INITIALINDEX);
         currentIndex  = b.getInt(EXTRA_INDEX);
         fromGallery   = b.getBoolean(EXTRA_FROM_GALLERY);
-        mediaPointers = thread.mediaPointers;
 
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
         ViewCompat.setTransitionName(imageViewForTransition, transitionName);
@@ -305,7 +286,7 @@ public class MediaActivity extends UiActivity {
             @Override public void onPageScrollStateChanged(int state) { }
             @Override public void onPageSelected(int position) {
                 currentIndex = position;
-                MediaPointer current = mediaPointers.get(currentIndex);
+                MediaPointer current = thread.mediaPointers.get(currentIndex);
                 MediaView currentView = pagerView(currentIndex);
                 currentView.prefs = prefs;
                 currentView.setTransitionNameForImageView(currentIndex+"");
@@ -328,7 +309,7 @@ public class MediaActivity extends UiActivity {
 
         // TODO: Get crash report here http://crashes.to/s/43716a0559b
         // Either mediaPointers or currentIndex can be null need to maybe think of a smooth handling of this situation
-        final MediaPointer current = mediaPointers.get(currentIndex);
+        final MediaPointer current = thread.mediaPointers.get(currentIndex);
         final MediaView currentView = pagerView(currentIndex);
         currentView.prefs = prefs;
         viewPager.postDelayed(new Runnable() {
@@ -481,7 +462,7 @@ public class MediaActivity extends UiActivity {
     }
 
     @Override public boolean onOptionsItemSelected(MenuItem item) {
-        MediaPointer current = mediaPointers.get(currentIndex);
+        MediaPointer current = thread.mediaPointers.get(currentIndex);
         String url = ApiModule.mediaUrl(boardName, current.id, current.ext);
         Intent intent;
         String path;
@@ -529,7 +510,7 @@ public class MediaActivity extends UiActivity {
                     // reason shared between activities in Lollipop... (if I don't set it to 255 it
                     // remains translucent in the next activity)
                     toolbar.getBackground().setAlpha(255);
-                    GalleryActivity.launch(this, boardName, threadNumber, mediaPointers);
+                    GalleryActivity.launch(this, thread);
                     ActivityCompat.finishAfterTransition(this);
                 }
                 break;
@@ -639,7 +620,7 @@ public class MediaActivity extends UiActivity {
         @Override public Object instantiateItem(ViewGroup container, int position) {
             MediaView mediaView = pagerView(position);
             mediaView.prefs = prefs;
-            MediaPointer current = mediaPointers.get(position);
+            MediaPointer current = thread.mediaPointers.get(position);
             mediaView.bindToPreview(boardName, current);
             if (container.indexOfChild(mediaView) != -1) container.removeView(mediaView);
             container.addView(mediaView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -653,8 +634,8 @@ public class MediaActivity extends UiActivity {
         }
 
         @Override public int getCount() {
-                if (mediaPointers == null) return 0;
-                return mediaPointers.size();
+                if (thread.mediaPointers == null) return 0;
+                return thread.mediaPointers.size();
         }
         @Override public boolean isViewFromObject(View view, Object object) { return view == object; }
     }

@@ -159,8 +159,6 @@ public class PostsActivity extends SwipeRefreshActivity {
         threadNumber = thread.threadNumber;
         Post opPost = thread.opPost();
 
-        setTitle(thread.title());
-
         if (opPost != null) {
             String thumbUrl = ApiModule.thumbUrl(boardName, opPost.mediaId);
             try {
@@ -187,6 +185,8 @@ public class PostsActivity extends SwipeRefreshActivity {
             previousStackHeight = savedInstanceState.getInt(PREVIOUS_STACK_HEIGHT);
             previousTitle = savedInstanceState.getString(PREVIOUS_TITLE);
         }
+
+        setTitle(thread.title());
 
         postsAdapter = new PostsAdapter();
         postsView.setAdapter(postsAdapter);
@@ -322,6 +322,8 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     // Data Loading ////////////////////////////////////////////////////////////////////////////////
 
+    public boolean firstLoad;
+
     @Override protected void load() { load(false); }
 
     private void load(final boolean silent) {
@@ -345,7 +347,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             }, 500);
         }
 
-        thread.load(service, new anabolicandroids.chanobol.api.data.Thread.OnResultCallback() {
+        thread.load(service, new Thread.OnResultCallback() {
             @Override public void onSuccess() {
                 if (prefs.preloadThumbnails()) {
                     for (MediaPointer mp : thread.mediaPointers)
@@ -474,7 +476,7 @@ public class PostsActivity extends SwipeRefreshActivity {
                 load();
                 break;
             case R.id.gallery:
-                GalleryActivity.launch(this, boardName, threadNumber, thread.mediaPointers);
+                GalleryActivity.launch(this, thread);
                 break;
             case R.id.close:
                 dismissAllPostsDialogs();
@@ -627,8 +629,6 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     // Animations //////////////////////////////////////////////////////////////////////////////////
-
-    public boolean firstLoad;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP) private void animatePostsArrival() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

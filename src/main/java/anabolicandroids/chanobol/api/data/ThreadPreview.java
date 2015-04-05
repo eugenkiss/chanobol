@@ -42,6 +42,12 @@ public class ThreadPreview extends Common {
         return gson.fromJson(gson.toJson(this), type);
     }
 
+    public Thread toThread() {
+        Thread thread = new Thread(board, number);
+        thread.posts.add(toOpPost());
+        return thread;
+    }
+
     // From Clover
     public static String generateTitle(Board board, ThreadPreview threadPreview) {
         return generateTitle(board, threadPreview, 100);

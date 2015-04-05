@@ -62,7 +62,7 @@ public class Thread {
         return posts.get(0);
     }
 
-    public String title(boolean gallery) {
+    private String title(boolean gallery) {
         Post op = opPost();
         if (op == null) return id;
         String title = "";
@@ -77,9 +77,8 @@ public class Thread {
         if (dead) title = "☠ " + title;
         return title;
     }
-    public String title() {
-        return title(false);
-    }
+    public String title() { return title(false); }
+    public String titleForGallery() { return title(true); }
 
     public static interface OnResultCallback {
         public void onSuccess();

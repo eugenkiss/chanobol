@@ -35,7 +35,6 @@ import java.util.concurrent.TimeUnit;
 
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.data.Board;
-import anabolicandroids.chanobol.api.data.MediaPointer;
 import anabolicandroids.chanobol.api.data.Thread;
 import anabolicandroids.chanobol.api.data.ThreadPreview;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
@@ -205,9 +204,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             pauseUpdating = true;
             // TODO: Shared element animation
             pauseUpdating = true; // To prevent update during transition
-            GalleryActivity.launch(
-                    ThreadsActivity.this, threadPreview.board, threadPreview.number, new ArrayList<MediaPointer>()
-            );
+            GalleryActivity.launch(ThreadsActivity.this, threadPreview.toThread());
             return true;
         }
     };
