@@ -109,7 +109,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             // Get some crash reports for this: http://crashes.to/s/9eae4cc77a6
             // TODO: Add test for situation if provided board is null
             showToast("Could not load board");
-            Util.restartApp(app, this);
+            finish();
             return;
         }
 
