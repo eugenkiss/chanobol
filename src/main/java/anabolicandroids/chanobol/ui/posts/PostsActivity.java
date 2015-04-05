@@ -75,7 +75,7 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     // Essential state
     private static String EXTRA_ROOT = "root";
-    private static String THREAD_MANAGER = "threadManager";
+    private static String THREAD = "thread";
     private Thread thread;
 
     // Internal state
@@ -110,7 +110,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         Intent intent = new Intent(activity, PostsActivity.class);
         intent.putExtra(EXTRA_TRANSITIONNAME, transitionName);
         intent.putExtra(EXTRA_ROOT, root);
-        intent.putExtra(THREAD_MANAGER, Parcels.wrap(thread));
+        intent.putExtra(THREAD, Parcels.wrap(thread));
         if (root) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             activity.startActivity(intent);
@@ -152,7 +152,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         super.onCreate(savedInstanceState);
 
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
-        thread = Parcels.unwrap(b.getParcelable(THREAD_MANAGER));
+        thread = Parcels.unwrap(b.getParcelable(THREAD));
         boolean inWatchlist = persistentData.isInWatchlist(thread.id);
         if (inWatchlist) thread = persistentData.getWatchlistThread(thread.id);
         boardName = thread.boardName;
@@ -180,7 +180,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             bitmapCacheKeys = new ArrayList<>();
         } else {
             firstLoad = false;
-            thread = Parcels.unwrap(savedInstanceState.getParcelable(THREAD_MANAGER));
+            thread = Parcels.unwrap(savedInstanceState.getParcelable(THREAD));
             bitmapCacheKeys = Parcels.unwrap(savedInstanceState.getParcelable(BITMAP_CACHE_KEYS));
 
             previousToolbarPosition = savedInstanceState.getFloat(PREVIOUS_TOOLBAR_POSITION);
@@ -231,7 +231,7 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     @Override protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable(THREAD_MANAGER, Parcels.wrap(thread));
+        outState.putParcelable(THREAD, Parcels.wrap(thread));
         outState.putParcelable(BITMAP_CACHE_KEYS, Parcels.wrap(bitmapCacheKeys));
 
         outState.putString(PREVIOUS_TITLE, previousTitle);
@@ -292,7 +292,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             int color = post.thumbMutedColor != -1 ? post.thumbMutedColor : getResources().getColor(R.color.colorPrimaryDark);
             MediaActivity.launch(
                     PostsActivity.this, iv, uuid, new Point(cx, cy), r, color, false,
-                    boardName, threadNumber, thread.mediaMap.get(post.number), thread.mediaPointers
+                    thread, thread.mediaMap.get(post.number)
             );
         }
     };

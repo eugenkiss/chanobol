@@ -46,6 +46,7 @@ import javax.inject.Inject;
 import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.MediaPointer;
+import anabolicandroids.chanobol.api.data.Thread;
 import anabolicandroids.chanobol.ui.scaffolding.UiActivity;
 import anabolicandroids.chanobol.util.HackyViewPager;
 import anabolicandroids.chanobol.util.ImageSaver;
@@ -70,18 +71,19 @@ public class MediaActivity extends UiActivity {
     private String transitionName;
     private Point revealPoint;
     private int revealRadius;
+    @SuppressWarnings("FieldCanBeLocal")
     private int revealColor;
     private boolean fromGallery;
     private int initialIndex;
 
     // Needed to form a valid request to 4Chan
-    private static String EXTRA_BOARDNAME = "boardName";
-    private static String EXTRA_THREADNUMBER = "threadNumber";
+    private static String THREAD = "thread";
+    private Thread thread;
+    // Convenience
     private String boardName;
     private String threadNumber;
 
     // Swipes
-    private static String EXTRA_IMAGEPOINTERS = "imagePointers";
     private static String EXTRA_INDEX = "index";
     private List<MediaPointer> mediaPointers;
     private int currentIndex;
@@ -95,8 +97,7 @@ public class MediaActivity extends UiActivity {
     public static void launch(
             Activity activity, View transitionView, String transitionName,
             Point revealPoint, int revealStartRadius, int revealColor, boolean fromGallery,
-            String boardName, String threadNumber,
-            int index, ArrayList<MediaPointer> mediaPointers
+            Thread thread, int index
     ) {
         ViewCompat.setTransitionName(transitionView, transitionName);
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity,
@@ -113,12 +114,23 @@ public class MediaActivity extends UiActivity {
         intent.putExtra(EXTRA_REVEALRADIUS, revealStartRadius);
         intent.putExtra(EXTRA_REVEALCOLOR, revealColor);
         intent.putExtra(EXTRA_FROM_GALLERY, fromGallery);
-        intent.putExtra(EXTRA_BOARDNAME, boardName);
-        intent.putExtra(EXTRA_THREADNUMBER, threadNumber);
         intent.putExtra(EXTRA_INITIALINDEX, index);
         intent.putExtra(EXTRA_INDEX, index);
-        intent.putExtra(EXTRA_IMAGEPOINTERS, Parcels.wrap(mediaPointers));
+        intent.putExtra(THREAD, Parcels.wrap(thread));
         ActivityCompat.startActivity(activity, intent, options.toBundle());
+    }
+
+    public static void launch(
+            Activity activity, View transitionView, String transitionName,
+            Point revealPoint, int revealStartRadius, int revealColor, boolean fromGallery,
+            String boardName, String threadNumber,
+            int index, ArrayList<MediaPointer> mediaPointers
+    ) {
+        Thread thread = new Thread(boardName, threadNumber);
+        thread.mediaPointers = mediaPointers;
+        launch(activity, transitionView, transitionName,
+               revealPoint, revealStartRadius, revealColor, fromGallery,
+               thread, index);
     }
 
     @Inject ImageSaver imageSaver;
@@ -143,18 +155,25 @@ public class MediaActivity extends UiActivity {
         revealPoint   = b.getParcelable(EXTRA_REVEALPOINT);
         revealRadius  = b.getInt(EXTRA_REVEALRADIUS) / 2;
         revealColor   = b.getInt(EXTRA_REVEALCOLOR);
-        boardName     = b.getString(EXTRA_BOARDNAME);
-        threadNumber  = b.getString(EXTRA_THREADNUMBER);
+        thread        = Parcels.unwrap(b.getParcelable(THREAD));
+        boardName     = thread.boardName;
+        threadNumber  = thread.threadNumber;
         initialIndex  = b.getInt(EXTRA_INITIALINDEX);
         currentIndex  = b.getInt(EXTRA_INDEX);
         fromGallery   = b.getBoolean(EXTRA_FROM_GALLERY);
-        mediaPointers = Parcels.unwrap(b.getParcelable(EXTRA_IMAGEPOINTERS));
+        mediaPointers = thread.mediaPointers;
 
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
         ViewCompat.setTransitionName(imageViewForTransition, transitionName);
         imageViewForTransition.setImageBitmap(transitionBitmap);
-        if (prefs.theme().isLightTheme)
-            background.setBackgroundColor(revealColor);
+        if (prefs.theme().isLightTheme) background.setBackgroundColor(revealColor);
+
+        if (savedInstanceState == null) {
+
+        } else {
+            thread = Parcels.unwrap(savedInstanceState.getParcelable(THREAD));
+            currentIndex = savedInstanceState.getInt(EXTRA_INDEX);
+        }
 
         setupViewPager();
 
@@ -264,6 +283,7 @@ public class MediaActivity extends UiActivity {
     @Override protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(EXTRA_INDEX, currentIndex);
+        outState.putParcelable(THREAD, Parcels.wrap(thread));
         // TODO: save photoattacher state (zoom etc.)
     }
 
