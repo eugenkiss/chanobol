@@ -263,7 +263,7 @@ public abstract class UiActivity extends BaseActivity {
                 drawerLayout.closeDrawers();
                 view.postDelayed(new Runnable() {
                     @Override public void run() {
-                        PostsActivity.launchFromWatchlist(UiActivity.this, thread);
+                        PostsActivity.launchFromNavbarWatchlist(UiActivity.this, thread);
                     }
                 }, RIPPLE_DELAY());
             }

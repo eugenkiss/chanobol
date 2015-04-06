@@ -91,7 +91,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     private static void launch(
             Class activityClass, Activity callerActivity,
             View transitionView, String transitionName,
-            Thread thread, boolean root
+            Thread thread, boolean fromNavbarWatchlist
     ) {
         if (callerActivity instanceof PostsActivity) {
             // Special case: Thread was opened from catalog, is scrolled and reopened from
@@ -110,10 +110,10 @@ public class PostsActivity extends SwipeRefreshActivity {
         );
         Intent intent = new Intent(callerActivity, activityClass);
         intent.putExtra(EXTRA_TRANSITIONNAME, transitionName);
-        intent.putExtra(EXTRA_ROOT, root);
+        intent.putExtra(EXTRA_ROOT, fromNavbarWatchlist);
         intent.putExtra(THREAD, Parcels.wrap(thread));
-        if (root) {
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        if (fromNavbarWatchlist) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             callerActivity.startActivity(intent);
         } else {
             ActivityCompat.startActivity(callerActivity, intent, options.toBundle());
@@ -133,7 +133,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         launch(activity, transitionView, transitionName, thread);
     }
 
-    public static void launchFromWatchlist(Activity activity, Thread thread) {
+    public static void launchFromNavbarWatchlist(Activity activity, Thread thread) {
         launch(WatchlistPostsActivity.class, activity, null, null, thread, true);
     }
 
