@@ -1,5 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <ListPreference
+        android:key="pref_theme"
+        android:title="Theme"
+        android:dialogTitle="Choose Theme"
+        android:entries="@array/Themes"
+        android:entryValues="@array/Themes"
+        android:defaultValue="light"
+        android:summary="Needs Restart"
+        />
+    <ListPreference
+        android:key="pref_thread_sort_order"
+        android:title="Thread Sort Order"
+        android:dialogTitle="Choose Order"
+        android:entries="@array/sort_names"
+        android:entryValues="@array/sort_keys"
+        android:defaultValue="bump"
+        />
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_hidable_toolbar"
@@ -19,23 +36,6 @@
         android:defaultValue="true"
         android:key="pref_refresh"
         android:title="Background Refresh"
-        />
-    <ListPreference
-        android:key="pref_theme"
-        android:title="Theme"
-        android:dialogTitle="Choose Theme"
-        android:entries="@array/Themes"
-        android:entryValues="@array/Themes"
-        android:defaultValue="light"
-        android:summary="Needs Restart"
-        />
-    <ListPreference
-        android:key="pref_thread_sort_order"
-        android:title="Thread Sort Order"
-        android:dialogTitle="Choose Order"
-        android:entries="@array/sort_names"
-        android:entryValues="@array/sort_keys"
-        android:defaultValue="bump"
         />
     <CheckBoxPreference
         android:defaultValue="false"
