@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.ui.scaffolding;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
@@ -108,9 +109,10 @@ import anabolicandroids.chanobol.api.data.Thread;
 
     ArrayList<WatchlistCallback> watchlistCallbacks = new ArrayList<>();
 
+    @SuppressLint("CommitPrefEdits")
     private void saveWatchlist(Set<WatchlistEntry> watchlist) {
         String jsonWatchlist = gson.toJson(watchlist);
-        prefs.edit().putString(watchlistId, jsonWatchlist).apply();
+        prefs.edit().putString(watchlistId, jsonWatchlist).commit();
         for (WatchlistCallback cb : watchlistCallbacks) {
             cb.onChanged(watchlist);
         }
@@ -156,7 +158,10 @@ import anabolicandroids.chanobol.api.data.Thread;
 
     public Thread getWatchlistThread(String id) {
         String jsonThread = readFromInternalFile(id);
-        return gson.fromJson(jsonThread, anabolicandroids.chanobol.api.data.Thread.class);
+        Thread thread = gson.fromJson(jsonThread, Thread.class);
+        // Remove it if it wasn't saved correctly (need ORM solution...)
+        if (thread == null) removeWatchlistThread(new WatchlistEntry(id));
+        return thread;
     }
 
     public void addWatchlistChangedCallback(WatchlistCallback callback) {

@@ -36,7 +36,17 @@
             android:configChanges="keyboardHidden|orientation|screenSize"
             />
         <activity
+            android:name=".ui.threads.WatchlistThreadsActivity"
+            android:taskAffinity=".watchlist"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
             android:name=".ui.posts.PostsActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            />
+        <activity
+            android:name=".ui.posts.WatchlistPostsActivity"
+            android:taskAffinity=".watchlist"
             android:configChanges="keyboardHidden|orientation|screenSize"
             />
         <activity

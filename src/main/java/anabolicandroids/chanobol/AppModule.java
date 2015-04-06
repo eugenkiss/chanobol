@@ -32,9 +32,11 @@ import anabolicandroids.chanobol.ui.media.GalleryActivity;
 import anabolicandroids.chanobol.ui.media.MediaActivity;
 import anabolicandroids.chanobol.ui.posts.PostsActivity;
 import anabolicandroids.chanobol.ui.posts.PostsDialog;
+import anabolicandroids.chanobol.ui.posts.WatchlistPostsActivity;
 import anabolicandroids.chanobol.ui.scaffolding.PersistentData;
 import anabolicandroids.chanobol.ui.scaffolding.Prefs;
 import anabolicandroids.chanobol.ui.threads.ThreadsActivity;
+import anabolicandroids.chanobol.ui.threads.WatchlistThreadsActivity;
 import anabolicandroids.chanobol.util.FileCache;
 import anabolicandroids.chanobol.util.ImageSaver;
 import anabolicandroids.chanobol.util.Util;
@@ -49,7 +51,9 @@ import dagger.Provides;
                 BoardsActivity.class,
                 FavoritesActivity.class,
                 ThreadsActivity.class,
+                WatchlistThreadsActivity.class,
                 PostsActivity.class,
+                WatchlistPostsActivity.class,
                 PostsDialog.class,
                 MediaActivity.class,
                 GalleryActivity.class,

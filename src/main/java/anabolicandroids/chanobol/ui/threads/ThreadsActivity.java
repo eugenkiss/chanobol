@@ -74,18 +74,19 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     // update is finished. I tried many other approaches but this is the only one that worked.
     private HashMap<String, Bitmap> bitMap;
 
-    private static void launch(Activity activity, Board board, boolean isWatchlist) {
-        Intent intent = new Intent(activity, ThreadsActivity.class);
+    private static void launch(Class activityClass, Activity callerActivity, Board board, boolean isWatchlist) {
+        Intent intent = new Intent(callerActivity, activityClass);
         if (board != null) intent.putExtra(EXTRA_BOARD, Parcels.wrap(board));
         intent.putExtra(EXTRA_IS_WATCHLIST, isWatchlist);
+        if (isWatchlist) intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        activity.startActivity(intent);
+        callerActivity.startActivity(intent);
     }
     public static void launch(Activity activity, Board board) {
-        launch(activity, board, false);
+        launch(ThreadsActivity.class, activity, board, false);
     }
     public static void launchForWatchlist(Activity activity) {
-        launch(activity, null, true);
+        launch(WatchlistThreadsActivity.class, activity, null, true);
     }
 
     @InjectView(R.id.threads) RecyclerView threadsView;
@@ -94,16 +95,16 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     @Override protected RecyclerView getRootRecyclerView() { return threadsView; }
 
     @Override protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
         Bundle b = getIntent().getExtras();
         watchlist = b.getBoolean(EXTRA_IS_WATCHLIST);
         if (watchlist) board = null;
         else board = Parcels.unwrap(b.getParcelable(EXTRA_BOARD));
+        taskRoot = watchlist;
+
+        super.onCreate(savedInstanceState);
 
         if (!watchlist && (board == null || board.name == null)) {
             // Get some crash reports for this: http://crashes.to/s/9eae4cc77a6
-            // TODO: Add test for situation if provided board is null
             showToast("Could not load board");
             finish();
             return;
@@ -154,6 +155,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         int i = 0;
         for (PersistentData.WatchlistEntry e : watchlistEntries) {
             Thread t = persistentData.getWatchlistThread(e.id);
+            if (t == null || t.opPost() == null) continue;
             ThreadPreview p = t.opPost().toThreadPreview();
             p.dead = t.dead;
             threadPreviews.add(p);

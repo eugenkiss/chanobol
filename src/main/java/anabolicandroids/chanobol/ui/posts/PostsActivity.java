@@ -88,14 +88,15 @@ public class PostsActivity extends SwipeRefreshActivity {
     private String threadNumber;
     private LinearLayoutManager layoutManager;
 
-    public static void launch(
-            Activity activity, View transitionView, String transitionName,
+    private static void launch(
+            Class activityClass, Activity callerActivity,
+            View transitionView, String transitionName,
             Thread thread, boolean root
     ) {
-        if (activity instanceof PostsActivity) {
+        if (callerActivity instanceof PostsActivity) {
             // Special case: Thread was opened from catalog, is scrolled and reopened from
             // watchlist in nav drawer. Then the scroll position should be remembered correctly.
-            PostsActivity pa = (PostsActivity) activity;
+            PostsActivity pa = (PostsActivity) callerActivity;
             if (thread.id.equals(pa.thread.id)) {
                 pa.persistPositionMaybe();
             }
@@ -104,26 +105,24 @@ public class PostsActivity extends SwipeRefreshActivity {
         // Must not be null or there will be glitches with the first PostView!
         if (transitionName == null) transitionName = "not null";
         if (transitionView != null) ViewCompat.setTransitionName(transitionView, transitionName);
-        ActivityOptionsCompat options = makeSceneTransitionAnimation(activity,
+        ActivityOptionsCompat options = makeSceneTransitionAnimation(callerActivity,
                 Pair.create(transitionView, transitionName)
         );
-        Intent intent = new Intent(activity, PostsActivity.class);
+        Intent intent = new Intent(callerActivity, activityClass);
         intent.putExtra(EXTRA_TRANSITIONNAME, transitionName);
         intent.putExtra(EXTRA_ROOT, root);
         intent.putExtra(THREAD, Parcels.wrap(thread));
         if (root) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-            activity.startActivity(intent);
-            activity.finish();
+            callerActivity.startActivity(intent);
         } else {
-            ActivityCompat.startActivity(activity, intent, options.toBundle());
+            ActivityCompat.startActivity(callerActivity, intent, options.toBundle());
         }
     }
 
-    public static void launch(
-            Activity activity, View transitionView, String transitionName,
-            Thread thread
-    ) { launch(activity, transitionView, transitionName, thread, false); }
+    public static void launch(Activity activity, View transitionView, String transitionName, Thread thread) {
+        launch(PostsActivity.class, activity, transitionView, transitionName, thread, false);
+    }
 
     public static void launch(
             Activity activity, View transitionView, String transitionName,
@@ -135,7 +134,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     public static void launchFromWatchlist(Activity activity, Thread thread) {
-        launch(activity, null, null, thread, true);
+        launch(WatchlistPostsActivity.class, activity, null, null, thread, true);
     }
 
     @Inject ImageSaver imageSaver;
@@ -154,7 +153,10 @@ public class PostsActivity extends SwipeRefreshActivity {
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
         thread = Parcels.unwrap(b.getParcelable(THREAD));
         boolean inWatchlist = persistentData.isInWatchlist(thread.id);
-        if (inWatchlist) thread = persistentData.getWatchlistThread(thread.id);
+        if (inWatchlist) {
+            Thread watchlistThread = persistentData.getWatchlistThread(thread.id);
+            if (watchlistThread != null) thread = watchlistThread;
+        }
         boardName = thread.boardName;
         threadNumber = thread.threadNumber;
         Post opPost = thread.opPost();

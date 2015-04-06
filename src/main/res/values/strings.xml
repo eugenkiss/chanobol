@@ -7,6 +7,7 @@
     <string name="view_video">View Video with</string>
     <string name="share_image">Share Image</string>
     <string name="share_video">Share Video</string>
+    <string name="watchtask">Chanobol – Watchtask</string>
     <!-- Screens -->
     <string name="replies_to">Replies to</string>
     <string name="quoted_by">Quoted by</string>
@@ -58,6 +59,7 @@
     <string name="no_thread">Thread is dead</string>
     <string name="image_saved_to_gallery">Image saved to gallery</string>
     <string name="copied_text">Copied text to clipboard</string>
+    <string name="corrupted_thread">Corrupted thread! Has been removed.</string>
     <!-- Threads -->
     <string name="sort_bump">Bump order</string>
     <string name="sort_replies">Reply count</string>

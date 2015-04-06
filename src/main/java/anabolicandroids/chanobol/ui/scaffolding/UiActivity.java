@@ -52,11 +52,14 @@ import anabolicandroids.chanobol.annotations.ForApplication;
 import anabolicandroids.chanobol.annotations.SfwMode;
 import anabolicandroids.chanobol.api.ChanService;
 import anabolicandroids.chanobol.api.data.Board;
+import anabolicandroids.chanobol.api.data.Thread;
 import anabolicandroids.chanobol.ui.Settings;
 import anabolicandroids.chanobol.ui.boards.BoardsActivity;
 import anabolicandroids.chanobol.ui.boards.FavoritesActivity;
 import anabolicandroids.chanobol.ui.posts.PostsActivity;
+import anabolicandroids.chanobol.ui.posts.WatchlistPostsActivity;
 import anabolicandroids.chanobol.ui.threads.ThreadsActivity;
+import anabolicandroids.chanobol.ui.threads.WatchlistThreadsActivity;
 import anabolicandroids.chanobol.util.BaseActivity;
 import anabolicandroids.chanobol.util.BindableAdapter;
 import anabolicandroids.chanobol.util.Util;
@@ -253,8 +256,17 @@ public abstract class UiActivity extends BaseActivity {
     private AdapterView.OnItemClickListener watchlistClickCallback = new AdapterView.OnItemClickListener() {
         @Override public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             PersistentData.WatchlistEntry entry = watchlistAdapter.getItem(position);
-            anabolicandroids.chanobol.api.data.Thread thread = persistentData.getWatchlistThread(entry.id);
-            PostsActivity.launchFromWatchlist(UiActivity.this, thread);
+            final Thread thread = persistentData.getWatchlistThread(entry.id);
+            if (thread == null) {
+                showToast(R.string.corrupted_thread);
+            } else {
+                drawerLayout.closeDrawers();
+                view.postDelayed(new Runnable() {
+                    @Override public void run() {
+                        PostsActivity.launchFromWatchlist(UiActivity.this, thread);
+                    }
+                }, RIPPLE_DELAY());
+            }
         }
     };
     private AdapterView.OnItemLongClickListener watchlistLongClickCallback = new AdapterView.OnItemLongClickListener() {
@@ -288,7 +300,12 @@ public abstract class UiActivity extends BaseActivity {
     }
 
     @OnClick(R.id.watchlistBtn) void onWatchlist() {
-        ThreadsActivity.launchForWatchlist(this);
+        drawerLayout.closeDrawers();
+        favoriteBoardsView.postDelayed(new Runnable() {
+            @Override public void run() {
+                ThreadsActivity.launchForWatchlist(UiActivity.this);
+            }
+        }, RIPPLE_DELAY());
     }
 
     @OnClick(R.id.settings) void onSettings() {
@@ -320,6 +337,8 @@ public abstract class UiActivity extends BaseActivity {
         if (drawerLayout.isDrawerOpen(drawer)) {
             drawerLayout.closeDrawers();
         } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+            super.onBackPressed();
+        } else if (this instanceof WatchlistThreadsActivity || this instanceof WatchlistPostsActivity) {
             super.onBackPressed();
         } else if (isTaskRoot() || taskRoot) {
             new AlertDialog.Builder(this)
