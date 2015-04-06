@@ -122,7 +122,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         }
 
         if (watchlist) setTitle(getResources().getString(R.string.watchlist));
-        else setTitle(board.name);
+        else setTitle(board.name + " – " + board.title);
 
         sortOrder = prefs.threadSortOrder();
         sortedThreadPreviews = new ArrayList<>();
