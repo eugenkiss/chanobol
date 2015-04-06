@@ -263,7 +263,7 @@ public abstract class UiActivity extends BaseActivity {
                 drawerLayout.closeDrawers();
                 view.postDelayed(new Runnable() {
                     @Override public void run() {
-                        PostsActivity.launchFromNavbarWatchlist(UiActivity.this, thread);
+                        PostsActivity.launchFromNavbarWatchlist(UiActivity.this, thread, prefs.excludeWatchtaskRecents());
                     }
                 }, RIPPLE_DELAY());
             }
@@ -303,7 +303,7 @@ public abstract class UiActivity extends BaseActivity {
         drawerLayout.closeDrawers();
         favoriteBoardsView.postDelayed(new Runnable() {
             @Override public void run() {
-                ThreadsActivity.launchForWatchlist(UiActivity.this);
+                ThreadsActivity.launchForWatchlist(UiActivity.this, prefs.excludeWatchtaskRecents());
             }
         }, RIPPLE_DELAY());
     }

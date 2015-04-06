@@ -74,19 +74,20 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     // update is finished. I tried many other approaches but this is the only one that worked.
     private HashMap<String, Bitmap> bitMap;
 
-    private static void launch(Class activityClass, Activity callerActivity, Board board, boolean isWatchlist) {
+    private static void launch(Class activityClass, Activity callerActivity, Board board, boolean isWatchlist, boolean excludeFromRecents) {
         Intent intent = new Intent(callerActivity, activityClass);
         if (board != null) intent.putExtra(EXTRA_BOARD, Parcels.wrap(board));
         intent.putExtra(EXTRA_IS_WATCHLIST, isWatchlist);
         if (isWatchlist) intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        if (excludeFromRecents) intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         callerActivity.startActivity(intent);
     }
     public static void launch(Activity activity, Board board) {
-        launch(ThreadsActivity.class, activity, board, false);
+        launch(ThreadsActivity.class, activity, board, false, false);
     }
-    public static void launchForWatchlist(Activity activity) {
-        launch(WatchlistThreadsActivity.class, activity, null, true);
+    public static void launchForWatchlist(Activity activity, boolean excludeFromRecents) {
+        launch(WatchlistThreadsActivity.class, activity, null, true, excludeFromRecents);
     }
 
     @InjectView(R.id.threads) RecyclerView threadsView;

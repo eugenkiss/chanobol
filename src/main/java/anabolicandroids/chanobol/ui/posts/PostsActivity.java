@@ -91,7 +91,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     private static void launch(
             Class activityClass, Activity callerActivity,
             View transitionView, String transitionName,
-            Thread thread, boolean fromNavbarWatchlist
+            Thread thread, boolean fromNavbarWatchlist, boolean excludeFromRecents
     ) {
         if (callerActivity instanceof PostsActivity) {
             // Special case: Thread was opened from catalog, is scrolled and reopened from
@@ -112,6 +112,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         intent.putExtra(EXTRA_TRANSITIONNAME, transitionName);
         intent.putExtra(EXTRA_ROOT, fromNavbarWatchlist);
         intent.putExtra(THREAD, Parcels.wrap(thread));
+        if (excludeFromRecents) intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         if (fromNavbarWatchlist) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             callerActivity.startActivity(intent);
@@ -121,7 +122,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     public static void launch(Activity activity, View transitionView, String transitionName, Thread thread) {
-        launch(PostsActivity.class, activity, transitionView, transitionName, thread, false);
+        launch(PostsActivity.class, activity, transitionView, transitionName, thread, false, false);
     }
 
     public static void launch(
@@ -133,8 +134,8 @@ public class PostsActivity extends SwipeRefreshActivity {
         launch(activity, transitionView, transitionName, thread);
     }
 
-    public static void launchFromNavbarWatchlist(Activity activity, Thread thread) {
-        launch(WatchlistPostsActivity.class, activity, null, null, thread, true);
+    public static void launchFromNavbarWatchlist(Activity activity, Thread thread, boolean excludeFromRecents) {
+        launch(WatchlistPostsActivity.class, activity, null, null, thread, true, excludeFromRecents);
     }
 
     @Inject ImageSaver imageSaver;

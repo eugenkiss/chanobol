@@ -103,4 +103,12 @@ public class Prefs {
         p.edit().putBoolean(IMMERSIVE_MODE, v).apply();
     }
 
+    public static final String WATCHTASK_RECENTS = "pref_watchtask_recents";
+    public boolean excludeWatchtaskRecents() {
+        return p.getBoolean(WATCHTASK_RECENTS, true);
+    }
+    public void excludeWatchtaskRecents(boolean v) {
+        p.edit().putBoolean(WATCHTASK_RECENTS, v).apply();
+    }
+
 }
