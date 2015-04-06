@@ -158,10 +158,7 @@ import anabolicandroids.chanobol.api.data.Thread;
 
     public Thread getWatchlistThread(String id) {
         String jsonThread = readFromInternalFile(id);
-        Thread thread = gson.fromJson(jsonThread, Thread.class);
-        // Remove it if it wasn't saved correctly (need ORM solution...)
-        if (thread == null) removeWatchlistThread(new WatchlistEntry(id));
-        return thread;
+        return gson.fromJson(jsonThread, Thread.class);
     }
 
     public void addWatchlistChangedCallback(WatchlistCallback callback) {
