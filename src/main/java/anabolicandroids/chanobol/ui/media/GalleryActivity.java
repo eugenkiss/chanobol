@@ -45,6 +45,10 @@ public class GalleryActivity extends SwipeRefreshActivity {
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 
+    private static Thread threadTransfer;
+    // backup
+    private static String EXTRA_THREAD = "thread";
+
     private static String THREAD = "thread";
     private Thread thread;
     // Convenience
@@ -56,7 +60,8 @@ public class GalleryActivity extends SwipeRefreshActivity {
     public static void launch(Activity activity, Thread thread) {
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity);
         Intent intent = new Intent(activity, GalleryActivity.class);
-        intent.putExtra(THREAD, Parcels.wrap(thread));
+        intent.putExtra(EXTRA_THREAD, Parcels.wrap(new Thread(thread.boardName, thread.threadNumber)));
+        threadTransfer = thread;
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
 
@@ -74,7 +79,13 @@ public class GalleryActivity extends SwipeRefreshActivity {
         getWindow().setBackgroundDrawableResource(R.color.transparent);
 
         Bundle b = getIntent().getExtras();
-        thread = Parcels.unwrap(b.getParcelable(THREAD));
+
+        // Ugly quick fix (transaction too large)
+        thread = Parcels.unwrap(b.getParcelable(EXTRA_THREAD));
+        if (threadTransfer != null && threadTransfer.threadNumber.equals(thread.threadNumber))
+            thread = threadTransfer;
+        threadTransfer = null;
+
         boardName = thread.boardName;
         threadNumber = thread.threadNumber;
 

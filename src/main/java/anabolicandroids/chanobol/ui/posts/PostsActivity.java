@@ -68,6 +68,10 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 
+    private static Thread threadTransfer;
+    // backup
+    private static final String EXTRA_THREAD = "thread";
+
     // Transition related
     private static String EXTRA_TRANSITIONNAME = "transitionName";
     private String transitionName;
@@ -111,7 +115,8 @@ public class PostsActivity extends SwipeRefreshActivity {
         Intent intent = new Intent(callerActivity, activityClass);
         intent.putExtra(EXTRA_TRANSITIONNAME, transitionName);
         intent.putExtra(EXTRA_ROOT, fromNavbarWatchlist);
-        intent.putExtra(THREAD, Parcels.wrap(thread));
+        intent.putExtra(EXTRA_THREAD, Parcels.wrap(new Thread(thread.boardName, thread.threadNumber)));
+        threadTransfer = thread;
         if (excludeFromRecents) intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         if (fromNavbarWatchlist) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -152,7 +157,13 @@ public class PostsActivity extends SwipeRefreshActivity {
         super.onCreate(savedInstanceState);
 
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
-        thread = Parcels.unwrap(b.getParcelable(THREAD));
+
+        // Ugly quick fix (transaction too large)
+        thread = Parcels.unwrap(b.getParcelable(EXTRA_THREAD));
+        if (threadTransfer != null && threadTransfer.threadNumber.equals(thread.threadNumber))
+            thread = threadTransfer;
+        threadTransfer = null;
+
         boolean inWatchlist = persistentData.isInWatchlist(thread.id);
         if (inWatchlist) {
             Thread watchlistThread = persistentData.getWatchlistThread(thread.id);

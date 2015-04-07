@@ -58,6 +58,10 @@ public class MediaActivity extends UiActivity {
 
     // Construction ////////////////////////////////////////////////////////////////////////////////
 
+    private static Thread threadTransfer;
+    // backup
+    private static String EXTRA_THREAD = "thread";
+
     // Transition related
     public static Bitmap transitionBitmap;
     private static String EXTRA_TRANSITIONNAME = "transitionName";
@@ -112,7 +116,10 @@ public class MediaActivity extends UiActivity {
         intent.putExtra(EXTRA_FROM_GALLERY, fromGallery);
         intent.putExtra(EXTRA_INITIALINDEX, index);
         intent.putExtra(EXTRA_INDEX, index);
-        intent.putExtra(THREAD, Parcels.wrap(thread));
+        intent.putExtra(EXTRA_THREAD, Parcels.wrap(new Thread(thread.boardName, thread.threadNumber)));
+        threadTransfer = thread;
+        //intent.putExtra(THREAD, Parcels.wrap(thread));
+
         ActivityCompat.startActivity(activity, intent, options.toBundle());
     }
 
@@ -138,7 +145,13 @@ public class MediaActivity extends UiActivity {
         revealPoint   = b.getParcelable(EXTRA_REVEALPOINT);
         revealRadius  = b.getInt(EXTRA_REVEALRADIUS) / 2;
         revealColor   = b.getInt(EXTRA_REVEALCOLOR);
-        thread        = Parcels.unwrap(b.getParcelable(THREAD));
+
+        // Ugly quick fix (transaction too large)
+        thread = Parcels.unwrap(b.getParcelable(EXTRA_THREAD));
+        if (threadTransfer != null && threadTransfer.threadNumber.equals(thread.threadNumber))
+            thread = threadTransfer;
+        threadTransfer = null;
+
         boardName     = thread.boardName;
         initialIndex  = b.getInt(EXTRA_INITIALINDEX);
         currentIndex  = b.getInt(EXTRA_INDEX);
