@@ -149,7 +149,11 @@ public class MediaActivity extends UiActivity {
         // Ugly quick fix (transaction too large)
         thread = Parcels.unwrap(b.getParcelable(EXTRA_THREAD));
         if (threadTransfer != null && threadTransfer.threadNumber.equals(thread.threadNumber)) {
-            //thread = Parcels.unwrap(Parcels.wrap(threadTransfer));
+            // Deep copy threadTransfer
+            Bundle bundle = new Bundle();
+            String key = "thread";
+            bundle.putParcelable(key, Parcels.wrap(threadTransfer));
+            thread = Parcels.unwrap(bundle.getParcelable(key));
             thread = threadTransfer;
         }
         threadTransfer = null;
