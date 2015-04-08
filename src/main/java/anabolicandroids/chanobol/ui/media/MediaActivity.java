@@ -148,8 +148,10 @@ public class MediaActivity extends UiActivity {
 
         // Ugly quick fix (transaction too large)
         thread = Parcels.unwrap(b.getParcelable(EXTRA_THREAD));
-        if (threadTransfer != null && threadTransfer.threadNumber.equals(thread.threadNumber))
+        if (threadTransfer != null && threadTransfer.threadNumber.equals(thread.threadNumber)) {
+            //thread = Parcels.unwrap(Parcels.wrap(threadTransfer));
             thread = threadTransfer;
+        }
         threadTransfer = null;
 
         boardName     = thread.boardName;

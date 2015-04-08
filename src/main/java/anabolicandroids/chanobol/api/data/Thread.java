@@ -168,7 +168,7 @@ public class Thread {
         pauseUpdating = false;
     }
 
-    public void stopBackgroundUpdating() {
+    public void pauseBackgroundUpdating() {
         pauseUpdating = true;
     }
 

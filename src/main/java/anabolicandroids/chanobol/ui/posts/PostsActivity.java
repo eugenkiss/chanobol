@@ -449,9 +449,9 @@ public class PostsActivity extends SwipeRefreshActivity {
         thread.resumeBackgroundUpdating();
     }
 
-    @Override public void onStop() {
-        super.onStop();
-        thread.stopBackgroundUpdating();
+    @Override protected void onPause() {
+        super.onPause();
+        thread.pauseBackgroundUpdating();
     }
 
     @Override public void onConfigurationChanged(Configuration newConfig) {

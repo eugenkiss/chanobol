@@ -359,8 +359,8 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         Util.updateRecyclerViewGridOnConfigChange(threadsView, R.dimen.column_width);
     }
 
-    @Override public void onStop() {
-        super.onStop();
+    @Override public void onPause() {
+        super.onPause();
         pauseUpdating = true;
     }
 
