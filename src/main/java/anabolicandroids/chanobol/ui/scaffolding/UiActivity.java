@@ -18,9 +18,8 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.internal.widget.CompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.text.SpannableString;
+import android.text.Html;
 import android.text.method.LinkMovementMethod;
-import android.text.util.Linkify;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -320,12 +319,9 @@ public abstract class UiActivity extends BaseActivity {
     }
 
     @OnClick(R.id.about) void onAbout() {
-        SpannableString s = new SpannableString(getResources().getString(R.string.about_app));
-        Linkify.addLinks(s, Linkify.ALL);
-
         AlertDialog d = new AlertDialog.Builder(this)
                 .setTitle(R.string.about_app_title)
-                .setMessage(s)
+                .setMessage(Html.fromHtml(getResources().getString(R.string.about_app)))
                 .setPositiveButton(android.R.string.ok, null)
                 .show();
 

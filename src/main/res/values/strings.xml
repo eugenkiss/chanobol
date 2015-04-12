@@ -40,7 +40,31 @@
     <!-- About -->
     <string name="about_app_title">About Chanobol</string>
     <string name="about_app">
-        Chanobol is a fast and usable 4Chan reader inspired by Chanu.\nFind the source code here: https://github.com/eugenkiss/chanobol
+        <![CDATA[
+        <p>
+        Chanobol is a fast and usable 4Chan reader inspired by
+        <a href="https://github.com/grzegorznittner/chanu">Chanu</a>,
+        <a href="https://floens.github.io/Clover/">Clover</a>
+        and more apps.
+        Find the source code <a href="https://github.com/eugenkiss/chanobol">here</a>.\n
+        </p>
+
+        <p>
+        Libraries used include<br/>
+        <a href="https://github.com/koush/ion">Ion</a><br/>
+        <a href="https://github.com/malmstein/fenster">Fenster</a><br/>
+        <a href="https://github.com/chrisbanes/PhotoView">PhotoView</a><br/>
+        <a href="http://jsoup.org">jsoup</a><br/>
+        <a href="https://github.com/johncarl81/parceler">Parceler</a><br/>
+        <a href="http://square.github.io/dagger">Dagger</a><br/>
+        <a href="http://jakewharton.github.io/butterknife">Butterknife</a>
+        </p>
+
+        <p>
+        If you want to show your support for Chanobol consider
+        buying <a href="https://play.google.com/store/apps/details?id=truefool.premium">True Fool</a>.
+        </p>
+        ]]>
     </string>
     <!-- Dialogs -->
     <string name="exit_sure">Are you sure you want to exit?</string>
