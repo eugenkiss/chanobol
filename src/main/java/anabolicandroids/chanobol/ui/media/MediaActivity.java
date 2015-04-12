@@ -45,6 +45,7 @@ import anabolicandroids.chanobol.R;
 import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.MediaPointer;
 import anabolicandroids.chanobol.api.data.Thread;
+import anabolicandroids.chanobol.ui.posts.PostsActivity;
 import anabolicandroids.chanobol.ui.scaffolding.UiActivity;
 import anabolicandroids.chanobol.util.HackyViewPager;
 import anabolicandroids.chanobol.util.ImageSaver;
@@ -322,6 +323,7 @@ public class MediaActivity extends UiActivity {
 
         // TODO: Get crash report here http://crashes.to/s/43716a0559b
         // Either mediaPointers or currentIndex can be null need to maybe think of a smooth handling of this situation
+        // TODO: Another crash report: http://crashes.to/s/e00853e900e
         final MediaPointer current = thread.mediaPointers.get(currentIndex);
         final MediaView currentView = pagerView(currentIndex);
         currentView.prefs = prefs;
@@ -508,11 +510,10 @@ public class MediaActivity extends UiActivity {
             case R.id.save:
                 imageSaver.saveImage(this, url, current.post.filename, current.ext.substring(1), item.getItemId() == R.id.share);
                 break;
-            case R.id.showPost:
-                // TODO
-                break;
             case R.id.gotoPost:
-                // TODO
+                // TODO: Shared return animation
+                PostsActivity.launchFromMediaActivity(this, thread, thread.indexForPost(current.post));
+                ActivityCompat.finishAfterTransition(this);
                 break;
             case R.id.gallery:
                 if (fromGallery) {

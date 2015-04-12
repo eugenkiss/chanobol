@@ -204,7 +204,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             pauseUpdating = true;
             // TODO: Shared element animation
             pauseUpdating = true; // To prevent update during transition
-            GalleryActivity.launch(ThreadsActivity.this, threadPreview.toThread());
+            GalleryActivity.launchFromCatalog(ThreadsActivity.this, threadPreview.toThread());
             return true;
         }
     };
@@ -216,7 +216,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
     };
 
     private void setSearchCallback(final SearchView searchView) {
-        if (searchQuery.length() > 0) {
+        if (searchQuery != null && searchQuery.length() > 0) {
             searchView.setIconified(false);
             searchView.setQuery(searchQuery, false);
             searchView.clearFocus();

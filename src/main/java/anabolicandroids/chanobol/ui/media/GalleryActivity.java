@@ -35,6 +35,7 @@ import anabolicandroids.chanobol.api.ApiModule;
 import anabolicandroids.chanobol.api.data.MediaPointer;
 import anabolicandroids.chanobol.api.data.Thread;
 import anabolicandroids.chanobol.api.data.ThreadPreview;
+import anabolicandroids.chanobol.ui.posts.PostsActivity;
 import anabolicandroids.chanobol.ui.scaffolding.SwipeRefreshActivity;
 import anabolicandroids.chanobol.ui.scaffolding.UiAdapter;
 import anabolicandroids.chanobol.util.ImageSaver;
@@ -57,12 +58,25 @@ public class GalleryActivity extends SwipeRefreshActivity {
 
     private GalleryAdapter galleryAdapter;
 
-    public static void launch(Activity activity, Thread thread) {
+    private static void launch(Activity activity, Thread thread, boolean fromCatalog) {
         ActivityOptionsCompat options = makeSceneTransitionAnimation(activity);
         Intent intent = new Intent(activity, GalleryActivity.class);
         intent.putExtra(EXTRA_THREAD, Parcels.wrap(new Thread(thread.boardName, thread.threadNumber)));
         threadTransfer = thread;
-        ActivityCompat.startActivity(activity, intent, options.toBundle());
+        if (fromCatalog) {
+            PostsActivity.launchSilently(activity, thread);
+            activity.startActivity(intent);
+        } else {
+            ActivityCompat.startActivity(activity, intent, options.toBundle());
+        }
+    }
+
+    public static void launch(Activity activity, Thread thread) {
+        launch(activity, thread, false);
+    }
+
+    public static void launchFromCatalog(Activity activity, Thread thread) {
+        launch(activity, thread, true);
     }
 
     @Inject ImageSaver imageSaver;

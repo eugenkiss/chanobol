@@ -73,12 +73,15 @@ public class PostsActivity extends SwipeRefreshActivity {
     private static final String EXTRA_THREAD = "thread";
 
     // Transition related
+    private static final String EXTRA_SILENT = "silent";
+    private boolean silent;
     private static String EXTRA_TRANSITIONNAME = "transitionName";
     private String transitionName;
     private BitmapDrawable opImage;
 
     // Essential state
     private static String EXTRA_ROOT = "root";
+    private static String EXTRA_START_INDEX = "startIndex";
     private static String THREAD = "thread";
     private Thread thread;
 
@@ -95,7 +98,9 @@ public class PostsActivity extends SwipeRefreshActivity {
     private static void launch(
             Class activityClass, Activity callerActivity,
             View transitionView, String transitionName,
-            Thread thread, boolean fromNavbarWatchlist, boolean excludeFromRecents
+            Thread thread, int index,
+            boolean fromNavbarWatchlist, boolean fromMediaActivity,
+            boolean excludeFromRecents, boolean silently
     ) {
         if (callerActivity instanceof PostsActivity) {
             // Special case: Thread was opened from catalog, is scrolled and reopened from
@@ -116,8 +121,16 @@ public class PostsActivity extends SwipeRefreshActivity {
         intent.putExtra(EXTRA_TRANSITIONNAME, transitionName);
         intent.putExtra(EXTRA_ROOT, fromNavbarWatchlist);
         intent.putExtra(EXTRA_THREAD, Parcels.wrap(new Thread(thread.boardName, thread.threadNumber)));
+        intent.putExtra(EXTRA_START_INDEX, index);
         threadTransfer = thread;
+        if (silently) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            intent.putExtra(EXTRA_SILENT, true);
+        }
         if (excludeFromRecents) intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+        if (fromMediaActivity) {
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        }
         if (fromNavbarWatchlist) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
             callerActivity.startActivity(intent);
@@ -127,7 +140,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     public static void launch(Activity activity, View transitionView, String transitionName, Thread thread) {
-        launch(PostsActivity.class, activity, transitionView, transitionName, thread, false, false);
+        launch(PostsActivity.class, activity, transitionView, transitionName, thread, -1, false, false, false, false);
     }
 
     public static void launch(
@@ -140,7 +153,15 @@ public class PostsActivity extends SwipeRefreshActivity {
     }
 
     public static void launchFromNavbarWatchlist(Activity activity, Thread thread, boolean excludeFromRecents) {
-        launch(WatchlistPostsActivity.class, activity, null, null, thread, true, excludeFromRecents);
+        launch(WatchlistPostsActivity.class, activity, null, null, thread, -1, true, false, excludeFromRecents, false);
+    }
+
+    public static void launchFromMediaActivity(Activity activity, Thread thread, int index) {
+        launch(PostsActivity.class, activity, null, null, thread, index, false, true, false, false);
+    }
+
+    public static void launchSilently(Activity activity, Thread thread) {
+        launch(PostsActivity.class, activity, null, null, thread, -1, false, false, false, true);
     }
 
     @Inject ImageSaver imageSaver;
@@ -154,6 +175,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         supportPostponeEnterTransition();
         Bundle b = getIntent().getExtras();
         taskRoot = b.getBoolean(EXTRA_ROOT);
+        silent = b.getBoolean(EXTRA_SILENT);
         super.onCreate(savedInstanceState);
 
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
@@ -207,7 +229,15 @@ public class PostsActivity extends SwipeRefreshActivity {
         layoutManager = new LinearLayoutManager(this);
         postsView.setLayoutManager(layoutManager);
         postsView.addItemDecoration(new SpacesItemDecoration((int) resources.getDimension(R.dimen.post_spacing)));
-        if (inWatchlist) postsView.scrollToPosition(thread.lastVisibleIndex);
+
+        // Subtle because of interaction with loading last viewed position in watchlist thread
+        // Can most probably be made more uniform/elegant.
+        int startIndex = b.getInt(EXTRA_START_INDEX);
+        if (inWatchlist && startIndex == -1) {
+            postsView.scrollToPosition(thread.lastVisibleIndex);
+        } else if (savedInstanceState == null && startIndex != -1) {
+            postsView.scrollToPosition(startIndex);
+        }
 
         getSupportFragmentManager().addOnBackStackChangedListener(backStackChangedListener);
         setupUpLongClickDismissAll();
@@ -437,6 +467,7 @@ public class PostsActivity extends SwipeRefreshActivity {
 
     @Override public void onResume() {
         super.onResume();
+        if (silent) finish();
         thread.initBackgroundUpdater(prefs, new Runnable() {
             @Override public void run() {
                 PostsActivity.this.runOnUiThread(new Runnable() {

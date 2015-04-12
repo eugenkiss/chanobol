@@ -14,14 +14,8 @@
           android:title="@string/view_external"
           app:showAsAction="never"
         />
-    <item android:id="@+id/showPost"
-          android:title="@string/show_post"
-          android:visible="false"
-          app:showAsAction="never"
-        />
     <item android:id="@+id/gotoPost"
           android:title="@string/goto_post"
-          android:visible="false"
           app:showAsAction="never"
         />
     <item android:id="@+id/gallery"
