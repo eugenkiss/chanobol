@@ -1,5 +1,6 @@
 package anabolicandroids.chanobol.api.data;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 
@@ -83,7 +84,7 @@ public class Thread {
         title = title.split("\\r?\\n")[0];
         if (gallery) title = boardName + "/gal/" + threadNumber + " – " + title;
         else title = id + " – " + title;
-        if (dead) title = "☠ " + title;
+        if (dead) title = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? "☠ " + title : "× " + title;
         return title;
     }
     public String title() { return title(false); }
