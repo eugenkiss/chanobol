@@ -1,10 +1,12 @@
 package anabolicandroids.chanobol.api.data;
 
+import android.os.Bundle;
 import android.text.Html;
 
 import com.koushikdutta.async.future.FutureCallback;
 
 import org.parceler.Parcel;
+import org.parceler.Parcels;
 import org.parceler.Transient;
 
 import java.util.ArrayList;
@@ -41,6 +43,13 @@ public class Thread {
         if (o == null || getClass() != o.getClass()) return false;
         Thread t = (Thread) o;
         return t.id.equals(id);
+    }
+
+    public Thread deepCopy() {
+        Bundle bundle = new Bundle();
+        String key = "thread";
+        bundle.putParcelable(key, Parcels.wrap(this));
+        return Parcels.unwrap(bundle.getParcelable(key));
     }
 
     public ArrayList<Post> posts = new ArrayList<>();
