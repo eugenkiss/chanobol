@@ -156,6 +156,13 @@ import anabolicandroids.chanobol.api.data.Thread;
         return new TreeSet<>(Arrays.asList(threads));
     }
 
+    public void clearWatchList() {
+        Set<WatchlistEntry> watchlist = getWatchlist();
+        for (WatchlistEntry entry : watchlist) {
+            removeWatchlistThread(entry);
+        }
+    }
+
     public Thread getWatchlistThread(String id) {
         String jsonThread = readFromInternalFile(id);
         return gson.fromJson(jsonThread, Thread.class);

@@ -23,6 +23,7 @@
     <string name="go_to_top">Go to Top</string>
     <string name="add_watchlist">Add to Watchlist</string>
     <string name="remove_watchlist">Remove from Watchlist</string>
+    <string name="clear_watchlist">Clear Watchlist</string>
     <string name="refresh">Refresh</string>
     <string name="favorize">Favorize</string>
     <string name="save">Save</string>
@@ -73,6 +74,8 @@
     <string name="favorize_title">Favorize?</string>
     <string name="favorite_added">added as favorite</string>
     <string name="open_thread_confirmation">Open this thread?</string>
+    <string name="clear_watchlist_title">Clear Watchlist?</string>
+    <string name="watchlist_cleared">Watchlist cleared</string>
     <!-- Post Popup Dialog -->
     <string name="copy_text">Copy Text</string>
     <string name="clipoard_copy_label">Post text</string>
@@ -89,7 +92,6 @@
     <string name="sort_replies">Reply count</string>
     <string name="sort_images">Image count</string>
     <string name="sort_date">Creation date</string>
-
     <!-- For ImageSaver from Clover -->
     <string name="open_link_failed">No applications found to open link</string>
     <string name="download_confirm">%1$s images will be downloaded to %2$s</string>
