@@ -25,6 +25,11 @@
           android:title="@string/refresh"
           app:showAsAction="never"
         />
+    <item android:id="@+id/clear_watchlist"
+        android:title="@string/clear_watchlist"
+        app:showAsAction="never"
+        android:visible="false"
+        />
     <item android:id="@+id/down"
           android:title="@string/go_to_bottom"
           app:showAsAction="never"

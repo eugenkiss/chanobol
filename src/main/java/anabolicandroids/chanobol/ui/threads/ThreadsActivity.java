@@ -2,6 +2,9 @@ package anabolicandroids.chanobol.ui.threads;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -164,6 +167,21 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             i++;
         }
         notifyDataSetChanged();
+    }
+
+    public static void showClearWatchListDialog(
+            final Context context, final PersistentData persistentData
+    ) {
+        new AlertDialog.Builder(context)
+                .setTitle(R.string.clear_watchlist_title)
+                .setNegativeButton(android.R.string.cancel, null)
+                .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        persistentData.clearWatchList();
+                        Util.showToast(context,
+                                context.getResources().getString(R.string.watchlist_cleared));
+                    }
+                }).show();
     }
 
     @Override protected void onSaveInstanceState(Bundle outState) {
@@ -378,6 +396,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
         if (watchlist) {
             menu.findItem(R.id.favorize).setVisible(false);
             menu.findItem(R.id.refresh).setVisible(false);
+            menu.findItem(R.id.clear_watchlist).setVisible(true);
         }
 
         final MenuItem searchItem = menu.findItem(R.id.search);
@@ -398,6 +417,9 @@ public class ThreadsActivity extends SwipeRefreshActivity {
                 break;
             case R.id.down:
                 threadsView.scrollToPosition(threadPreviews.size()-1);
+                break;
+            case R.id.clear_watchlist:
+                showClearWatchListDialog(ThreadsActivity.this, persistentData);
                 break;
             case R.id.favorize:
                 BoardsActivity.showAddFavoriteDialog(this, persistentData, board);
