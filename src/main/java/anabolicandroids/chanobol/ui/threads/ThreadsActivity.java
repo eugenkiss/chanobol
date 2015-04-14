@@ -384,8 +384,8 @@ public class ThreadsActivity extends SwipeRefreshActivity {
 
     @Override public void onDestroy() {
         if (executor != null) executor.shutdown();
-        bitMap.clear();
-        persistentData.removeWatchlistChangedCallback(watchlistChangedCallback);
+        if (bitMap != null) bitMap.clear();
+        if (persistentData != null) persistentData.removeWatchlistChangedCallback(watchlistChangedCallback);
         super.onDestroy();
     }
 
