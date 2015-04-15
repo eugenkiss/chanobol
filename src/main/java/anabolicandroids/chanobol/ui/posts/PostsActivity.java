@@ -73,9 +73,11 @@ public class PostsActivity extends SwipeRefreshActivity {
     private static final String EXTRA_THREAD = "thread";
 
     // Transition related
+    private static final String EXTRA_FROM_MEDIAACTIVITY = "fromMediaActivity";
     private static final String EXTRA_SILENT = "silent";
+    private static final String EXTRA_TRANSITIONNAME = "transitionName";
+    private boolean fromMediaActivity;
     private boolean silent;
-    private static String EXTRA_TRANSITIONNAME = "transitionName";
     private String transitionName;
     private BitmapDrawable opImage;
 
@@ -130,6 +132,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         if (excludeFromRecents) intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
         if (fromMediaActivity) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            intent.putExtra(EXTRA_FROM_MEDIAACTIVITY, true);
         }
         if (fromNavbarWatchlist) {
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -176,6 +179,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         Bundle b = getIntent().getExtras();
         taskRoot = b.getBoolean(EXTRA_ROOT);
         silent = b.getBoolean(EXTRA_SILENT);
+        fromMediaActivity = b.getBoolean(EXTRA_FROM_MEDIAACTIVITY);
         super.onCreate(savedInstanceState);
 
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
@@ -246,7 +250,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             postsAdapter.notifyItemChanged(0);
         }
 
-        if (inWatchlist) {
+        if (inWatchlist || fromMediaActivity) {
             firstLoad = false;
             postsAdapter.notifyDataSetChanged();
         } else {
