@@ -512,9 +512,7 @@ public class MediaActivity extends UiActivity {
                 imageSaver.saveImage(this, url, current.post.filename, current.ext.substring(1), item.getItemId() == R.id.share);
                 break;
             case R.id.gotoPost:
-                // TODO: Shared return animation
-                PostsActivity.launchFromMediaActivity(this, thread, thread.indexForPost(current.post));
-                ActivityCompat.finishAfterTransition(this);
+                gotoPost();
                 break;
             case R.id.gallery:
                 if (fromGallery) {
@@ -607,7 +605,14 @@ public class MediaActivity extends UiActivity {
 
     // Utility /////////////////////////////////////////////////////////////////////////////////////
 
-    public int getStatusBarHeight() {
+    public void gotoPost() {
+        // TODO: Shared return animation
+        MediaPointer current = thread.mediaPointers.get(currentIndex);
+        PostsActivity.launchFromMediaActivity(this, thread, thread.indexForPost(current.post));
+        ActivityCompat.finishAfterTransition(this);
+    }
+
+    private int getStatusBarHeight() {
         int result = 0;
         int resourceId = getResources().getIdentifier("status_bar_height", "dimen", "android");
         if (resourceId > 0) {
@@ -616,7 +621,7 @@ public class MediaActivity extends UiActivity {
         return result;
     }
 
-    public void setTopPadding(View v, int padding) {
+    private void setTopPadding(View v, int padding) {
         v.setPadding(v.getPaddingLeft(), padding, v.getPaddingRight(), v.getPaddingBottom());
     }
 

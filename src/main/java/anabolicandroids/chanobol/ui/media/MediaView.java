@@ -200,6 +200,9 @@ public class MediaView extends FrameLayout {
                         else videoViewController.show();
                         return true;
                     }
+                    @Override public void onLongPress(MotionEvent e) {
+                        ((MediaActivity)getContext()).gotoPost();
+                    }
                 });
 
                 Util.setAlpha(videoContainer, 0);
@@ -274,6 +277,12 @@ public class MediaView extends FrameLayout {
     private void setupPhotoAttacher() {
         if (attacher != null) attacher.cleanup();
         attacher = new PhotoViewAttacher(imageView);
+        attacher.setOnLongClickListener(new OnLongClickListener() {
+            @Override public boolean onLongClick(View v) {
+                ((MediaActivity)getContext()).gotoPost();
+                return true;
+            }
+        });
         attacher.setMaximumScale(25);
         attacher.setOnMatrixChangeListener(new PhotoViewAttacher.OnMatrixChangedListener() {
             @Override public void onMatrixChanged(RectF rect) {
