@@ -43,11 +43,8 @@
     <string name="about_app">
         <![CDATA[
         <p>
-        Chanobol is a fast and usable 4Chan reader inspired by
-        <a href="https://github.com/grzegorznittner/chanu">Chanu</a>,
-        <a href="https://floens.github.io/Clover/">Clover</a>
-        and more apps.
-        Find the source code <a href="https://github.com/eugenkiss/chanobol">here</a>.\n
+        Chanobol is a fast, usable and open-source 4Chan reader inspired by
+        Chanu, Clover and more apps.
         </p>
 
         <p>
