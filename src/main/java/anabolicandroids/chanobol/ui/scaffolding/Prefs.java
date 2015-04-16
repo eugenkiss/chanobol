@@ -23,6 +23,10 @@ public class Prefs {
         String name = p.getString("pref_theme", Theme.LIGHT.name);
         if (name.equals(Theme.LIGHT.name)) return Theme.LIGHT;
         if (name.equals(Theme.DARK.name)) return Theme.DARK;
+        if (name.equals(Theme.TEAL.name)) return Theme.TEAL;
+        if (name.equals(Theme.BLUE1.name)) return Theme.BLUE1;
+        if (name.equals(Theme.BLUE2.name)) return Theme.BLUE2;
+        if (name.equals(Theme.GRAY.name)) return Theme.GRAY;
         return Theme.LIGHT;
     }
     public void theme(Theme theme) {

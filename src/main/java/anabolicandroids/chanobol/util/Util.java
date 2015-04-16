@@ -254,6 +254,14 @@ public class Util {
                 window.setStatusBarColor(r.getColor(R.color.colorPrimaryDark_light));
             if (theme == Theme.DARK)
                 window.setStatusBarColor(r.getColor(R.color.colorPrimaryDark));
+            if (theme == Theme.TEAL)
+                window.setStatusBarColor(r.getColor(R.color.colorPrimaryDark_teal));
+            if (theme == Theme.BLUE1)
+                window.setStatusBarColor(r.getColor(R.color.colorPrimaryDark_blue1));
+            if (theme == Theme.BLUE2)
+                window.setStatusBarColor(r.getColor(R.color.colorPrimaryDark_blue2));
+            if (theme == Theme.GRAY)
+                window.setStatusBarColor(r.getColor(R.color.colorPrimaryDark_gray));
         }
     }
 

@@ -3,6 +3,10 @@
     <string-array name="Themes">
         <item>light</item>
         <item>dark</item>
+        <item>teal</item>
+        <item>blue1</item>
+        <item>blue2</item>
+        <item>gray</item>
     </string-array>
 
     <string-array name="sort_keys">

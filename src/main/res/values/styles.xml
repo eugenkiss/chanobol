@@ -72,6 +72,26 @@
         <item name="popup_theme">@style/Toolbar_Popup</item>
     </style>
 
+    <style name="AppTheme.Teal">
+        <item name="colorPrimary">@color/colorPrimary_teal</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_teal</item>
+    </style>
+
+    <style name="AppTheme.Blue1">
+        <item name="colorPrimary">@color/colorPrimary_blue1</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_blue1</item>
+    </style>
+
+    <style name="AppTheme.Blue2">
+        <item name="colorPrimary">@color/colorPrimary_blue2</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_blue2</item>
+    </style>
+
+    <style name="AppTheme.Gray">
+        <item name="colorPrimary">@color/colorPrimary_gray</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark_gray</item>
+    </style>
+
     <!-- http://stackoverflow.com/a/28953241/283607 -->
     <style name="Toolbar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
         <item name="android:textColor">#fff</item>
