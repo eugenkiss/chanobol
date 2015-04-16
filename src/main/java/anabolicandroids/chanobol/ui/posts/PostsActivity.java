@@ -97,6 +97,9 @@ public class PostsActivity extends SwipeRefreshActivity {
     private String threadNumber;
     private LinearLayoutManager layoutManager;
 
+    // Scrolling via volume keys
+    private int SCROLL_BY_HEIGHT;
+
     private static void launch(
             Class activityClass, Activity callerActivity,
             View transitionView, String transitionName,
@@ -183,6 +186,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         super.onCreate(savedInstanceState);
 
         transitionName = b.getString(EXTRA_TRANSITIONNAME);
+        SCROLL_BY_HEIGHT = Util.getScreenHeight(this) - Util.getActionBarHeight(this);
 
         // Ugly quick fix (transaction too large)
         thread = Parcels.unwrap(b.getParcelable(EXTRA_THREAD));
@@ -494,6 +498,7 @@ public class PostsActivity extends SwipeRefreshActivity {
         postsView.postDelayed(new Runnable() {
             @Override public void run() {
                 postsView.requestLayout();
+                SCROLL_BY_HEIGHT = Util.getScreenHeight(PostsActivity.this) - Util.getActionBarHeight(PostsActivity.this);
             }
         }, 100);
     }
@@ -666,6 +671,43 @@ public class PostsActivity extends SwipeRefreshActivity {
                 }
             });
         }
+    }
+
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+
+        if (prefs.volumeScrolling()) {
+            FragmentManager fm = getSupportFragmentManager();
+            int stackHeight = fm.getBackStackEntryCount();
+
+            if (stackHeight == 0) {
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_VOLUME_UP:
+                        if (action == KeyEvent.ACTION_DOWN) postsView.smoothScrollBy(0, -SCROLL_BY_HEIGHT);
+                        return true;
+                    case KeyEvent.KEYCODE_VOLUME_DOWN:
+                        if (action == KeyEvent.ACTION_DOWN) postsView.smoothScrollBy(0, SCROLL_BY_HEIGHT);
+                        return true;
+                }
+            } else {
+                final PostsDialog dialog = (PostsDialog) fm.getFragments().get(stackHeight-1);
+                final int dialogPadding = 150;
+                final int scrollDuration = 500;
+
+                switch (keyCode) {
+                    case KeyEvent.KEYCODE_VOLUME_UP:
+                        if (action == KeyEvent.ACTION_DOWN) dialog.postsView.smoothScrollBy(-SCROLL_BY_HEIGHT - dialogPadding, scrollDuration);
+                        return true;
+                    case KeyEvent.KEYCODE_VOLUME_DOWN:
+                        if (action == KeyEvent.ACTION_DOWN) dialog.postsView.smoothScrollBy(SCROLL_BY_HEIGHT - dialogPadding, scrollDuration);
+                        return true;
+                }
+            }
+        }
+
+        return super.dispatchKeyEvent(event);
     }
 
     private void showPostsDialog(Post repliedTo, List<Post> posts) {

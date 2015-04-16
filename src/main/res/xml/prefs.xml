@@ -33,6 +33,11 @@
         android:title="Only Thumbnails in Post List"
         />
     <CheckBoxPreference
+        android:defaultValue="false"
+        android:key="pref_volume_scrolling"
+        android:title="Scrolling Posts via Volume Keys"
+        />
+    <CheckBoxPreference
         android:defaultValue="true"
         android:key="pref_refresh"
         android:title="Background Refresh"
