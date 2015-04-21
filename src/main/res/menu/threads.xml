@@ -25,6 +25,10 @@
           android:title="@string/refresh"
           app:showAsAction="never"
         />
+    <item android:id="@+id/sort_order"
+        android:title="@string/sort_order"
+        app:showAsAction="never"
+        />
     <item android:id="@+id/clear_watchlist"
         android:title="@string/clear_watchlist"
         app:showAsAction="never"

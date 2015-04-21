@@ -27,6 +27,7 @@ import com.koushikdutta.async.future.FutureCallback;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -167,6 +168,26 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             i++;
         }
         notifyDataSetChanged();
+    }
+
+    public void showSortOrderDialog() {
+        final CharSequence[] sort_names = getResources().getStringArray(R.array.sort_names);
+        final CharSequence[] sort_keys = getResources().getStringArray(R.array.sort_keys);
+
+        int indexOfCurrentOrder = Arrays.asList(sort_keys).indexOf(prefs.threadSortOrder().string);
+        new AlertDialog.Builder(this)
+            .setTitle(R.string.choose_sort_order)
+            .setNegativeButton(android.R.string.cancel, null)
+            .setSingleChoiceItems(sort_names, indexOfCurrentOrder, new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int item) {
+                    ThreadSortOrder newSortOrder = ThreadSortOrder.values()[item];
+                    prefs.threadSortOrder(newSortOrder);
+                    sortOrder = newSortOrder;
+                    notifyDataSetChanged();
+
+                    dialog.dismiss();
+                }
+            }).show();
     }
 
     public static void showClearWatchListDialog(
@@ -417,6 +438,9 @@ public class ThreadsActivity extends SwipeRefreshActivity {
                 break;
             case R.id.down:
                 threadsView.scrollToPosition(threadPreviews.size()-1);
+                break;
+            case R.id.sort_order:
+                showSortOrderDialog();
                 break;
             case R.id.clear_watchlist:
                 showClearWatchListDialog(ThreadsActivity.this, persistentData);
