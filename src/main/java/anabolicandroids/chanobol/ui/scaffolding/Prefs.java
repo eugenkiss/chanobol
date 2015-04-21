@@ -57,6 +57,14 @@ public class Prefs {
         p.edit().putBoolean(ONLY_THUMBNAILS, v).apply();
     }
 
+    public static final String VOLUME_SCROLLING = "pref_volume_scrolling";
+    public boolean volumeScrolling() {
+        return p.getBoolean(VOLUME_SCROLLING, false);
+    }
+    public void volumeScrolling(boolean v) {
+        p.edit().putBoolean(VOLUME_SCROLLING, v).apply();
+    }
+
     public static final String AUTO_REFRESH = "pref_refresh";
     public boolean autoRefresh() {
         return p.getBoolean(AUTO_REFRESH, true);
