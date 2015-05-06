@@ -15,7 +15,6 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.internal.widget.CompatTextView;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -102,9 +101,9 @@ public abstract class UiActivity extends BaseActivity {
     @InjectView(R.id.drawer) public View drawer;
     @InjectView(R.id.allBoards) public TextView allBoards;
     @InjectView(R.id.debugSettings) public TextView debugSettings;
-    @InjectView(R.id.favoriteBoardsHeader) public CompatTextView favoriteBoardsHeader;
+    @InjectView(R.id.favoriteBoardsHeader) public TextView favoriteBoardsHeader;
     @InjectView(R.id.favoriteBoards) public ListView favoriteBoardsView;
-    @InjectView(R.id.watchlistHeader) public CompatTextView watchlistHeader;
+    @InjectView(R.id.watchlistHeader) public TextView watchlistHeader;
     @InjectView(R.id.watchlist) public ListView watchlistView;
 
     public ActionBarDrawerToggle drawerToggle;
