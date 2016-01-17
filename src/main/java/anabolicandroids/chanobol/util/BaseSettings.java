@@ -31,12 +31,15 @@ public abstract class BaseSettings extends PreferenceActivity implements SharedP
         Util.setTheme(this, prefs);
         setContentView(R.layout.activity_settings);
         toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish();
-            }
-        });
+        // For some reason toolbar is null resp. doesn't exist in Marshmallow
+        if (toolbar != null) {
+            toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    finish();
+                }
+            });
+        }
     }
 
     @Override
