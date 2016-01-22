@@ -1,9 +1,12 @@
 package anabolicandroids.chanobol.ui.posts;
 
+import android.animation.ObjectAnimator;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -17,12 +20,15 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
 import android.support.v7.graphics.Palette;
+import android.support.v7.widget.LinearLayoutCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.transition.Slide;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
 import android.transition.TransitionManager;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -30,6 +36,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewPropertyAnimator;
 import android.widget.ImageView;
 
 import com.koushikdutta.async.future.FutureCallback;
@@ -96,6 +103,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     private String boardName;
     private String threadNumber;
     private LinearLayoutManager layoutManager;
+    private boolean isArrowRotated = false;
 
     // Scrolling via volume keys
     private int SCROLL_BY_HEIGHT;
@@ -237,6 +245,28 @@ public class PostsActivity extends SwipeRefreshActivity {
         layoutManager = new LinearLayoutManager(this);
         postsView.setLayoutManager(layoutManager);
         postsView.addItemDecoration(new SpacesItemDecoration((int) resources.getDimension(R.dimen.post_spacing)));
+        postsView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                int offset = recyclerView.computeVerticalScrollOffset();
+                if(menu != null) {
+                    MenuItem it = menu.findItem(R.id.down);
+                    ViewPropertyAnimator animator = it.getActionView().animate();
+                    animator.setDuration(200);
+
+                    if(offset > 0 && !isArrowRotated) {
+                        animator.rotation(180f);
+                        isArrowRotated = true;
+                    } else if(offset == 0) {
+                        animator.rotation(0f);
+                        isArrowRotated = false;
+                    }
+
+                    animator.start();
+                }
+            }
+        });
 
         // Subtle because of interaction with loading last viewed position in watchlist thread
         // Can most probably be made more uniform/elegant.
@@ -528,6 +558,34 @@ public class PostsActivity extends SwipeRefreshActivity {
     @Override public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.posts, menu);
         this.menu = menu;
+
+        Resources res = getResources();
+        DisplayMetrics dm = res.getDisplayMetrics();
+
+        int pixelSize = ((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, dm));
+
+        MenuItem it = menu.findItem(R.id.down);
+        ImageView iv = new ImageView(this);
+        iv.setLayoutParams(
+                new LinearLayoutCompat.LayoutParams(pixelSize, pixelSize));
+        iv.setImageDrawable(getResources().getDrawable(R.drawable.ic_down));
+
+        // Add ripple
+        TypedArray ta = obtainStyledAttributes(new int[]{R.attr.selectableItemBackgroundBorderless});
+        int backgroundRes = ta.getResourceId(0, 0);
+        iv.setBackgroundResource(backgroundRes);
+        ta.recycle();
+
+        iv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                postsView.scrollToPosition(
+                        isArrowRotated? 0 : postsAdapter.getItemCount() - 1);
+            }
+        });
+
+        it.setActionView(iv);
+
         if (persistentData.isInWatchlist(thread.id)) {
             menu.findItem(R.id.addWatchlist).setVisible(false);
             menu.findItem(R.id.removeWatchlist).setVisible(true);
