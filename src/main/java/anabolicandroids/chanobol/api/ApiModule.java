@@ -22,11 +22,11 @@ import dagger.Provides;
         library = true
 )
 public class ApiModule {
-    public static final String endpoint = "http://a.4cdn.org";
-    // http://t.4cdn.org/board/1358180697001s.jpg
-    public static final String thumbCdn = "http://t.4cdn.org";
-    // http://i.4cdn.org/board/1358180697001.ext
-    public static final String mediaCdn = "http://i.4cdn.org";
+    public static final String endpoint = "https://a.4cdn.org";
+    // https://t.4cdn.org/board/1358180697001s.jpg
+    public static final String thumbCdn = "https://t.4cdn.org";
+    // https://i.4cdn.org/board/1358180697001.ext
+    public static final String mediaCdn = "https://i.4cdn.org";
 
     public static String thumbUrl(String board, String mediaId) {
         return thumbCdn + "/" + board + "/" + mediaId + "s.jpg";
@@ -36,9 +36,9 @@ public class ApiModule {
         return mediaCdn + "/" + board + "/" + mediaId + ending;
     }
 
-    // http://boards.4chan.org/fit/thread/31627542
+    // https://boards.4chan.org/fit/thread/31627542
     public static String threadUrl(String board, String number) {
-        return "http://boards.4chan.org/" + board + "/thread/" + number;
+        return "https://boards.4chan.org/" + board + "/thread/" + number;
     }
 
     @Provides @Singleton
