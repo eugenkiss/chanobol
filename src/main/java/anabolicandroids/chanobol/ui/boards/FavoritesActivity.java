@@ -8,10 +8,13 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,6 +99,7 @@ public class FavoritesActivity extends UiActivity {
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
                             persistentData.removeFavorite(bv.board);
+                            showSnackbar(R.string.favorite_board_been_deleted);
                         }
                     }).show();
             return true;
@@ -127,22 +131,23 @@ public class FavoritesActivity extends UiActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.addFavorite) {
             final EditText input = new EditText(this);
-            input.setHint("ck");
+            input.setSingleLine(true);
+            input.setHint("co");
             new AlertDialog.Builder(this)
                     .setTitle(R.string.add_favorite_title)
                     .setView(input)
                     .setNegativeButton(android.R.string.cancel, null)
                     .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
                         public void onClick(DialogInterface dialog, int whichButton) {
-                            String normalizedName = input.getText().toString().replace("/", "");
+                            String normalizedName = input.getText().toString().replace("/", "").toLowerCase();
                             for (Board board : allBoards) {
                                 if (board.name.equals(normalizedName)) {
                                     persistentData.addFavorite(board);
-                                    showToast(board.name + " " + resources.getString(R.string.favorite_added));
+                                    showSnackbar("\"" + board.name + "\" " + resources.getString(R.string.favorite_added));
                                     return;
                                 }
                             }
-                            showToast(R.string.no_board);
+                            showSnackbar(R.string.no_board);
                         }
                     }).show();
         }

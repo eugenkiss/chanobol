@@ -100,4 +100,5 @@
     <string name="image_save_succeeded">Saved image to</string>
     <string name="image_save_failed">Saving image failed</string>
     <string name="action_share">Share</string>
+    <string name="favorite_board_been_deleted">Board has been deleted.</string>
 </resources>

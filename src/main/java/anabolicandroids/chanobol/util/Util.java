@@ -15,6 +15,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v8.renderscript.Allocation;
@@ -66,6 +67,28 @@ public class Util {
 
     public static void showToast(Context context, int res) {
         Toast.makeText(context, res, Toast.LENGTH_SHORT).show();
+    }
+
+    public static void showSnackbar(View view, String msg){
+        final Snackbar snackbar = Snackbar.make(view, msg, Snackbar.LENGTH_SHORT);
+        snackbar.setAction(R.string.ok, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                snackbar.dismiss();
+            }
+        });
+        snackbar.show();
+    }
+
+    public static void showSnackbar(View view, int res){
+        final Snackbar snackbar = Snackbar.make(view, res, Snackbar.LENGTH_SHORT);
+        snackbar.setAction(R.string.ok, new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                snackbar.dismiss();
+            }
+        });
+        snackbar.show();
     }
 
     @SuppressWarnings("UnusedDeclaration")
