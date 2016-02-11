@@ -256,7 +256,7 @@ public abstract class UiActivity extends BaseActivity {
             PersistentData.WatchlistEntry entry = watchlistAdapter.getItem(position);
             final Thread thread = persistentData.getWatchlistThread(entry.id);
             if (thread == null) {
-                showToast(R.string.corrupted_thread);
+                showSnackbar(R.string.corrupted_thread);
             } else {
                 drawerLayout.closeDrawers();
                 view.postDelayed(new Runnable() {
@@ -450,6 +450,8 @@ public abstract class UiActivity extends BaseActivity {
     @SuppressWarnings("UnusedDeclaration")
     protected void showToast(int res) { Util.showToast(appContext, res); }
     protected void showToast(String msg) { Util.showToast(appContext, msg); }
+    protected void showSnackbar(int res) { Util.showSnackbar(this.getRootRecyclerView(), res); }
+    protected void showSnackbar(String msg){ Util.showSnackbar(this.getRootRecyclerView(), msg); }
 
     // In order to not repeat shared status-, navigation- and toolbar.
     // http://stackoverflow.com/a/26748694/283607

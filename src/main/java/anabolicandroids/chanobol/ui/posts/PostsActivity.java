@@ -402,7 +402,7 @@ public class PostsActivity extends SwipeRefreshActivity {
     private void load(final boolean silent) {
         if (thread.dead) {
             loaded();
-            if (!silent) showToast(R.string.no_thread);
+            if (!silent) showSnackbar(R.string.no_thread);
             return;
         }
 
@@ -432,7 +432,7 @@ public class PostsActivity extends SwipeRefreshActivity {
             }
 
             @Override public void onError(String message) {
-                if (!silent) showToast(message);
+                if (!silent) showSnackbar(message);
                 loaded();
             }
         });

@@ -32,6 +32,7 @@ dependencies {
     compile  'com.android.support:recyclerview-v7:22.2.+'
     compile  'com.android.support:gridlayout-v7:22.1.+'
     compile  'com.android.support:palette-v7:22.1.+'
+    compile  'com.android.support:design:22.2.0'
     compile  'com.nineoldandroids:library:2.4.0'
 
     compile  'com.squareup.dagger:dagger:1.2.2'

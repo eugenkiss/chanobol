@@ -219,7 +219,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             final ThreadView tv = (ThreadView) v;
             ThreadPreview threadPreview = tv.threadPreview;
             if (threadPreview.dead && !watchlist) {
-                showToast(R.string.no_thread);
+                showSnackbar(R.string.no_thread);
                 return;
             }
             pauseUpdating = true;
@@ -237,7 +237,7 @@ public class ThreadsActivity extends SwipeRefreshActivity {
             final ThreadView tv = (ThreadView) v;
             ThreadPreview threadPreview = tv.threadPreview;
             if (threadPreview.dead) {
-                showToast(R.string.no_thread);
+                showSnackbar(R.string.no_thread);
                 return true;
             }
             pauseUpdating = true;
