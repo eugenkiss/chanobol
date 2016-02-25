@@ -1,6 +1,6 @@
 {
   "boards": [
-     {
+    {
       "board": "qa",
       "title": "Question & Answer",
       "ws_board": 1,
@@ -44,6 +44,28 @@
       "board": "a",
       "title": "Anime & Manga",
       "ws_board": 1,
+      "per_page": 15,
+      "pages": 10,
+      "max_filesize": 4194304,
+      "max_webm_filesize": 3145728,
+      "max_comment_chars": 2000,
+      "bump_limit": 500,
+      "image_limit": 250,
+      "cooldowns": {
+        "threads": 600,
+        "replies": 30,
+        "images": 60,
+        "replies_intra": 60,
+        "images_intra": 60
+      },
+      "spoilers": 1,
+      "custom_spoilers": 1,
+      "is_archived": 1
+    },
+    {
+      "board": "aco",
+      "title": "Adult Cartoons",
+      "ws_board": 0,
       "per_page": 15,
       "pages": 10,
       "max_filesize": 4194304,
@@ -466,6 +488,26 @@
       "is_archived": 1
     },
     {
+      "board": "his",
+      "title": "History & Humanities",
+      "ws_board": 1,
+      "per_page": 15,
+      "pages": 10,
+      "max_filesize": 8388608,
+      "max_webm_filesize": 3145728,
+      "max_comment_chars": 2000,
+      "bump_limit": 300,
+      "image_limit": 150,
+      "cooldowns": {
+        "threads": 600,
+        "replies": 60,
+        "images": 60,
+        "replies_intra": 60,
+        "images_intra": 30
+      },
+      "is_archived": 1
+    },
+    {
       "board": "hm",
       "title": "Handsome Men",
       "ws_board": 0,
@@ -717,6 +759,26 @@
     {
       "board": "n",
       "title": "Transportation",
+      "ws_board": 1,
+      "per_page": 15,
+      "pages": 10,
+      "max_filesize": 4194304,
+      "max_webm_filesize": 3145728,
+      "max_comment_chars": 2000,
+      "bump_limit": 300,
+      "image_limit": 150,
+      "cooldowns": {
+        "threads": 600,
+        "replies": 30,
+        "images": 60,
+        "replies_intra": 60,
+        "images_intra": 60
+      },
+      "is_archived": 1
+    },
+    {
+      "board": "news",
+      "title": "Current News",
       "ws_board": 1,
       "per_page": 15,
       "pages": 10,
@@ -1238,6 +1300,26 @@
     {
       "board": "wsg",
       "title": "Worksafe GIF",
+      "ws_board": 1,
+      "per_page": 15,
+      "pages": 10,
+      "max_filesize": 4194304,
+      "max_webm_filesize": 3145728,
+      "max_comment_chars": 2000,
+      "bump_limit": 300,
+      "image_limit": 150,
+      "cooldowns": {
+        "threads": 600,
+        "replies": 30,
+        "images": 60,
+        "replies_intra": 60,
+        "images_intra": 60
+      },
+      "is_archived": 1
+    },
+    {
+      "board": "wsr",
+      "title": "Worksafe Requests",
       "ws_board": 1,
       "per_page": 15,
       "pages": 10,
